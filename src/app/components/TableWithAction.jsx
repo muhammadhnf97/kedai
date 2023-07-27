@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
 import { FaMagnifyingGlass } from 'react-icons/fa6'
+import { LiaExchangeAltSolid } from 'react-icons/lia'
+import { MdDeleteForever } from 'react-icons/md'
 
-const Table = ({ field, row }) => {
+const TableWithAction = ({ field, row }) => {
     const [detailBarang, setDetailBarang] = useState([])
     const [isShowDetail, setIsShowDetai] = useState(false)
 
@@ -26,18 +28,23 @@ const Table = ({ field, row }) => {
                                 <th key={index}>{fieldData.label}</th>
                             ))
                         }
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     {
                         row?.map((data, index)=>(
                             <tr key={index} className={`${index % 2 === 0 ? 'bg-blue-200' : 'bg-green-200'} h-7 hover:bg-blue-400 hover:duration-150 ease-out`}>
-                                <td>{index+1}</td>
+                                <td className='font-semibold'>{index+1}. </td>
                                     {
                                         Object.values(data).map((value, index)=>(
-                                            <td key={index}>{value}</td>
+                                            <td key={index} className='text-md'>{value}</td>
                                         ))     
                                     }
+                                <td className='flex items-center justify-center gap-1 px-2 py-1'>
+                                    <button className='py-2 w-full bg-yellow-400 rounded-lg flex justify-center hover:bg-yellow-500 active:bg-yellow-600 active:shadow-inner'><LiaExchangeAltSolid className='w-5 h-5' /></button>
+                                    <button className='py-2 w-full bg-red-400 rounded-lg flex justify-center hover:bg-red-500 active:bg-red-600 active:shadow-inner'><MdDeleteForever className='w-5 h-5' /></button>
+                                </td>
                             </tr>
                         ))
                     }
@@ -80,6 +87,10 @@ const Table = ({ field, row }) => {
                                     </div>
                                 )).slice(1)
                             }
+                            <div className='flex items-center justify-center gap-1 px-2 py-1'>
+                                <button className='py-2 w-full bg-yellow-400 rounded-lg flex justify-center hover:bg-yellow-500 active:bg-yellow-600 active:shadow-inner' onClick={()=>handleClickUpdate(detailBarang[0].idBarang)}><LiaExchangeAltSolid className='w-5 h-5' /></button>
+                                <button className='py-2 w-full bg-red-400 rounded-lg flex justify-center hover:bg-red-500 active:bg-red-600 active:shadow-inner'onClick={()=>handleClickUpdate(detailBarang[0].idBarang)} ><MdDeleteForever className='w-5 h-5' /></button>
+                            </div>
                         </div>
                     ))
                 }
@@ -89,4 +100,4 @@ const Table = ({ field, row }) => {
   )
 }
 
-export default Table
+export default TableWithAction

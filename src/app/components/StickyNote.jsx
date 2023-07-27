@@ -1,6 +1,6 @@
 import React from 'react'
 
-const StickyNote = ({ action, nominal, baseColor}) => {
+const StickyNote = ({ desc, nominal, baseColor}) => {
   let newBaseColor
   let secondColor
   
@@ -16,7 +16,7 @@ const StickyNote = ({ action, nominal, baseColor}) => {
     <div className={`flex w-72 ${newBaseColor} shadow-md`}>
       <div className={`w-1/12 ${secondColor}`}></div>
       <div className="flex-1 text-center p-3">
-        <p className="text-lg">{action} Januari</p>
+        <p className="text-lg">{desc}</p>
         <p className="font-bold text-2xl">{nominal.toLocaleString("id-ID", { style: "currency", currency: "IDR"})}</p>
       </div>
     </div>

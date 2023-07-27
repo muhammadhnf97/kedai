@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RiMenu3Fill } from 'react-icons/ri'
 import { IoIosArrowDown } from 'react-icons/io'
 import { RxCross1 } from 'react-icons/rx'
@@ -26,6 +26,7 @@ const Header = () => {
         setDropdownHutangPiutang(prev=>!prev)
     }
 
+
   return (
     <>
     <div className={`fixed w-full h-20 px-5 bg-white`}>
@@ -41,26 +42,60 @@ const Header = () => {
                 <Link href={'/'} >
                     <p className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Home</p>
                 </Link>
-                <div className='relative'>
-                    <button id='dropdownHoverButton' className='flex items-center gap-2' onClick={handleClickDropdownMaster}><span className=''>Master</span><IoIosArrowDown /></button>
-                    <div className={`absolute w-48 p-3 group flex flex-col -bottom-[8rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left ${dropdownMaster ? 'visible scale-100' : 'invisible scale-0'}`}>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/barang'}>Barang</Link></div>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/supplier'}>Supplier</Link></div>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/kategori'}>Kategori</Link></div>
+                <div className='relative group h-full flex items-center'>
+                    <button className='flex items-center gap-2'>
+                        <span className=''>Master</span><IoIosArrowDown />
+                    </button>
+                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[7rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
+                        <Link href={'/barang'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Barang
+                            </button>
+                        </Link>
+                        <Link href={'/supplier'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Supplier
+                            </button>
+                        </Link>
+                        <Link href={'/kategori'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Kategori
+                            </button>
+                        </Link>
                     </div>
                 </div>
-                <div className='relative'>
-                    <button id='dropdownHoverButton' className='flex items-center gap-2' onClick={handleClickDropdownTransaksi}><span>Transaksi</span><IoIosArrowDown /></button>
-                    <div className={`absolute w-48 p-3 group flex flex-col -bottom-[6rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left ${dropdownTransaksi ? 'visible scale-100' : 'invisible scale-0'}`}>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/penjualan'}>Penjualan</Link></div>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/pembelian'}>Pembelian</Link></div>
+                <div className='relative group h-full flex items-center'>
+                    <button className='flex items-center gap-2'>
+                        <span className=''>Transaksi</span><IoIosArrowDown />
+                    </button>
+                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
+                        <Link href={'/penjualan'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Penjualan
+                            </button>
+                        </Link>
+                        <Link href={'/pembelian'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Pembelian
+                            </button>
+                        </Link>
                     </div>
                 </div>
-                <div className='relative'>
-                    <button id='dropdownHoverButton' className='flex items-center gap-2' onClick={handleClickDropdownHutangPiutang}><span>Hutang/Piutang</span><IoIosArrowDown /></button>
-                    <div className={`absolute w-48 p-3 group flex flex-col -bottom-[6rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left ${dropdownHutangPiutang ? 'visible scale-100' : 'invisible scale-0'}`}>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/hutang'}>Hutang</Link></div>
-                        <div className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'><Link href={'/piutang'}>Piutang</Link></div>
+                <div className='relative group h-full flex items-center'>
+                    <button className='flex items-center gap-2'>
+                        <span className=''>Hutang/Piutang</span><IoIosArrowDown />
+                    </button>
+                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
+                        <Link href={'/hutang'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Hutang
+                            </button>
+                        </Link>
+                        <Link href={'/piutang'}>
+                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Piutang
+                            </button>
+                        </Link>
                     </div>
                 </div>
                 <p className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Laporan</p>

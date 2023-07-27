@@ -1,0 +1,31 @@
+import { createContext, useContext, useEffect, useState } from "react";
+
+export const KategoriContext = createContext()
+export const useKategori = () => useContext(KategoriContext)
+
+export default function KategoriProvider({ children }){
+    const [listKategori, setListKategori] = useState([])
+
+    useEffect(()=>{
+        const getKategori = async() => {
+            try {
+                const response = await fetch('/api/kategori')
+                const data = await response.json()
+                return data.data
+            } catch (error) {
+                console.log({
+                    message: "Terjadi kesalahan masbro",
+                    error
+                })
+            }
+        }
+
+        getKategori().then(data=>setListKategori(data))
+    }, [])
+
+    return(
+        <KategoriContext.Provider value={listKategori}>
+            {children}
+        </KategoriContext.Provider>
+    )
+}

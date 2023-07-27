@@ -6,6 +6,7 @@ import { Poppins } from 'next/font/google';
 import Footer from './components/Footer';
 import Loading from './components/Loading';
 import Header from './components/Header';
+import Providers from './context/providers';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -41,23 +42,25 @@ export default function RootLayout({ children }) {
         <meta name="description" content={metadata.description} />
       </head>
       <body className={`h-full flex flex-col ${poppins.className}`}>
-        <CustomeBackground />
-        {
-          isLoading && 
-          <div className='fixed h-screen w-screen bg-white flex items-center justify-center z-10'>
-            <Loading />
-          </div>
-        }
+            <Providers>
+          <CustomeBackground />
+          {
+            isLoading && 
+            <div className='fixed h-screen w-screen bg-white flex items-center justify-center z-10'>
+              <Loading />
+            </div>
+          }
 
-        {
-          isLoginPage ? <> { children } </> 
-          :
-          <>
-            <Header />
-            <main className=' mt-20 py-14'>{ children }</main>
-          </>
-        }
-        <Footer />
+          {
+            isLoginPage ? <> { children } </> 
+            :
+            <>
+              <Header />
+              <main className=' mt-20 border py-5'>{ children }</main>
+            </>
+          }
+          <Footer />
+            </Providers>
       </body>
     </html>
   );

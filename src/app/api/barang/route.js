@@ -7,7 +7,7 @@ export async function GET(req) {
     const offsed = (page - 1) * itemsPerPage
 
     try {
-        const query = `SELECT * FROM barang LIMIT ${itemsPerPage} OFFSET ${offsed} `
+        const query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, barang.satuan, kategori.nmKategori FROM barang INNER JOIN kategori ON barang.idKategori = kategori.idKategori ORDER BY barang.idBarang ASC LIMIT ${itemsPerPage} OFFSET ${offsed} `
         const data = await dbConnect(query);
 
         return NextResponse.json({
@@ -18,3 +18,16 @@ export async function GET(req) {
         console.log(error);
     }
 }
+
+export async function POST(req) {
+    try {
+        const { namaBarang, stok, modalBeli,hargaJual, satuan,idKategori } = await req.json()
+
+        return NextResponse.json({
+            namaBarang, stok, modalBeli,hargaJual, satuan,idKategori
+        })
+    } catch (error) {
+        console.log(error);
+    }
+}
+
