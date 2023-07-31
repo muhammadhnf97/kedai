@@ -7,29 +7,15 @@ import { RxCross1 } from 'react-icons/rx'
 
 const Header = () => {
 
-    const [dropdownMaster, setDropdownMaster] = useState(false)
-    const [dropdownTransaksi, setDropdownTransaksi] = useState(false)
-    const [dropdownHutangPiutang, setDropdownHutangPiutang] = useState(false)
     const [showMobileView, setShowMobileView] = useState(false)
 
     const handleClickMobileNavbar = () => {
         setShowMobileView(prev=>!prev)
     }
 
-    const handleClickDropdownMaster = () => {
-        setDropdownMaster(prev=>!prev)
-    }
-    const handleClickDropdownTransaksi = () => {
-        setDropdownTransaksi(prev=>!prev)
-    }
-    const handleClickDropdownHutangPiutang = () => {
-        setDropdownHutangPiutang(prev=>!prev)
-    }
-
-
   return (
     <>
-    <div className={`fixed w-full h-20 px-5 bg-white`}>
+    <div className={`fixed w-full h-20 px-5 bg-white z-10`}>
         <div className='h-full max-w-7xl mx-auto border-b-2 border-[#EE6C4D] px-5 py-2 flex justify-between'>
             <div className='leading-3'>
                 <h3 className='text-2xl font-bold text-[#293241]'>Username</h3>
@@ -40,26 +26,31 @@ const Header = () => {
             </button>
             <div className='hidden h-full md:flex md:items-center md:justify-center md:gap-4'>
                 <Link href={'/'} >
-                    <p className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Home</p>
+                    <p className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Home</p>
                 </Link>
                 <div className='relative group h-full flex items-center'>
                     <button className='flex items-center gap-2'>
                         <span className=''>Master</span><IoIosArrowDown />
                     </button>
-                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[7rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
+                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[9rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
                         <Link href={'/barang'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
                                     Barang
                             </button>
                         </Link>
-                        <Link href={'/supplier'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Supplier
+                        <Link href={'/kategori'}>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Kategori Barang
                             </button>
                         </Link>
-                        <Link href={'/kategori'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Kategori
+                        <Link href={'/satuan'}>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Satuan Barang
+                            </button>
+                        </Link>
+                        <Link href={'/supplier'}>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                                    Supplier
                             </button>
                         </Link>
                     </div>
@@ -70,12 +61,12 @@ const Header = () => {
                     </button>
                     <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
                         <Link href={'/penjualan'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
                                     Penjualan
                             </button>
                         </Link>
                         <Link href={'/pembelian'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
                                     Pembelian
                             </button>
                         </Link>
@@ -87,22 +78,22 @@ const Header = () => {
                     </button>
                     <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
                         <Link href={'/hutang'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
                                     Hutang
                             </button>
                         </Link>
                         <Link href={'/piutang'}>
-                            <button className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
+                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
                                     Piutang
                             </button>
                         </Link>
                     </div>
                 </div>
-                <p className='py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Laporan</p>
+                <p className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Laporan</p>
             </div>
         </div>
     </div>
-    <section className={`fixed w-screen h-screen bg-black bg-opacity-80 duration-300 ${showMobileView ? 'visible' : 'invisible'}`}>
+    <section className={`fixed w-screen h-screen bg-black bg-opacity-80 duration-300 z-20 ${showMobileView ? 'visible' : 'invisible'}`}>
         <div className={`relative w-full bg-white flex flex-col items-center gap- py-5 duration-300 ease-in-out ${showMobileView ? 'visible translate-y-0' : 'invisible -translate-y-20'}`}>
             <button className='w-10 h-10 absolute top-5 right-10 px-1 rounded-full border flex justify-center items-center duration-200 hover:bg-gray-100' onClick={handleClickMobileNavbar}>
                 <RxCross1 />

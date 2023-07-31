@@ -16,10 +16,16 @@ export const barangAddValue = [{
     type: 'number'
 },{
     label: 'Satuan',
-    key: 'satuan',
+    key: 'idSatuan',
     type: 'select'
 },{
     label: 'Kategori',
     key: 'idKategori',
     type: 'select'
 },]
+
+export const satuanAddValue = [{
+    label: 'Nama Satuan',
+    key: 'namaSatuan',
+    type: 'text'
+}]

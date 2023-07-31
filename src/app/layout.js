@@ -41,7 +41,7 @@ export default function RootLayout({ children }) {
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </head>
-      <body className={`h-full flex flex-col ${poppins.className}`}>
+      <body className={`h-full flex flex-col bg-white ${poppins.className}`}>
             <Providers>
           <CustomeBackground />
           {
@@ -56,7 +56,7 @@ export default function RootLayout({ children }) {
             :
             <>
               <Header />
-              <main className=' mt-20 border py-5'>{ children }</main>
+              <main className=' mt-20 py-5'>{ children }</main>
             </>
           }
           <Footer />

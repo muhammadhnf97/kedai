@@ -1,16 +1,16 @@
 'use client'
 import React from 'react'
-import { useState, useEffect } from 'react'
-import { fieldTableBarang } from '../utils/tableName'
 import TableAset from '../components/TableAset'
-import { useBarang } from '../context/barang'
 import TableWithAction from '../components/TableWithAction'
 import AddItem from '../components/AddItem'
-import { barangAddValue } from '../utils/tableAddValue'
 import Notification from '../components/Notification'
+import { useState, useEffect } from 'react'
+import { fieldTableSatuan } from '../utils/tableName'
+import { useBarang } from '../context/barang'
+import { satuanAddValue } from '../utils/tableAddValue'
 
 const Home = () => {
-  const page = 'Barang' 
+  const page = 'Satuan' 
 
   //MENDAPATKAN TOTAL PAGE
     const [totalRow, setTotalRow] = useState(0)
@@ -19,7 +19,7 @@ const Home = () => {
     const [currentPage, setCurrentPage] = useState(1)
 
   //MENDAPATKAN ISI TABEL BARANG
-    const [tableBarang, setTableBarang] = useState([])
+    const [tableSatuan, setTableSatuan] = useState([])
   
   //MENGATUR NOTIF
     const [isNotif, setIsNotif] = useState({
@@ -30,16 +30,8 @@ const Home = () => {
   //MENGATUR NILAI INPUT UNTUK DIKIRIM KE BE
     const [inputData, setInputData] = useState({
       namaBarang : '',
-      stok : '',
-      modalBeli : '',
-      hargaJual : '',
-      idSatuan : '',
-      idKategori : '',
       notif: null
     })
-
-  //MENGAMBIL CONTEXT ASET DAN FUNGSINYA
-    const { totalAset, handleTotalAset } = useBarang()
     
     const handleChangeInputData = (e) => {
         const {name, value} = e.target
@@ -62,8 +54,8 @@ const Home = () => {
     const handleSubmit = async(e) => { 
       e.preventDefault()
       try {
-        if(inputData.namaBarang.length > 0 && inputData.stok.length > 0 && inputData.modalBeli.length > 0 && inputData.hargaJual.length > 0 && inputData.idSatuan.length > 0 && inputData.idKategori.length > 0){
-          const response = await fetch('/api/barang',{
+        if(inputData.namaBarang.length > 1 && inputData.stok.length > 1 && inputData.modalBeli.length > 1 && inputData.hargaJual.length > 1 && inputData.satuan.length > 1 && inputData.idKategori.length > 1 ){
+          const response = await fetch('/api/satuan',{
             method: 'POST',
             headers: {
               "Content-Type": 'application/json'
@@ -73,7 +65,7 @@ const Home = () => {
               stok: inputData.stok,
               modalBeli: inputData.modalBeli,
               hargaJual: inputData.hargaJual,
-              idSatuan: inputData.idSatuan,
+              satuan: inputData.satuan,
               idKategori: inputData.idKategori,
               notif: null,
             })
@@ -86,21 +78,19 @@ const Home = () => {
             desc: data.desc
           })
 
-          setTableBarang(prev=>[
+          setTableSatuan(prev=>[
             {  
               idBarang: data.input.newID,
               namaBarang: data.input.namaBarang,
               stok: data.input.stok,
               modalBeli: data.input.modalBeli,
               hargaJual: data.input.hargaJual,
-              namaSatuan: data.input.namaSatuan.namaSatuan,
+              satuan: data.input.satuan,
               nmKategori: data.input.nmKategori.nmKategori,
             },
               ...prev 
             ]
           )
-
-          handleTotalAset(data.input.newTotalAset)
           
         } else {
           setIsNotif({
@@ -116,6 +106,7 @@ const Home = () => {
           desc: 'Data tidak dapat dikirim ke database !'
         })
       }
+
       handleClickReset()
     }
 
@@ -129,7 +120,7 @@ const Home = () => {
         stok : '',
         modalBeli : '',
         hargaJual : '',
-        idSatuan : '',
+        satuan : '',
         idKategori : '',
         notif : '',
       })
@@ -137,7 +128,7 @@ const Home = () => {
 
   useEffect(()=>{
     const getTotalRow = async() => {
-      const response = await fetch('/api/barang/totalrow')
+      const response = await fetch('/api/satuan/totalrow')
       const data = await response.json()
       return data.totalRow
     }
@@ -146,9 +137,9 @@ const Home = () => {
   }, [])
 
   useEffect(()=>{
-    const getDataBarang = async() => {
+    const getDataSatuan = async() => {
       try {
-        const response = await fetch(`/api/barang?page=${currentPage}`)
+        const response = await fetch(`/api/satuan?page=${currentPage}`)
         const data = await response.json()
         return data
       } catch (error) {
@@ -156,7 +147,7 @@ const Home = () => {
       }
     }
 
-    getDataBarang().then(barang=>setTableBarang(barang?.data))
+    getDataSatuan().then(satuan=>setTableSatuan(satuan?.newData))
   }, [currentPage])
 
   return (
@@ -169,7 +160,7 @@ const Home = () => {
       <h3 className='text-center text-3xl font-semibold'>{page}</h3>
         <section className='w-full px-2 md:px-5'>
             <AddItem 
-              input={barangAddValue} 
+              input={satuanAddValue} 
               inputData={inputData} 
               handleChangeInputData={handleChangeInputData}
               handleSubmit={handleSubmit}
@@ -179,15 +170,11 @@ const Home = () => {
         <section className="w-full px-2 md:px-5">
             <h4 className="font-semibold text-xl">Tabel {page}</h4>
             <TableWithAction 
-              field={fieldTableBarang} 
-              row={tableBarang}
+              field={fieldTableSatuan} 
+              row={tableSatuan}
               totalRow={totalRow}
               currentPage={currentPage}
               handleClickCurrentPage={handleClickCurrentPage}
-            />
-            <TableAset 
-              desc={'Total Aset'} 
-              nominal={totalAset}
             />
         </section>
     </div>

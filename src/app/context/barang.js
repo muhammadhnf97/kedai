@@ -35,8 +35,12 @@ export default function BarangProvider({ children }) {
         fetchStokDanHargaJual().then(data=>setTotalAset(data))
     }, [])
 
+    const handleTotalAset = (newAsset) => {
+      setTotalAset(prev=> prev + newAsset)
+    }
+
   return (
-    <BarangContext.Provider value={{totalAset}}>
+    <BarangContext.Provider value={{totalAset, handleTotalAset}}>
       {children}
     </BarangContext.Provider>
   )

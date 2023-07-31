@@ -19,8 +19,17 @@ export const fieldTableBarang = [
         key: 'hargaJual'
     },{
         label: 'Satuan',
-        key: 'satuan'
+        key: 'namaSatuan'
     },{
         label: 'Kategori',
         key: 'nmKategori'
+    }]
+
+export const fieldTableSatuan = [
+    {
+        label: 'No',
+        key: 'no'
+    },{
+        label: 'Nama Satuan',
+        key: 'namaSatuan'
     }]
