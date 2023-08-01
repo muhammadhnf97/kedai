@@ -24,7 +24,7 @@ export default function KategoriProvider({ children }){
     }, [])
 
     return(
-        <KategoriContext.Provider value={listKategori}>
+        <KategoriContext.Provider value={{listKategori}}>
             {children}
         </KategoriContext.Provider>
     )

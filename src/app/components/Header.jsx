@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { RiMenu3Fill } from 'react-icons/ri'
 import { IoIosArrowDown } from 'react-icons/io'
 import { RxCross1 } from 'react-icons/rx'
+import { FcBarChart } from 'react-icons/fc'
 
 const Header = () => {
 
@@ -73,8 +74,8 @@ const Header = () => {
                     </div>
                 </div>
                 <div className='relative group h-full flex items-center'>
-                    <button className='flex items-center gap-2'>
-                        <span className=''>Hutang/Piutang</span><IoIosArrowDown />
+                    <button className='flex items-center justify-center gap-1'>
+                    <span className=''>Hutang/Piutang</span><IoIosArrowDown />
                     </button>
                     <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
                         <Link href={'/hutang'}>
@@ -89,7 +90,7 @@ const Header = () => {
                         </Link>
                     </div>
                 </div>
-                <p className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Laporan</p>
+                <p className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full flex items-center justify-center gap-1'><FcBarChart className='w-6 h-6' />Laporan</p>
             </div>
         </div>
     </div>
@@ -129,7 +130,7 @@ const Header = () => {
                 </Link>
             </div>
             <Link href={'/laporan'}>
-                <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-200 ease-in mb-2 mt-2'>Laporan</p>
+                <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-200 ease-in mb-2 mt-2 flex items-center justify-center gap-1'><FcBarChart className='w-6 h-6' />Laporan</p>
             </Link>
         </div>
     </section>

@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { FaMagnifyingGlass } from 'react-icons/fa6'
-import { LiaExchangeAltSolid } from 'react-icons/lia'
-import { MdDeleteForever } from 'react-icons/md'
+import { FcSynchronize } from 'react-icons/fc'
+import { FcFullTrash } from 'react-icons/fc'
 
 const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrentPage }) => {
     const [detailItem, setDetailItem] = useState({})
@@ -25,6 +25,7 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
         const getID = Object.values(detailItem)[0]
         console.log(getID)
     }
+
     
   return (
     <>
@@ -35,7 +36,7 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
             </div>
             :
             <>
-            <div className='border-2 border-black rounded-2xl overflow-hidden bg-white my-2 h-96 overflow-y-auto relative'>
+            <div className='border-2 border-black rounded-2xl overflow-auto bg-white my-2 h-96 relative'>
                 <section id='desktop' className='hidden md:block'>
                     <table className='w-full text-center h-full'>
                         <thead className=''>
@@ -59,8 +60,8 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
                                                 ))     
                                             }
                                         <td className='flex items-center justify-center gap-1 px-2 py-1'>
-                                            <button className='py-2 w-full bg-yellow-400 rounded-lg flex justify-center hover:bg-yellow-500 active:bg-yellow-600 active:shadow-inner'><LiaExchangeAltSolid className='w-5 h-5' /></button>
-                                            <button className='py-2 w-full bg-red-400 rounded-lg flex justify-center hover:bg-red-500 active:bg-red-600 active:shadow-inner'><MdDeleteForever className='w-5 h-5' /></button>
+                                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-white rounded-lg flex justify-center hover:bg-yellow-100 active:bg-yellow-300'><FcSynchronize className='w-5 h-5' /></button>
+                                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-white rounded-lg flex justify-center hover:bg-red-200 active:bg-red-300'><FcFullTrash className='w-5 h-5' /></button>
                                         </td>
                                     </tr>
                                 ))
@@ -84,7 +85,7 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
                                             </div>
                                         )).slice(1,3)
                                     }</div>
-                                    <button className='p-5 text-white bg-blue-500 duration-150 hover:bg-blue-600 active:bg-blue-700 active:shadow-inner' onClick={()=>handleClickDetail(row[index])}><FaMagnifyingGlass className='w-5 h-5' /></button>
+                                    <button className='p-5 text-white bg-blue-500 duration-150 hover:bg-blue-600 active:bg-blue-700' onClick={()=>handleClickDetail(row[index])}><FaMagnifyingGlass className='w-5 h-5' /></button>
                                 </div>
                             ))
                         }
@@ -98,13 +99,13 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
                             field.map((value, index)=>(
                                 <div key={index} className='flex gap-5'>
                                     <div className='w-28 font-semibold px-2'><p>{value.label}</p></div>
-                                    <div className='flex-1'><p>: {detailItem[value.key]}</p></div>
+                                    <div className='flex-1'><p>: { value.key !== 'modalBeli' && value.key !== 'hargaJual' ? detailItem[value.key] : detailItem[value.key]?.toLocaleString('id-ID', { style: 'currency', currency: 'IDR'})  }</p></div>
                                 </div>
                             )).slice(1)
                         }
                         <div className='flex items-center justify-center gap-1 px-2 py-1'>
-                            <button className='py-2 w-full bg-yellow-400 rounded-lg flex justify-center hover:bg-yellow-500 active:bg-yellow-600 active:shadow-inner' onClick={()=>handleClickUpdate()}><LiaExchangeAltSolid className='w-5 h-5' /></button>
-                            <button className='py-2 w-full bg-red-400 rounded-lg flex justify-center hover:bg-red-500 active:bg-red-600 active:shadow-inner'onClick={()=>handleClickUpdate()} ><MdDeleteForever className='w-5 h-5' /></button>
+                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-yellow-50 rounded-lg flex justify-center hover:bg-yellow-100 active:bg-yellow-300' onClick={()=>handleClickUpdate()}><FcSynchronize className='w-5 h-5' /></button>
+                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-red-50 rounded-lg flex justify-center hover:bg-red-200 active:bg-red-300'onClick={()=>handleClickUpdate()} ><FcFullTrash className='w-5 h-5' /></button>
                         </div>
                     </div>
                 </div>
@@ -112,7 +113,7 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
             <section className='flex justify-center gap-5 py-5'>
                 {currentPage !== 1 && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(1)}>First Page</button>}
                 {currentPage - 1 > 0 && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(currentPage - 1)}>{currentPage - 1}</button>}
-                <button className='px-2 py-1 rounded-md bg-yellow-400 shadow-md hover:bg-yellow-500 active:bg-yellow-600' onClick={()=>handleClickCurrentPage(currentPage)}>{currentPage}</button>
+                <button className='px-2 py-1 rounded-md bg-emerald-300 shadow-md hover:bg-emerald-400 active:bg-emerald-500' onClick={()=>handleClickCurrentPage(currentPage)}>{currentPage}</button>
                 {currentPage + 1 <= totalPage && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(currentPage + 1)}>{currentPage + 1}</button>}
                 {currentPage !== totalPage && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(totalPage)}>Last Page</button>}
             </section>
