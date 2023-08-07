@@ -33,7 +33,7 @@ const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClic
                         </div>
                 )})
             }
-            <button className='py-1 px-2 w-full text-center rounded-md shadow-md bg-orange-300 hover:bg-orange-400 active:bg-orange-500' onClick={handleClickResetSearching}>Reset Searching</button>
+            <button className='py-1 px-2 w-full text-center rounded-md shadow-md bg-orange-300 hover:bg-orange-400 active:bg-orange-500' onClick={handleClickResetSearching}>Reset Keyword</button>
         </div>      
     </div>
   )

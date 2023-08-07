@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 import { FaMagnifyingGlass } from 'react-icons/fa6'
-import { FcSynchronize } from 'react-icons/fc'
+import { AiFillEdit } from 'react-icons/ai'
 import { FcFullTrash } from 'react-icons/fc'
 
-const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrentPage }) => {
+const TableWithAction = ({ page, field, row, totalRow, currentPage, handleClickCurrentPage, paggination, handleEditAndDelete }) => {
     const [detailItem, setDetailItem] = useState({})
     const [isShowDetail, setIsShowDetai] = useState(false)
 
@@ -31,16 +31,18 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
     <>
         {
             row?.length < 1 ? 
-            <div className='border-2 border-black rounded-2xl overflow-hidden bg-white my-2 h-36 overflow-y-auto relative flex items-center justify-center md:h-96'>
+            <div className='border-2 border-black rounded-2xl overflow-hidden bg-white my-2 h-36 overflow-y-auto flex items-center justify-center md:h-96'>
                 <p className='font-semibold text-xl'>Data belum ditambahkan</p>
             </div>
             :
             <>
+            <h4 className="font-semibold text-xl">Tabel {page}</h4>
             <div className='border-2 border-black rounded-2xl overflow-auto bg-white my-2 h-96 relative'>
                 <section id='desktop' className='hidden md:block'>
                     <table className='w-full text-center h-full'>
                         <thead className=''>
                             <tr className='w-full h-10'>
+                            <th>No. </th>
                                 {
                                     field?.map((fieldData, index)=>(
                                         <th key={index}>{fieldData.label}</th>
@@ -60,8 +62,12 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
                                                 ))     
                                             }
                                         <td className='flex items-center justify-center gap-1 px-2 py-1'>
-                                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-white rounded-lg flex justify-center hover:bg-yellow-100 active:bg-yellow-300'><FcSynchronize className='w-5 h-5' /></button>
-                                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-white rounded-lg flex justify-center hover:bg-red-200 active:bg-red-300'><FcFullTrash className='w-5 h-5' /></button>
+                                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-white rounded-lg flex justify-center hover:bg-yellow-100 active:bg-yellow-300' onClick={()=>handleEditAndDelete(Object.values(data)[0], Object.values(data)[1], 'edit' )}>
+                                                <AiFillEdit className='text-blue-400 w-5 h-5 animate-wiggle' />
+                                            </button>
+                                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-white rounded-lg flex justify-center hover:bg-red-200 active:bg-red-300' onClick={()=>handleEditAndDelete(data, 'delete' )}>
+                                                <FcFullTrash className='w-5 h-5 group-hover:animate-wiggle' />
+                                            </button>
                                         </td>
                                     </tr>
                                 ))
@@ -93,7 +99,7 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
             </div>
             <div className={`w-full h-full bg-black fixed top-0 left-0 bg-opacity-60 px-2 flex items-center justify-center z-20 ${isShowDetail ? 'visible' : 'invisible'}`} onClick={handleClickShowDetail}>
                 <div className={`w-full bg-white duration-200 p-5 space-y-5 rounded-lg ${isShowDetail ? 'scale-100' : 'scale-0'}`}>
-                    <h3 className='text-lg font-semibold text-center'>Detail Barang</h3>
+                    <h3 className='text-lg font-semibold text-center'>Detail {page}</h3>
                     <div className=''>
                         {
                             field.map((value, index)=>(
@@ -104,12 +110,14 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
                             )).slice(1)
                         }
                         <div className='flex items-center justify-center gap-1 px-2 py-1'>
-                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-yellow-50 rounded-lg flex justify-center hover:bg-yellow-100 active:bg-yellow-300' onClick={()=>handleClickUpdate()}><FcSynchronize className='w-5 h-5' /></button>
-                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-red-50 rounded-lg flex justify-center hover:bg-red-200 active:bg-red-300'onClick={()=>handleClickUpdate()} ><FcFullTrash className='w-5 h-5' /></button>
+                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-yellow-50 rounded-lg flex justify-center hover:bg-yellow-100 active:bg-yellow-300' onClick={()=>handleClickUpdate()}><AiFillEdit className='text-blue-400 w-5 h-5 animate-wiggle' /></button>
+                            <button className='py-2 w-full shadow-sm shadow-gray-600 bg-red-50 rounded-lg flex justify-center hover:bg-red-200 active:bg-red-300' onClick={e=>handleEditAndDelete}><FcFullTrash className='w-5 h-5 group-hover:animate-wiggle' /></button>
                         </div>
                     </div>
                 </div>
             </div>
+            {
+            paggination &&
             <section className='flex justify-center gap-5 py-5'>
                 {currentPage !== 1 && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(1)}>First Page</button>}
                 {currentPage - 1 > 0 && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(currentPage - 1)}>{currentPage - 1}</button>}
@@ -117,6 +125,7 @@ const TableWithAction = ({ field, row, totalRow, currentPage, handleClickCurrent
                 {currentPage + 1 <= totalPage && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(currentPage + 1)}>{currentPage + 1}</button>}
                 {currentPage !== totalPage && <button className='px-2 py-1 rounded-md bg-blue-400 shadow-md hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickCurrentPage(totalPage)}>Last Page</button>}
             </section>
+            }
             </>
         }
     </>

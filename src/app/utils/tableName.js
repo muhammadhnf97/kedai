@@ -1,28 +1,32 @@
-export const fieldTableBarang = [
-    {
-        label: 'No',
-        key: 'no'
-    },{
+export const fieldTableBarang = [{
         label: 'ID Barang',
-        key: 'idBarang'
+        key: 'idBarang',
+        type: 'text',
+        primaryKey: true
     },{
         label: 'Nama',
-        key: 'namaBarang'
+        key: 'namaBarang',
+        type: 'text'
     },{
         label: 'Stok',
-        key: 'stok'
+        key: 'stok',
+        type: 'number'
     },{
         label: 'Modal Beli',
-        key: 'modalBeli'
+        key: 'modalBeli',
+        type: 'number'
     },{
         label: 'Harga Jual',
-        key: 'hargaJual'
+        key: 'hargaJual',
+        type: 'number'
     },{
         label: 'Satuan',
-        key: 'namaSatuan'
+        key: 'idSatuan',
+        type: 'select'
     },{
         label: 'Kategori',
-        key: 'nmKategori'
+        key: 'idKategori',
+        type: 'select'
     }]
 
 export const fieldTableSatuan = [

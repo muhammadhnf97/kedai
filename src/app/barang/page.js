@@ -10,156 +10,227 @@ import TableWithAction from '../components/TableWithAction'
 import AddItem from '../components/AddItem'
 import Notification from '../components/Notification'
 import Search from '../components/Search'
+import Loading from '../components/Loading'
+import EditForm from '../components/EditForm'
 
 const Home = () => {
-  const page = 'Barang' 
+  const page = 'Barang'
+  const { totalAset, handleTotalAset, handleDeleteTotalAset } = useBarang()
+  const [isLoading, setIsLoading] = useState(false)
+  const [paggination, setPaggination] = useState(true)
+  const [totalRow, setTotalRow] = useState(0)
+  const [currentPage, setCurrentPage] = useState(1)
+  const [tableBarang, setTableBarang] = useState([])
+  const [isNotif, setIsNotif] = useState({
+    showNotif:false,
+    alertTitle : null,
+    desc: null,
+    answer: null
+  })
 
-  //MENDAPATKAN TOTAL PAGE
-    const [totalRow, setTotalRow] = useState(0)
+  const [inputData, setInputData] = useState({
+    namaBarang : '',
+    stok : '',
+    modalBeli : '',
+    hargaJual : '',
+    idSatuan : '',
+    idKategori : '',
+    notif: null
+  })
 
-  //MEDAPATKAN CURRENT PAGE
-    const [currentPage, setCurrentPage] = useState(1)
+  const [searchValue, setSearchValue] = useState({
+    keyword: '',
+    idKategori: ''
+  })
 
-  //MENDAPATKAN ISI TABEL BARANG
-    const [tableBarang, setTableBarang] = useState([])
+  const [dataNeedAction, setDataNeedAction] = useState({})
+
+  const [showEditForm, setShowEditForm] = useState(false)
+
+  const handleClickResetSearching = () => {
+    setSearchValue({
+      keyword: '',
+      idKategori: ''
+    })
+  }
+
+  const handleChangeSearch = (e) => {
+    const {name, value} = e.target
+    setSearchValue(prev=>{
+      return {
+        ...prev,
+        [name]: value
+      }
+    })
+  }
   
-  //MENGATUR NOTIF
-    const [isNotif, setIsNotif] = useState({
+  const handleChangeInputData = (e) => {
+    const {name, value} = e.target
+    setInputData(prev=>{
+        return {
+            ...prev,
+            [name] : value
+        }
+    })
+  }
+  const handleClickResetNotif = () => {
+    setIsNotif({
+      showNotif:false,
       alertTitle : null,
       desc: null
     })
+  }
+  
+  const handleSubmit = async(e) => { 
+    e.preventDefault()
+    setIsLoading(prev=>!prev)
+    try {
+      if(inputData.namaBarang.length > 0 && inputData.stok.length > 0 && inputData.modalBeli.length > 0 && inputData.hargaJual.length > 0 && inputData.idSatuan.length > 0 && inputData.idKategori.length > 0){
+        const response = await fetch('/api/barang',{
+          method: 'POST',
+          headers: {
+            "Content-Type": 'application/json'
+          },
+          body: JSON.stringify({
+            namaBarang: inputData.namaBarang,
+            stok: inputData.stok,
+            modalBeli: inputData.modalBeli,
+            hargaJual: inputData.hargaJual,
+            idSatuan: inputData.idSatuan,
+            idKategori: inputData.idKategori,
+            notif: null,
+          })
+        })
+        const data = await response.json()
+        
+        setIsNotif({
+          showNotif:data.showNotif,
+          alertTitle : data.alertTitle,
+          desc: data.desc,
+        })
+        setTableBarang(prev=>[
+          {  
+            idBarang: data.input.newID,
+            namaBarang: data.input.namaBarang,
+            stok: data.input.stok,
+            modalBeli: data.input.modalBeli,
+            hargaJual: data.input.hargaJual,
+            namaSatuan: data.input.namaSatuan.namaSatuan,
+            nmKategori: data.input.nmKategori.nmKategori,
+          },
+            ...prev 
+          ]
+        )
+        handleTotalAset(data.input.newTotalAset)
+        setIsLoading(data.isLoading)
+        
+      } else {
+        setIsNotif({
+          showNotif: true,
+          alertTitle : 'caution',
+          desc: 'Data tidak boleh kosong !'
+        })
+        setIsLoading(prev=>!prev)
+      }
+    } catch (error) {
+      setIsNotif({
+        showNotif: true,
+        alertTitle : 'caution',
+        desc: 'Data tidak dapat dikirim ke database !'
+      })
+    }
+    handleClickReset()
+  }
 
-  //MENGATUR NILAI INPUT UNTUK DIKIRIM KE BE
-    const [inputData, setInputData] = useState({
+  const handleClickCurrentPage = (page) => {
+    setCurrentPage(page)
+  }
+
+  const handleClickReset = () => {
+    setInputData({
       namaBarang : '',
       stok : '',
       modalBeli : '',
       hargaJual : '',
       idSatuan : '',
       idKategori : '',
-      notif: null
+      notif : '',
     })
+  }
 
-  //MENGAMBIL CONTEXT ASET DAN FUNGSINYA
-    const { totalAset, handleTotalAset } = useBarang()
-
-  //SEARCHING
-    const [searchValue, setSearchValue] = useState({
-      keyword: '',
-      idKategori: ''
+  const handleEditAndDelete = async(idBarang, namaBarang, action = null) => {
+    setIsNotif({
+      showNotif: true,
+      alertTitle : 'warning',
+      desc: `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${idBarang} ${namaBarang} ?`
     })
+    const response = await fetch(`/api/barang/searching?id=${idBarang}`)
+    const data = await response.json()
+    setDataNeedAction({
+      action, data: data.data
+    })   
 
-    const handleClickResetSearching = () => {
-      setSearchValue({
-        keyword: '',
-        idKategori: ''
-      })
-    }
+  }
 
-    const handleChangeSearch = (e) => {
-      const {name, value} = e.target
+  const handleClickCloseEditForm = () => {
+    setShowEditForm(prev=>!prev)
+    setDataNeedAction({})
+  }
 
-      setSearchValue(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-    
-    const handleChangeInputData = (e) => {
-        const {name, value} = e.target
-        setInputData(prev=>{
-            return {
-                ...prev,
-                [name] : value
-            }
-        })
-    }
-
-    const handleClickResetNotif = () => {
-      setIsNotif({
-        showNotif:false,
-        alertTitle : null,
-        desc: null
-      })
-    }
-    
-    const handleSubmit = async(e) => { 
-      e.preventDefault()
-      try {
-        if(inputData.namaBarang.length > 0 && inputData.stok.length > 0 && inputData.modalBeli.length > 0 && inputData.hargaJual.length > 0 && inputData.idSatuan.length > 0 && inputData.idKategori.length > 0){
-          const response = await fetch('/api/barang',{
-            method: 'POST',
-            headers: {
-              "Content-Type": 'application/json'
-            },
-            body: JSON.stringify({
-              namaBarang: inputData.namaBarang,
-              stok: inputData.stok,
-              modalBeli: inputData.modalBeli,
-              hargaJual: inputData.hargaJual,
-              idSatuan: inputData.idSatuan,
-              idKategori: inputData.idKategori,
-              notif: null,
-            })
-          })
-          const data = await response.json()
-          
-          setIsNotif({
-            showNotif:data.showNotif,
-            alertTitle : data.alertTitle,
-            desc: data.desc
-          })
-
-          setTableBarang(prev=>[
-            {  
-              idBarang: data.input.newID,
-              namaBarang: data.input.namaBarang,
-              stok: data.input.stok,
-              modalBeli: data.input.modalBeli,
-              hargaJual: data.input.hargaJual,
-              namaSatuan: data.input.namaSatuan.namaSatuan,
-              nmKategori: data.input.nmKategori.nmKategori,
-            },
-              ...prev 
-            ]
-          )
-
-          handleTotalAset(data.input.newTotalAset)
-          
-        } else {
-          setIsNotif({
-            showNotif: true,
-            alertTitle : 'caution',
-            desc: 'Data tidak boleh kosong !'
-          })
-        }
-      } catch (error) {
-        setIsNotif({
-          showNotif: true,
-          alertTitle : 'caution',
-          desc: 'Data tidak dapat dikirim ke database !'
-        })
+  const handleClickResponseNotif = (res) => {
+    if(res){
+      if(dataNeedAction?.action === 'delete'){
+        handleDelete()
       }
-      handleClickReset()
-    }
 
-    const handleClickCurrentPage = (page) => {
-      setCurrentPage(page)
+      if(dataNeedAction?.action === 'edit'){
+        setShowEditForm(prev=>!prev)
+      }
+    } else {
+      setDataNeedAction({})
     }
-
-    const handleClickReset = () => {
-      setInputData({
-        namaBarang : '',
-        stok : '',
-        modalBeli : '',
-        hargaJual : '',
-        idSatuan : '',
-        idKategori : '',
-        notif : '',
+    
+    handleClickResetNotif()
+  }
+  
+   const handleDelete = async() => {   
+    setIsLoading(prev=>!prev)
+    try {
+      const response = await fetch('/api/barang', {
+          method: 'DELETE',
+          headers: {
+              'Content-Type': 'application/json'
+          },
+          body:JSON.stringify({
+              idBarang: dataNeedAction?.data?.idBarang
+          })
       })
-    }
+      const data = await response.json()
+      const totalAsetToDelete = dataNeedAction?.data?.hargaJual * dataNeedAction?.data?.stok
+  
+      setTableBarang(prev=>prev.filter(data=>data.idBarang !== dataNeedAction?.data?.idBarang))
+      handleDeleteTotalAset(totalAsetToDelete)
+      setIsNotif({
+        showNotif: data.showNotif,
+        alertTitle : data.alertTitle,
+        desc: data.desc
+      })
+      setIsLoading(data.isLoading)
+    } catch (error) {
+      console.log(error)
+    }     
+  }
+
+  const handleSubmitEdit = (e) => {
+    e.preventDefault()
+    console.log('hola')
+  }
+
+  console.log(dataNeedAction)
+
+  const handleEdit = async(id) => {
+    
+  }
 
   useEffect(()=>{
     const getTotalRow = async() => {
@@ -167,7 +238,6 @@ const Home = () => {
       const data = await response.json()
       return data.totalRow
     }
-
     getTotalRow().then(data=>setTotalRow(data))
   }, [])
 
@@ -181,8 +251,10 @@ const Home = () => {
         console.log('error : ', error)
       }
     }
-
-    getDataBarang().then(barang=>setTableBarang(barang?.data))
+    getDataBarang().then(barang=>{
+      setTableBarang(barang?.data)
+      setPaggination(barang?.paggination)
+    })
   }, [currentPage])
 
   useEffect(()=>{
@@ -200,21 +272,31 @@ const Home = () => {
 
       const data = await response.json()
       return data
-
     }
 
-    getBarangBasedSearch().then(data=>setTableBarang(data.data))
+    getBarangBasedSearch().then(data=>{
+      setTableBarang(data.data)
+      setPaggination(data.paggination)
+    })
   }, [searchValue])
-
-  useEffect(()=>{
-    console.log(tableBarang.length)
-  }, [tableBarang])
 
   return (
     <>
+    { showEditForm && 
+    <EditForm
+      page={page}
+      listField={fieldTableBarang}
+      dataNeedEdit={dataNeedAction?.data[0]}
+      handleSubmitEdit={handleSubmitEdit}
+      handleClickCloseEditForm={handleClickCloseEditForm}  /> }
+    { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
-      <Notification alertTitle={isNotif.alertTitle} desc={isNotif.desc} handleClickResetNotif={handleClickResetNotif} />
+      <Notification 
+        alertTitle={isNotif.alertTitle} 
+        desc={isNotif.desc} 
+        handleClickResponseNotif={handleClickResponseNotif} 
+      />
     }
     <div className='max-w-7xl mx-auto space-y-5'>
       <h3 className='text-center text-3xl font-semibold'>{page}</h3>
@@ -239,20 +321,22 @@ const Home = () => {
            />
         </section>
       </div>
-        <section className="w-full px-2 md:px-5">
-            <h4 className="font-semibold text-xl">Tabel {page}</h4>
-            <TableWithAction 
-              field={fieldTableBarang} 
-              row={tableBarang}
-              totalRow={totalRow}
-              currentPage={currentPage}
-              handleClickCurrentPage={handleClickCurrentPage}
-            />
-            <TableAset 
-              desc={'Total Aset'} 
-              nominal={totalAset}
-            />
-        </section>
+      <section className="w-full px-2 md:px-5">
+          <TableWithAction
+            page={page}
+            field={fieldTableBarang} 
+            row={tableBarang}
+            totalRow={totalRow}
+            currentPage={currentPage}
+            handleClickCurrentPage={handleClickCurrentPage}
+            paggination={paggination}
+            handleEditAndDelete={handleEditAndDelete}
+          />
+          <TableAset 
+            desc={'Total Aset'} 
+            nominal={totalAset}
+          />
+      </section>
     </div>
     </>
   )

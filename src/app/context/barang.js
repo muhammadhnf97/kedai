@@ -39,8 +39,12 @@ export default function BarangProvider({ children }) {
       setTotalAset(prev=> prev + newAsset)
     }
 
+    const handleDeleteTotalAset = (newAsset) => {
+      setTotalAset(prev=> prev - newAsset )
+    }
+
   return (
-    <BarangContext.Provider value={{totalAset, handleTotalAset}}>
+    <BarangContext.Provider value={{totalAset, handleTotalAset, handleDeleteTotalAset}}>
       {children}
     </BarangContext.Provider>
   )

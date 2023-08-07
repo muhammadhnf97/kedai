@@ -9,7 +9,7 @@ const dbConnect = async(query, values=[]) => {
         })
 
         const [results] = await connect.execute(query, values);
-        connect.end;
+        connect.end()
         return results
     } catch (error) {
         console.log(error)

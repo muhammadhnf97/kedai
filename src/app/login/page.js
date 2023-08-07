@@ -23,13 +23,6 @@ const Home = () => {
     console.log(user)
 
   return (
-    <>
-    { 
-        isLoading &&
-        <div className='fixed w-screen h-screen bg-white flex items-center justify-center'>
-            <Loading />
-        </div>
-    }
     <div className='w-full h-screen flex flex-col items-center justify-between'>
         <div className='h-full w-full flex flex-col justify-center items-center gap-10 md:flex-row md:justify-evenly'>
             <section className='leading-3'>
@@ -54,7 +47,6 @@ const Home = () => {
             </form>
         </div>
     </div>
-    </>
   )
 }
 

@@ -23,6 +23,7 @@ export default function RootLayout({ children }) {
 
   const [isLoginPage, setIsLoginPage] = useState(null)
   const [isLoading, setIsLoading] = useState(true)
+  let renderPage
 
   useEffect(() => {
     const isLoginPage = window.location.pathname === '/login' ? true : false;
@@ -35,6 +36,26 @@ export default function RootLayout({ children }) {
     }
   }, [isLoginPage])
 
+  if(isLoading){
+    renderPage = ( <Loading /> )
+  } else if(isLoginPage){
+    renderPage = ( 
+      <>
+        {children}
+        <Footer />
+      </>
+     )
+  } else {
+    renderPage = (
+      <>
+        <Header />
+        <main className=' mt-20 py-5'>
+          {children}
+        </main>
+        <Footer />
+      </>)
+  }
+
   return (
     <html lang="en">
       <head>
@@ -42,25 +63,10 @@ export default function RootLayout({ children }) {
         <meta name="description" content={metadata.description} />
       </head>
       <body className={`h-full flex flex-col bg-white ${poppins.className}`}>
-            <Providers>
-          <CustomeBackground />
-          {
-            isLoading && 
-            <div className='fixed h-screen w-screen bg-white flex items-center justify-center z-10'>
-              <Loading />
-            </div>
-          }
-
-          {
-            isLoginPage ? <> { children } </> 
-            :
-            <>
-              <Header />
-              <main className=' mt-20 py-5'>{ children }</main>
-            </>
-          }
-          <Footer />
-            </Providers>
+          <Providers>
+            <CustomeBackground />
+              { renderPage }
+          </Providers>
       </body>
     </html>
   );

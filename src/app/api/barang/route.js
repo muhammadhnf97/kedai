@@ -11,12 +11,12 @@ export async function GET(req) {
         `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
-        INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan ORDER BY barang.idBarang DESC LIMIT ${itemsPerPage} OFFSET ${offsed} `
+        INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan ORDER BY barang.dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed} `
         const data = await dbConnect(query);
 
         return NextResponse.json({
             data,
-            status: 200
+            paggination: true
         })
     } catch (error) {
         return NextResponse.json({
@@ -37,6 +37,8 @@ export async function POST(req) {
         const maxID = sliceID.length > 0 ? Math.max(...sliceID) + 1 : 1
         const newID = '9999' + idKategori.toString().padStart(3, '0') + maxID.toString().padStart(3, '0') 
 
+        const dateCreated = new Date 
+
         const queryNamaKategori = `SELECT nmKategori FROM kategori WHERE idKategori = ${idKategori}`
         const dataNama = await dbConnect(queryNamaKategori)
         const nmKategori = dataNama[0]
@@ -45,8 +47,8 @@ export async function POST(req) {
         const dataNamaSatuan = await dbConnect(queryNamaSatuan)
         const namaSatuan = dataNamaSatuan[0]
 
-        const PostQuery = `INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori) VALUES (?, ?, ?, ?, ?, ?, ?)`
-        const values = [newID, namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori]
+        const PostQuery = `INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+        const values = [newID, namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori, dateCreated]
         await dbConnect(PostQuery, values)
 
         const newTotalAset = hargaJual * stok
@@ -55,7 +57,7 @@ export async function POST(req) {
             showNotif: true,
             alertTitle: 'caution',
             desc: "Data berhasil disimpan",
-            sliceID,
+            isLoading: false,
             input : {
                 newID, 
                 namaBarang, 
@@ -73,6 +75,30 @@ export async function POST(req) {
             alertTitle: 'caution',
             desc: "error masbro",
         })
+    }
+}
+
+export async function DELETE(req) {
+    try {
+        const { idBarang } = await req.json()
+        const query = `DELETE FROM barang WHERE idBarang = ?`
+        const values = [idBarang]
+        await dbConnect(query, values)
+
+        return NextResponse.json({
+            showNotif: true,
+            alertTitle: 'caution',
+            desc: "Data telah dihapus",
+            isLoading: false
+        })
+    } catch (error) {
+        return NextResponse.json({
+            showNotif: true,
+            alertTitle: 'caution',
+            desc: "error masbro",
+            isLoading: false
+        })
+        
     }
 }
 
