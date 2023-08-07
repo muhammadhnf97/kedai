@@ -3,13 +3,11 @@ import { useKategori } from '../context/kategori'
 import { useSatuan } from '../context/satuan'
 import { RxCross1 } from 'react-icons/rx'
 
-const EditForm = ({ page, listField, dataNeedEdit, handleClickCloseEditForm, handleSubmitEdit}) => {
+const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, handleSubmitEdit, handleChangeEdit}) => {
 
     const { listKategori } = useKategori()
     const { satuan } = useSatuan()
-    
-    console.log(listField)
-    
+       
 
   return (
     <form onSubmit={(e)=>handleSubmitEdit(e)}>
@@ -28,13 +26,13 @@ const EditForm = ({ page, listField, dataNeedEdit, handleClickCloseEditForm, han
                             let listOf
                             let initialID
 
-                            const defaultValue = dataNeedEdit[value.key] || ''
+                            const defaultValue = initalValue[value.key] || ''
 
                             if(value.type === 'text' || value.type === 'number'){
                                 if(value.primaryKey){
                                     inputType = ( <p className='flex-1'> {defaultValue}</p> )
                                 } else {
-                                    inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' /> )
+                                    inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' onChange={(e)=>handleChangeEdit(e)} /> )
                                 }
                             } else if(value.type === 'select'){
                                 if(value.key === 'idKategori'){
@@ -50,7 +48,7 @@ const EditForm = ({ page, listField, dataNeedEdit, handleClickCloseEditForm, han
                                 }
                                 
                                 inputType = ( 
-                                <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm'>
+                                <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm' onChange={(e)=>handleChangeEdit(e)}>
                                     <option value={defaultValue}>{initialID}</option>
                                     { listOf }
                                 </select> )

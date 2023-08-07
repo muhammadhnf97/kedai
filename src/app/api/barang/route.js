@@ -102,3 +102,23 @@ export async function DELETE(req) {
     }
 }
 
+export async function PUT(req){
+    try {
+        const {idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori} = await req.json()
+        const query = 'UPDATE barang SET namaBarang = ?, stok = ?, modalBeli = ?, hargaJual = ?, idSatuan = ?, idKategori = ? WHERE idBarang = ?'
+        const values = [idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori]
+        await dbConnect(query, values)
+
+        return NextResponse.json({
+            data: 'success'
+        })
+    } catch (error) {
+        return NextResponse.json({
+            showNotif: true,
+            alertTitle: 'caution',
+            desc: "error masbro",
+            isLoading: false
+        })
+    }
+}
+

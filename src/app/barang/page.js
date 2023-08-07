@@ -21,6 +21,7 @@ const Home = () => {
   const [totalRow, setTotalRow] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [tableBarang, setTableBarang] = useState([])
+  const [editedValue, setEditedValue] = useState({})
   const [isNotif, setIsNotif] = useState({
     showNotif:false,
     alertTitle : null,
@@ -43,7 +44,7 @@ const Home = () => {
     idKategori: ''
   })
 
-  const [dataNeedAction, setDataNeedAction] = useState({})
+  const [initalValue, setInitialValue] = useState({})
 
   const [showEditForm, setShowEditForm] = useState(false)
 
@@ -73,12 +74,27 @@ const Home = () => {
         }
     })
   }
+  
   const handleClickResetNotif = () => {
     setIsNotif({
       showNotif:false,
       alertTitle : null,
       desc: null
     })
+  }
+
+  const handleChangeEdit = (e) => {
+    const {name, value} = e.target
+    console.log(name, value)
+    // setInitialValue(prev=>{
+    //   prev.action,
+    //   prev.data.map(prevData=>{
+    //     return {
+    //       ...prevData,
+    //       [name]: value
+    //     }
+    //   })
+    // })
   }
   
   const handleSubmit = async(e) => { 
@@ -164,30 +180,36 @@ const Home = () => {
       alertTitle : 'warning',
       desc: `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${idBarang} ${namaBarang} ?`
     })
-    const response = await fetch(`/api/barang/searching?id=${idBarang}`)
-    const data = await response.json()
-    setDataNeedAction({
-      action, data: data.data
-    })   
-
+    try {
+      const response = await fetch(`/api/barang/searching?id=${idBarang}`)
+      const data = await response.json()
+      setInitialValue({
+        action, data: data.data
+      })
+      setEditedValue({
+        data: data.data
+      })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const handleClickCloseEditForm = () => {
     setShowEditForm(prev=>!prev)
-    setDataNeedAction({})
+    setInitialValue({})
   }
 
   const handleClickResponseNotif = (res) => {
     if(res){
-      if(dataNeedAction?.action === 'delete'){
+      if(initalValue?.action === 'delete'){
         handleDelete()
       }
 
-      if(dataNeedAction?.action === 'edit'){
+      if(initalValue?.action === 'edit'){
         setShowEditForm(prev=>!prev)
       }
     } else {
-      setDataNeedAction({})
+      setInitialValue({})
     }
     
     handleClickResetNotif()
@@ -202,13 +224,13 @@ const Home = () => {
               'Content-Type': 'application/json'
           },
           body:JSON.stringify({
-              idBarang: dataNeedAction?.data?.idBarang
+              idBarang: initalValue?.data?.idBarang
           })
       })
       const data = await response.json()
-      const totalAsetToDelete = dataNeedAction?.data?.hargaJual * dataNeedAction?.data?.stok
+      const totalAsetToDelete = initalValue?.data?.hargaJual * initalValue?.data?.stok
   
-      setTableBarang(prev=>prev.filter(data=>data.idBarang !== dataNeedAction?.data?.idBarang))
+      setTableBarang(prev=>prev.filter(data=>data.idBarang !== initalValue?.data?.idBarang))
       handleDeleteTotalAset(totalAsetToDelete)
       setIsNotif({
         showNotif: data.showNotif,
@@ -221,12 +243,38 @@ const Home = () => {
     }     
   }
 
-  const handleSubmitEdit = (e) => {
+  const handleSubmitEdit = async(e) => {
     e.preventDefault()
-    console.log('hola')
+    try {
+      const response = await fetch('/api/barang', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          idBarang: editedValue.idBarang,
+          namaBarang: editedValue.namaBarang,
+          stok: editedValue.stok,
+          modalBeli: editedValue.modalBeli,
+          hargaJual: editedValue.hargaJual,
+          idSatuan: editedValue.idSatuan,
+          idKategori: editedValue.idKategori,
+        })
+      })
+
+      const data = await response.json()
+      console.log(data)
+    } catch (error) {
+      setIsNotif({
+        showNotif: true,
+        alertTitle : 'caution',
+        desc: 'Ada kesalahan'
+      })
+      
+    }
   }
 
-  console.log(dataNeedAction)
+  console.log(initalValue)
 
   const handleEdit = async(id) => {
     
@@ -286,9 +334,10 @@ const Home = () => {
     <EditForm
       page={page}
       listField={fieldTableBarang}
-      dataNeedEdit={dataNeedAction?.data[0]}
+      initalValue={initalValue?.data[0]}
       handleSubmitEdit={handleSubmitEdit}
-      handleClickCloseEditForm={handleClickCloseEditForm}  /> }
+      handleClickCloseEditForm={handleClickCloseEditForm}
+      handleChangeEdit={handleChangeEdit}  /> }
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
