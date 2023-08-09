@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { useKategori } from '../context/kategori'
 import { useSatuan } from '../context/satuan'
 import { RxCross1 } from 'react-icons/rx'
@@ -24,9 +24,9 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                         listField.map(value=>{
                             let inputType
                             let listOf
-                            let initialID
 
                             const defaultValue = initalValue[value.key] || ''
+                            console.log(initalValue)                       
 
                             if(value.type === 'text' || value.type === 'number'){
                                 if(value.primaryKey){
@@ -35,21 +35,19 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                     inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' onChange={(e)=>handleChangeEdit(e)} /> )
                                 }
                             } else if(value.type === 'select'){
-                                if(value.key === 'idKategori'){
-                                    initialID = Object.values(listKategori.find(kat=>kat.idKategori === defaultValue))[1]
+                                if(value.key === 'nmKategori'){
                                     listOf = listKategori.map(kategori => (
-                                        <option key={kategori.idKategori} value={kategori.idKategori}>{kategori.nmKategori}</option>
+                                        <option key={kategori.idKategori} value={kategori.idKategori}>{kategori.idKategori} {kategori.nmKategori}</option>
                                     ))
-                                } else if(value.key === 'idSatuan'){
-                                    initialID = Object.values(satuan.find(sat=>sat.idSatuan === defaultValue))[1]
+                                } else if(value.key === 'namaSatuan'){
                                     listOf = satuan.map(sat => (
-                                        <option key={sat.idSatuan} value={sat.idSatuan}>{sat.namaSatuan}</option>
+                                        <option key={sat.idSatuan} value={sat.idSatuan}>{sat.idSatuan} {sat.namaSatuan}</option>
                                     ))
                                 }
                                 
                                 inputType = ( 
                                 <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm' onChange={(e)=>handleChangeEdit(e)}>
-                                    <option value={defaultValue}>{initialID}</option>
+                                    <option value={defaultValue}>{defaultValue}</option>
                                     { listOf }
                                 </select> )
                             }

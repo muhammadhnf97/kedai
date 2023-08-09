@@ -15,19 +15,30 @@ import EditForm from '../components/EditForm'
 
 const Home = () => {
   const page = 'Barang'
-  const { totalAset, handleTotalAset, handleDeleteTotalAset } = useBarang()
+  const { totalAset, handleTotalAset, handleDeleteTotalAset, handleUpdateTotalAsset } = useBarang()
+  
+  const [isNotif, setIsNotif] = useState({
+    showNotif: false,
+    alertTitle : null,
+    desc: null,
+    action: null,
+    answer: null
+  })
+
+  const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null, answer = null) => {
+      setIsNotif(prev=>{
+          return {
+              ...prev,
+              showNotif, alertTitle, desc, action, answer
+          }
+      })
+  }
+  const [tempData, setTempData] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [paggination, setPaggination] = useState(true)
   const [totalRow, setTotalRow] = useState(0)
   const [currentPage, setCurrentPage] = useState(1)
   const [tableBarang, setTableBarang] = useState([])
-  const [editedValue, setEditedValue] = useState({})
-  const [isNotif, setIsNotif] = useState({
-    showNotif:false,
-    alertTitle : null,
-    desc: null,
-    answer: null
-  })
 
   const [inputData, setInputData] = useState({
     namaBarang : '',
@@ -43,8 +54,6 @@ const Home = () => {
     keyword: '',
     idKategori: ''
   })
-
-  const [initalValue, setInitialValue] = useState({})
 
   const [showEditForm, setShowEditForm] = useState(false)
 
@@ -74,27 +83,16 @@ const Home = () => {
         }
     })
   }
-  
-  const handleClickResetNotif = () => {
-    setIsNotif({
-      showNotif:false,
-      alertTitle : null,
-      desc: null
-    })
-  }
 
   const handleChangeEdit = (e) => {
     const {name, value} = e.target
-    console.log(name, value)
-    // setInitialValue(prev=>{
-    //   prev.action,
-    //   prev.data.map(prevData=>{
-    //     return {
-    //       ...prevData,
-    //       [name]: value
-    //     }
-    //   })
-    // })
+
+    setTempData(prev=>{
+        return {
+          ...prev,
+          [name]: value
+        }
+    })
   }
   
   const handleSubmit = async(e) => { 
@@ -118,12 +116,7 @@ const Home = () => {
           })
         })
         const data = await response.json()
-        
-        setIsNotif({
-          showNotif:data.showNotif,
-          alertTitle : data.alertTitle,
-          desc: data.desc,
-        })
+
         setTableBarang(prev=>[
           {  
             idBarang: data.input.newID,
@@ -139,21 +132,14 @@ const Home = () => {
         )
         handleTotalAset(data.input.newTotalAset)
         setIsLoading(data.isLoading)
+        makeNotif(data.showNotif, data.alertTitle, data.desc)
         
       } else {
-        setIsNotif({
-          showNotif: true,
-          alertTitle : 'caution',
-          desc: 'Data tidak boleh kosong !'
-        })
         setIsLoading(prev=>!prev)
+        makeNotif(true, 'info', 'Data tidak boleh kosong')
       }
     } catch (error) {
-      setIsNotif({
-        showNotif: true,
-        alertTitle : 'caution',
-        desc: 'Data tidak dapat dikirim ke database !'
-      })
+      makeNotif(true, 'info', 'Data tidak dapat dikirim ke database')
     }
     handleClickReset()
   }
@@ -174,77 +160,67 @@ const Home = () => {
     })
   }
 
-  const handleEditAndDelete = async(idBarang, namaBarang, action = null) => {
-    setIsNotif({
-      showNotif: true,
-      alertTitle : 'warning',
-      desc: `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${idBarang} ${namaBarang} ?`
-    })
+  const handleEditAndDelete = async(idBarang, namaBarang, action) => {
+    const isNotif = true
+    const alertTitle = 'Peringatan'
+    const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${idBarang} ${namaBarang} ?`
+
+    setIsLoading(prev=>!prev)
+    
     try {
       const response = await fetch(`/api/barang/searching?id=${idBarang}`)
       const data = await response.json()
-      setInitialValue({
-        action, data: data.data
-      })
-      setEditedValue({
-        data: data.data
-      })
+      setTempData(data.data[0])
+      setIsLoading(prev=>!prev)
+      makeNotif(isNotif, alertTitle, desc, action)
     } catch (error) {
-      console.log(error)
+      makeNotif(true, 'info', 'Ada Kesalahan')
     }
-  }
-
-  const handleClickCloseEditForm = () => {
-    setShowEditForm(prev=>!prev)
-    setInitialValue({})
   }
 
   const handleClickResponseNotif = (res) => {
     if(res){
-      if(initalValue?.action === 'delete'){
-        handleDelete()
+      if(isNotif?.action === 'delete'){
+        (async()=>{
+          setIsLoading(prev=>!prev)
+          try {
+            const response = await fetch('/api/barang', {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body:JSON.stringify({
+                    idBarang: tempData?.idBarang
+                })
+            })
+            const data = await response.json()
+            const totalAsetToDelete = tempData?.hargaJual * tempData?.stok
+
+            console.log(data, totalAsetToDelete)
+        
+            setTableBarang(prev=>prev.filter(data=>data.idBarang !== tempData.idBarang))
+            handleDeleteTotalAset(totalAsetToDelete)
+            makeNotif(data.showNotif, data.alertTitle, data.desc)
+            setIsLoading(data.isLoading)
+
+          } catch (error) {
+            makeNotif(true, 'info', 'Ada kesalahan')
+          }   
+        })()
       }
 
-      if(initalValue?.action === 'edit'){
+      if(isNotif?.action === 'edit'){
         setShowEditForm(prev=>!prev)
       }
     } else {
-      setInitialValue({})
+      setTempData({})
     }
-    
-    handleClickResetNotif()
+    makeNotif()
   }
   
-   const handleDelete = async() => {   
-    setIsLoading(prev=>!prev)
-    try {
-      const response = await fetch('/api/barang', {
-          method: 'DELETE',
-          headers: {
-              'Content-Type': 'application/json'
-          },
-          body:JSON.stringify({
-              idBarang: initalValue?.data?.idBarang
-          })
-      })
-      const data = await response.json()
-      const totalAsetToDelete = initalValue?.data?.hargaJual * initalValue?.data?.stok
-  
-      setTableBarang(prev=>prev.filter(data=>data.idBarang !== initalValue?.data?.idBarang))
-      handleDeleteTotalAset(totalAsetToDelete)
-      setIsNotif({
-        showNotif: data.showNotif,
-        alertTitle : data.alertTitle,
-        desc: data.desc
-      })
-      setIsLoading(data.isLoading)
-    } catch (error) {
-      console.log(error)
-    }     
-  }
-
   const handleSubmitEdit = async(e) => {
     e.preventDefault()
+    setIsLoading(prev=>!prev)
     try {
       const response = await fetch('/api/barang', {
         method: 'PUT',
@@ -252,34 +228,51 @@ const Home = () => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          idBarang: editedValue.idBarang,
-          namaBarang: editedValue.namaBarang,
-          stok: editedValue.stok,
-          modalBeli: editedValue.modalBeli,
-          hargaJual: editedValue.hargaJual,
-          idSatuan: editedValue.idSatuan,
-          idKategori: editedValue.idKategori,
+          idBarang: tempData?.idBarang,
+          namaBarang: tempData?.namaBarang,
+          stok: tempData?.stok,
+          modalBeli: tempData?.modalBeli,
+          hargaJual: tempData?.hargaJual,
+          idSatuan: tempData?.idSatuan,
+          idKategori: tempData?.idKategori,
         })
       })
 
       const data = await response.json()
-      console.log(data)
-    } catch (error) {
-      setIsNotif({
-        showNotif: true,
-        alertTitle : 'caution',
-        desc: 'Ada kesalahan'
+
+      handleUpdateTotalAsset(data.data.oldAsset, data.data.newAsset)
+
+      setTableBarang(prev=>{
+        return prev.map(prevItem => {
+            if(prevItem.idBarang === data.data.idBarang){
+                return {
+                  idBarang: data.data.idBarang,
+                  namaBarang: data.data.namaBarang,
+                  stok: data.data.stok,
+                  modalBeli: data.data.modalBeli,
+                  hargaJual: data.data.hargaJual,
+                  namaSatuan: data.data.namaSatuan,
+                  nmKategori: data.data.nmKategori,
+                }
+            } else {
+                return prevItem
+            }
+        })
       })
-      
+      makeNotif(data.showNotif, data.alertTitle, data.desc)
+      setIsLoading(data.isLoading)
+
+      setShowEditForm(prev=>!prev)
+    } catch (error) {
+      makeNotif(true, 'info', 'Ada kesalahan')
     }
   }
 
-  console.log(initalValue)
-
-  const handleEdit = async(id) => {
-    
+  const handleClickCloseEditForm = () => {
+    setShowEditForm(prev=>!prev)
+    setTempData({})
   }
-
+  
   useEffect(()=>{
     const getTotalRow = async() => {
       const response = await fetch('/api/barang/totalrow')
@@ -334,7 +327,7 @@ const Home = () => {
     <EditForm
       page={page}
       listField={fieldTableBarang}
-      initalValue={initalValue?.data[0]}
+      initalValue={tempData}
       handleSubmitEdit={handleSubmitEdit}
       handleClickCloseEditForm={handleClickCloseEditForm}
       handleChangeEdit={handleChangeEdit}  /> }

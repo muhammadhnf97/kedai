@@ -21,7 +21,7 @@ export async function GET(req) {
     } catch (error) {
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
+            alertTitle: 'info',
             desc: "error masbro",
         })
     }
@@ -55,7 +55,7 @@ export async function POST(req) {
 
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
+            alertTitle: 'info',
             desc: "Data berhasil disimpan",
             isLoading: false,
             input : {
@@ -72,7 +72,7 @@ export async function POST(req) {
     } catch (error) {
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
+            alertTitle: 'info',
             desc: "error masbro",
         })
     }
@@ -87,14 +87,14 @@ export async function DELETE(req) {
 
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
+            alertTitle: 'info',
             desc: "Data telah dihapus",
             isLoading: false
         })
     } catch (error) {
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
+            alertTitle: 'info',
             desc: "error masbro",
             isLoading: false
         })
@@ -106,16 +106,32 @@ export async function PUT(req){
     try {
         const {idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori} = await req.json()
         const query = 'UPDATE barang SET namaBarang = ?, stok = ?, modalBeli = ?, hargaJual = ?, idSatuan = ?, idKategori = ? WHERE idBarang = ?'
-        const values = [idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori]
+
+        const getKategori = await dbConnect(`SELECT * FROM kategori WHERE idKategori = ?`, [idKategori])
+        const nmKategori = getKategori[0]?.nmKategori
+        const getSatuan = await dbConnect(`SELECT * FROM satuan WHERE idSatuan = ?`, [idSatuan])
+        const namaSatuan = getSatuan[0]?.namaSatuan
+        const getBarang = await dbConnect(`SELECT barang.stok, barang.hargaJual FROM barang WHERE idBarang = ?`, [idBarang])
+        const oldAsset = getBarang[0]?.stok * getBarang[0]?.hargaJual
+        
+        const newAsset = stok * hargaJual
+
+        const values = [namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, idBarang]
         await dbConnect(query, values)
 
         return NextResponse.json({
-            data: 'success'
+            data: 'success',
+            showNotif: true,
+            alertTitle: 'info',
+            desc: "Data berhasil disimpan",
+            isLoading: false,
+            data: { idBarang, namaBarang, stok, modalBeli, hargaJual, namaSatuan, nmKategori, oldAsset, newAsset }
+            
         })
     } catch (error) {
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
+            alertTitle: 'info',
             desc: "error masbro",
             isLoading: false
         })
