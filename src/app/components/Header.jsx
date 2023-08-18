@@ -3,10 +3,77 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { RiMenu3Fill } from 'react-icons/ri'
 import { IoIosArrowDown } from 'react-icons/io'
-import { RxCross1 } from 'react-icons/rx'
-import { FcBarChart } from 'react-icons/fc'
+import { usePathname } from 'next/navigation'
+import { useLogin } from '../context/login'
 
 const Header = () => {
+    const currentPathname = usePathname()
+    const menu = [{
+        label: 'Home',
+        pathName: '/',
+        child: null
+    },{
+        label: 'Master',
+        pathName: '/',
+        child: [{
+            label: 'Barang',
+            pathName: '/barang',
+            child: null
+        },{
+            label: 'Kategori Barang',
+            pathName: '/kategori',
+            child: null
+        },{
+            label: 'Satuan Barang',
+            pathName: '/satuan',
+            child: null
+        },{
+            label: 'Supplier',
+            pathName: '/supplier',
+            child: null
+        },{
+            label: 'Pegawai',
+            pathName: '/pegawai',
+            child: null
+        }]
+    },{
+        label: 'Transaksi',
+        pathName: '/',
+        child: [{
+            label: 'Pembelian',
+            pathName: '/pembelian',
+            child: null
+        },{
+            label: 'Kategori Barang',
+            pathName: '/penjualan',
+            child: null
+        }]
+    },{
+        label: 'Hutang/Piutang',
+        pathName: '/',
+        child: [{
+            label: 'Hutang',
+            pathName: '/hutang',
+            child: null
+        },{
+            label: 'Piutang',
+            pathName: '/piutang',
+            child: null
+        }]
+    },{
+        label: 'Laporan',
+        pathName: '/laporan',
+        child: null
+    },]
+
+    const { loginData, handleClickSaveLoginData } = useLogin()
+
+    const renderUsernameAndStatus = (
+        <div className='leading-3'>
+            <h3 className='text-2xl font-bold text-[#293241]'>{loginData.nmPegawai}</h3>
+            <h3 className='text-sml font-bold text-[#3D5A80]'>{loginData.status}</h3>
+        </div>
+    )
 
     const [showMobileView, setShowMobileView] = useState(false)
 
@@ -16,124 +83,78 @@ const Header = () => {
 
   return (
     <>
-    <div className={`fixed w-full h-20 px-5 bg-white z-10`}>
-        <div className='h-full max-w-7xl mx-auto border-b-2 border-[#EE6C4D] px-5 py-2 flex justify-between'>
-            <div className='leading-3'>
-                <h3 className='text-2xl font-bold text-[#293241]'>Username</h3>
-                <h3 className='text-sml font-bold text-[#3D5A80]'>Administrator</h3>
-            </div>
-            <button className='flex items-center md:hidden' onClick={handleClickMobileNavbar}>
-                <RiMenu3Fill className='w-7 h-7 ' />
-            </button>
-            <div className='hidden h-full md:flex md:items-center md:justify-center md:gap-4'>
-                <Link href={'/'} >
-                    <p className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>Home</p>
-                </Link>
-                <div className='relative group h-full flex items-center'>
-                    <button className='flex items-center gap-2'>
-                        <span className=''>Master</span><IoIosArrowDown />
-                    </button>
-                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[9rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
-                        <Link href={'/barang'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Barang
-                            </button>
-                        </Link>
-                        <Link href={'/kategori'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Kategori Barang
-                            </button>
-                        </Link>
-                        <Link href={'/satuan'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Satuan Barang
-                            </button>
-                        </Link>
-                        <Link href={'/supplier'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Supplier
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-                <div className='relative group h-full flex items-center'>
-                    <button className='flex items-center gap-2'>
-                        <span className=''>Transaksi</span><IoIosArrowDown />
-                    </button>
-                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
-                        <Link href={'/penjualan'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Penjualan
-                            </button>
-                        </Link>
-                        <Link href={'/pembelian'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Pembelian
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-                <div className='relative group h-full flex items-center'>
-                    <button className='flex items-center justify-center gap-1'>
-                    <span className=''>Hutang/Piutang</span><IoIosArrowDown />
-                    </button>
-                    <div className='absolute w-48 p-3 group flex flex-col -bottom-[5rem] left-7 border-2 border-[#293241] shadow-lg bg-[#E0FBFC] rounded-lg duration-200 origin-top-left invisible scale-0 group-hover:visible group-hover:scale-100'>
-                        <Link href={'/hutang'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Hutang
-                            </button>
-                        </Link>
-                        <Link href={'/piutang'}>
-                            <button className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full'>
-                                    Piutang
-                            </button>
-                        </Link>
-                    </div>
-                </div>
-                <p className='w-full py-1 px-2 hover:bg-[#98C1D9] duration-150 ease-out rounded-full flex items-center justify-center gap-1'><FcBarChart className='w-6 h-6' />Laporan</p>
-            </div>
+    <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-10'>
+        <div className='max-w-7xl h-full  px-5 mx-auto flex justify-between items-center relative'>
+            { renderUsernameAndStatus }
+            <ul className='flex gap-5 justify-center items-center'>
+            {
+                menu.map((listmenu)=>{
+                    if(!listmenu.child){
+                        return (
+                            <Link key={listmenu.pathName} href={listmenu.pathName} as={Link}>
+                                <li>
+                                    <p className={`py-1 px-2 hover:bg-[#98C1D9] hover:rounded-full duration-150 ease-out rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300'}`}>{listmenu.label}</p>
+                                    </li>
+                            </Link>
+                        )
+                    } else {
+                        return (
+                        <div className='group leading-7'>
+                            <div className='flex items-center justify-center gap-1'>{listmenu.label}<IoIosArrowDown /></div>
+                            <ul className='absolute invisible origin-top scale-0 border-2 border-black rounded-lg duration-200 ease-out bg-white p-1 group-hover:scale-100 group-hover:visible '>
+                            {
+                                listmenu.child.map(childmenu=>(
+                                    <Link key={childmenu.pathName} href={childmenu.pathName} as={Link}>
+                                        <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
+                                    </Link>
+                                ))
+                            }
+                            </ul>
+                        </div>
+                        )
+                    }
+                })
+            }
+            </ul>
         </div>
     </div>
-    <section className={`fixed w-screen h-screen bg-black bg-opacity-80 duration-300 z-20 ${showMobileView ? 'visible' : 'invisible'}`}>
-        <div className={`relative w-full bg-white flex flex-col items-center gap- py-5 duration-300 ease-in-out ${showMobileView ? 'visible translate-y-0' : 'invisible -translate-y-20'}`}>
-            <button className='w-10 h-10 absolute top-5 right-10 px-1 rounded-full border flex justify-center items-center duration-200 hover:bg-gray-100' onClick={handleClickMobileNavbar}>
-                <RxCross1 />
-            </button>
-            <Link href={'/'}>
-                <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out mb-2'>Home</p>
-            </Link>
-            <div className='w-56 flex flex-col items-center py-2 border-t-2 border-[#293241]'>
-                <Link href={'/'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Barang</p>
-                </Link>
-                <Link href={'/barang'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Kategori</p>
-                </Link>
-                <Link href={'/katagori'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Supplier</p>
-                </Link>
-            </div>
-            <div className='w-56 flex flex-col items-center py-2 border-t-2 border-[#293241]'>
-                <Link href={'/pembelian'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Pembelian</p>
-                </Link>
-                <Link href={'/penjualan'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Penjualan</p>
-                </Link>
-            </div>
-            <div className='w-56 flex flex-col items-center py-2 border-t-2 border-b-2 border-[#293241]'>
-                <Link href={'/hutang'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Hutang</p>
-                </Link>
-                <Link href={'/piutang'} >
-                    <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-100 ease-out'>Piutang</p>
-                </Link>
-            </div>
-            <Link href={'/laporan'}>
-                <p className='hover:bg-[#98C1D9] w-fit rounded-full px-20 py-1 hover:duration-200 ease-in mb-2 mt-2 flex items-center justify-center gap-1'><FcBarChart className='w-6 h-6' />Laporan</p>
-            </Link>
+    <div className='md:hidden fixed w-full h-20 px-5 flex items-center justify-between bg-white shadow-md'>
+        { renderUsernameAndStatus }
+        <button className='flex items-center md:hidden' onClick={handleClickMobileNavbar}>
+            <RiMenu3Fill className='w-7 h-7 ' />
+        </button>
+    </div>
+    <div className={`fixed w-full h-full bg-black bg-opacity-70 ${showMobileView ? 'visible' : 'invisible'}`} onClick={handleClickMobileNavbar}>
+        <div className={`w-full h-fit shadow-md bg-white text-center leading-7 py-5 px-10`}>
+            <ul className='leading-6'>
+                {
+                    menu.map(listmenu=>{
+                        if(!listmenu.child){
+                            return (
+                                <Link key={listmenu.pathName} href={listmenu.pathName}>
+                                    <li><p className={`px-2 hover   :bg-[#98C1D9] hover:rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{listmenu.label}</p></li>
+                                </Link>
+                            )
+                        } else {
+                            return (
+                                <div className='group leading-7 my-2 rounded-lg'>
+                                    <ul className='border-t-2 border-blue-500 bg-white p-1'>
+                                    {
+                                        listmenu.child.map(childmenu=>(
+                                            <Link href={childmenu.pathName}>
+                                                <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
+                                            </Link>
+                                        ))
+                                    }
+                                    </ul>
+                                </div>
+                            )
+                        }
+                    })
+                }
+            </ul>
         </div>
-    </section>
+    </div>
     </>
   )
 }

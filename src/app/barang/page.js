@@ -3,7 +3,6 @@ import React from 'react'
 import { useState, useEffect } from 'react'
 import { fieldTableBarang } from '../utils/tableName'
 import { useBarang } from '../context/barang'
-import { barangAddValue } from '../utils/tableAddValue'
 import { searchUtilsBarang } from '../utils/searchutils'
 import TableAset from '../components/TableAset'
 import TableWithAction from '../components/TableWithAction'
@@ -12,8 +11,11 @@ import Notification from '../components/Notification'
 import Search from '../components/Search'
 import Loading from '../components/Loading'
 import EditForm from '../components/EditForm'
+import { useSearchParams } from 'next/navigation'
 
 const Home = () => {
+  const pathname = useSearchParams().get('page')
+
   const page = 'Barang'
   const { totalAset, handleTotalAset, handleDeleteTotalAset, handleUpdateTotalAsset } = useBarang()
   
@@ -34,10 +36,10 @@ const Home = () => {
       })
   }
   const [tempData, setTempData] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
-  const [paggination, setPaggination] = useState(true)
+  const [isLoading, setIsLoading] = useState(true)
+  const [showPaggination, setShowPaggination] = useState(true)
   const [totalRow, setTotalRow] = useState(0)
-  const [currentPage, setCurrentPage] = useState(1)
+  const [currentPage, setCurrentPage] = useState(pathname || 1)
   const [tableBarang, setTableBarang] = useState([])
 
   const [inputData, setInputData] = useState({
@@ -74,7 +76,7 @@ const Home = () => {
     })
   }
   
-  const handleChangeInputData = (e) => {
+  const handleChangeInsertData = (e) => {
     const {name, value} = e.target
     setInputData(prev=>{
         return {
@@ -95,7 +97,7 @@ const Home = () => {
     })
   }
   
-  const handleSubmit = async(e) => { 
+  const handleSubmitInsert = async(e) => { 
     e.preventDefault()
     setIsLoading(prev=>!prev)
     try {
@@ -133,6 +135,7 @@ const Home = () => {
         handleTotalAset(data.input.newTotalAset)
         setIsLoading(data.isLoading)
         makeNotif(data.showNotif, data.alertTitle, data.desc)
+        setTotalRow(prev=>prev+1)
         
       } else {
         setIsLoading(prev=>!prev)
@@ -160,7 +163,7 @@ const Home = () => {
     })
   }
 
-  const handleEditAndDelete = async(idBarang, namaBarang, action) => {
+  const handleClickAction = async(idBarang, namaBarang, action) => {
     const isNotif = true
     const alertTitle = 'Peringatan'
     const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${idBarang} ${namaBarang} ?`
@@ -195,8 +198,6 @@ const Home = () => {
             })
             const data = await response.json()
             const totalAsetToDelete = tempData?.hargaJual * tempData?.stok
-
-            console.log(data, totalAsetToDelete)
         
             setTableBarang(prev=>prev.filter(data=>data.idBarang !== tempData.idBarang))
             handleDeleteTotalAset(totalAsetToDelete)
@@ -205,7 +206,9 @@ const Home = () => {
 
           } catch (error) {
             makeNotif(true, 'info', 'Ada kesalahan')
-          }   
+          }  
+          setTempData({}) 
+          setTotalRow(prev=>prev-1)
         })()
       }
 
@@ -294,7 +297,8 @@ const Home = () => {
     }
     getDataBarang().then(barang=>{
       setTableBarang(barang?.data)
-      setPaggination(barang?.paggination)
+      setShowPaggination(barang?.paggination)
+      setIsLoading(barang?.isLoading)
     })
   }, [currentPage])
 
@@ -317,12 +321,13 @@ const Home = () => {
 
     getBarangBasedSearch().then(data=>{
       setTableBarang(data.data)
-      setPaggination(data.paggination)
+      setShowPaggination(data.paggination)
     })
   }, [searchValue])
 
   return (
     <>
+    {/* { isLoading && <Loading /> } */}
     { showEditForm && 
     <EditForm
       page={page}
@@ -346,10 +351,10 @@ const Home = () => {
         <section className='flex-1'>
           <AddItem
             page={page}
-            input={barangAddValue} 
+            field={fieldTableBarang} 
             inputData={inputData} 
-            handleChangeInputData={handleChangeInputData}
-            handleSubmit={handleSubmit}
+            handleChangeInsertData={handleChangeInsertData}
+            handleSubmitInsert={handleSubmitInsert}
             handleClickReset={handleClickReset}
           />
         </section>
@@ -367,12 +372,12 @@ const Home = () => {
           <TableWithAction
             page={page}
             field={fieldTableBarang} 
-            row={tableBarang}
+            initialData={tableBarang}
             totalRow={totalRow}
             currentPage={currentPage}
             handleClickCurrentPage={handleClickCurrentPage}
-            paggination={paggination}
-            handleEditAndDelete={handleEditAndDelete}
+            showPaggination={showPaggination}
+            handleClickAction={handleClickAction}
           />
           <TableAset 
             desc={'Total Aset'} 

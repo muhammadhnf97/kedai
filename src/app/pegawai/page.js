@@ -6,24 +6,24 @@ import TableWithAction from '../components/TableWithAction'
 import Loading from '../components/Loading'
 import Notification from '../components/Notification'
 import EditForm from '../components/EditForm'
-import { fieldSatuan } from '../utils/tableName'
-import { searchSatuanBy } from '../utils/searchutils'
+import { fieldPegawai } from '../utils/tableName'
+import { searchPegawaiBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
 
 const Home = () => {
 
-    const page = 'Satuan Barang'
+    const page = 'Pegawai'
     const searchParam = useSearchParams().get('page')
 
     const [isLoading, setIsLoading] = useState(true)
     const [showPaggination, setShowPaggination] = useState(true)
     const [currentPage, setCurrentPage] = useState(searchParam || 1)
-    const [dataSatuan, setDataSatuan] = useState([])
+    const [initialData, setInitialData] = useState([])
     const [totalRow, setTotalRow] = useState(0)
 
     useEffect(()=>{
       const getTotalRow = async() => {
-        const response = await fetch('/api/satuan/totalrow')
+        const response = await fetch('/api/pegawai/totalrow')
         const data = await response.json()
         return data.totalRow
       }
@@ -47,13 +47,13 @@ const Home = () => {
     }
 
     useEffect(()=>{
-      const getDataSatuan = async() => {
+      const getinitialData = async() => {
         setIsLoading(true)
         try {
-          const response = await fetch(`/api/satuan?page=${currentPage}`)
+          const response = await fetch(`/api/pegawai?page=${currentPage}`)
           const data = await response.json()
           if(data.status === 200){
-            setDataSatuan(data.data)
+            setInitialData(data.data)
             setIsLoading(data.isLoading)
           } else {
             makeNotif(data.showNotif, data.alertTitle, data.desc)
@@ -62,7 +62,7 @@ const Home = () => {
           makeNotif(true, 'info', "Backend tidak ada")
         }
       }
-      getDataSatuan()
+      getinitialData()
     }, [currentPage])
 
     useEffect(()=>{
@@ -78,19 +78,22 @@ const Home = () => {
     const handleClickAction = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
-      const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
+    
+      const desc = action === 'newakun' ? 
+      `Tambah akun dengan ID ${id} ${nama} ? ` : 
+      `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
       setIsLoading(prev=>!prev)
       try {
-        const response = await fetch(`/api/satuan/searching?id=${id}`)
+        const response = await fetch(`/api/pegawai/databyid?id=${id}`)
         const data = await response.json()
         setTempData(data.data[0])
         setIsLoading(prev=>!prev)
         makeNotif(isNotif, alertTitle, desc, action)
       } catch (error) {
-        
+        makeNotif(isNotif, alertTitle, desc, action)
       }
     }
-
+    console.log(isNotif)
     const [showEditForm, setShowEditForm] = useState(false)
 
     const handleClickResponseNotif = async(res = null) => {
@@ -98,19 +101,19 @@ const Home = () => {
         if(isNotif.action === 'delete'){
           setIsLoading(prev=>!prev)
           try {
-            const response = await fetch('/api/satuan', {
+            const response = await fetch('/api/pegawai', {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                idSatuan: tempData?.idSatuan
+                idPegawai: tempData?.idPegawai
               })
             })
 
             const data = await response.json()
         
-            setDataSatuan(prev=>prev.filter(data=>data.idSatuan !== tempData?.idSatuan))
+            setInitialData(prev=>prev.filter(data=>data.idPegawai !== tempData?.idPegawai))
             makeNotif(data.showNotif, data.alertTitle, data.desc)
             setIsLoading(data.isLoading)
             setTotalRow(prev=>prev-1)
@@ -118,10 +121,10 @@ const Home = () => {
           } catch (error) {
             setTempData({})
           }
-        } else {
-          if(isNotif?.action === 'edit'){
-            setShowEditForm(prev=>!prev)
-          }
+        } else if(isNotif?.action === 'edit'){
+          setShowEditForm(prev=>!prev)
+        } else if(isNotif?.action === 'newakun'){
+          console.log('user baru telah dibuat')
         }
       }
       makeNotif()
@@ -130,25 +133,30 @@ const Home = () => {
     const handleSubmitEdit = async(e) =>{
       e.preventDefault()
       try {
-        const response = await fetch('/api/satuan', {
+        const response = await fetch('/api/pegawai', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            idSatuan: tempData?.idSatuan,
-            namaSatuan: tempData?.namaSatuan
+            idPegawai: tempData?.idPegawai,
+            nmPegawai: tempData?.nmPegawai,
+            alamat: tempData?.alamat,
+            noTelp: tempData?.noTelp,
+            jabatan: tempData?.jabatan
           })
         })
   
         const data = await response.json()
   
-        setDataSatuan(prev=>{
+        setInitialData(prev=>{
           return prev.map(prevItem => {
-              if(prevItem.idSatuan === data.data.idSatuan){
+              if(prevItem.idPegawai === data.data.idPegawai){
                   return {
-                    idSatuan: data.data.idSatuan,
-                    namaSatuan: data.data.namaSatuan
+                    idPegawai: data.data.idPegawai,
+                    nmPegawai: data.data.nmPegawai,
+                    alamat: data.data.alamat,
+                    noTelp: data.data.noTelp,
                   }
               } else {
                   return prevItem
@@ -181,7 +189,10 @@ const Home = () => {
 
 
     const [insertData, setInsertData] = useState({
-        namaSatuan: ''
+        nmPegawai: '',
+        alamat: '',
+        noTelp: '',
+        jabatan: ''
     })
 
     const handleChangeInsertData = (e) =>{
@@ -196,29 +207,36 @@ const Home = () => {
 
     const handleSubmitInsert = async(e) => {
       e.preventDefault()
-      if(insertData.namaSatuan.length < 1){
+      if(insertData.nmPegawai.length < 1 && insertData.alamat.length < 1 && insertData.noTelp.length < 1){
         makeNotif(true, 'info', 'Data tidak boleh kosong')
         return
       }
 
       setIsLoading(prev=>!prev)
       try {
-          const response = await fetch('/api/satuan', {
+          const response = await fetch('/api/pegawai', {
             method:'POST',
             headers: {
               'Content-type': 'application/json'
             },
             body: JSON.stringify({
-              namaSatuan: insertData.namaSatuan
+              nmPegawai: insertData?.nmPegawai,
+              alamat: insertData?.alamat,
+              noTelp: insertData?.noTelp,
+              jabatan: insertData?.jabatan
             })            
           })
           const data = await response.json()
 
-          setDataSatuan(prev=>{
+          setInitialData(prev=>{
             return [
               {
-                idSatuan: data.data.idSatuan,
-                namaSatuan: data.data.namaSatuan
+                idPegawai: data.data.idPegawai,
+                nmPegawai: data.data.nmPegawai,
+                alamat: data.data.alamat,
+                noTelp: data.data.noTelp,
+                jabatan: data.data.jabatan
+                
               },
               ...prev
             ]
@@ -226,27 +244,24 @@ const Home = () => {
 
           makeNotif(data.showNotif, data.alertTitle, data.desc)
           setIsLoading(data.isLoading)
-          setSatuan(prev=>{
-            return [
-              {
-                idSatuan: data.data.idSatuan,
-                namaSatuan: data.data.namaSatuan
-              },
-              ...prev
-            ]
-          })
           setTotalRow(prev=>prev+1)
       } catch (error) {
         makeNotif(true, 'info', 'Ada kesalahan saat mengirim data')        
       }
       setInsertData({
-        namaSatuan: ''
+        nmPegawai: '',
+        alamat: '',
+        noTelp: '',
+        jabatan: ''
       })
     }
 
     const handleClickEmptyInsert = () => {
       setInsertData({
-        namaSatuan: ''
+        nmPegawai: '',
+        alamat: '',
+        noTelp: '',
+        jabatan: ''
       })
     }
 
@@ -268,9 +283,9 @@ const Home = () => {
       const getBasedSearch = async() => {
         let response
         if(searchQuery.keyword.length > 0){
-          response = await fetch(`/api/satuan/searching?keyword=${searchQuery.keyword}`)
+          response = await fetch(`/api/pegawai/searching?keyword=${searchQuery.keyword}`)
         } else {
-          response = await fetch(`/api/satuan?page=${currentPage}`)
+          response = await fetch(`/api/pegawai?page=${currentPage}`)
         }
   
         const data = await response.json()
@@ -278,7 +293,7 @@ const Home = () => {
       }
   
       getBasedSearch().then(data=>{
-        setDataSatuan(data.data)
+        setInitialData(data.data)
         setShowPaggination(data.paggination)
       })
     }, [searchQuery])
@@ -296,7 +311,7 @@ const Home = () => {
     { showEditForm && 
     <EditForm
       page={page}
-      listField={fieldSatuan}
+      listField={fieldPegawai}
       initalValue={tempData}
       handleSubmitEdit={handleSubmitEdit}
       handleClickCloseEditForm={handleClickCloseEditForm}
@@ -316,7 +331,7 @@ const Home = () => {
         <section className='flex-1'>
           <AddItem
             page={page}
-            field={fieldSatuan} 
+            field={fieldPegawai} 
             inputData={insertData} 
             handleChangeInsertData={handleChangeInsertData}
             handleSubmitInsert={handleSubmitInsert}
@@ -327,7 +342,7 @@ const Home = () => {
           <Search 
             page={page}
             searchValue={searchQuery}
-            searchUtils={searchSatuanBy}
+            searchUtils={searchPegawaiBy}
             handleChangeSearch={handleChangeSearchQuery}
             handleClickResetSearching={handleChangeResetQuery}
            />
@@ -336,8 +351,8 @@ const Home = () => {
       <section className="w-full px-2 md:px-5">
           <TableWithAction
             page={page}
-            field={fieldSatuan} 
-            row={dataSatuan}
+            field={fieldPegawai} 
+            initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}
             handleClickCurrentPage={handleClickCurrentPage}

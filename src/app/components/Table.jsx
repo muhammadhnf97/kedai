@@ -19,7 +19,6 @@ const Table = ({ field, row }) => {
     
     const handleClickUpdate = () => {
         const getID = Object.values(detailItem)[0]
-        console.log(getID)
     }
     
   return (

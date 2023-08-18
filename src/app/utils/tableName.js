@@ -29,13 +29,76 @@ export const fieldTableBarang = [{
         key: 'idKategori',
         type: 'select',
         detail: 'nmKategori'
-    }]
+    }
+]
 
-export const fieldTableSatuan = [
-    {
-        label: 'No',
-        key: 'no'
-    },{
-        label: 'Nama Satuan',
-        key: 'namaSatuan'
-    }]
+export const fieldKategori = [{
+    label: 'ID Kategori',
+    key: 'idKategori',
+    type: 'number',
+    primaryKey:true
+},{
+    label: 'Nama Kategori',
+    key: 'nmKategori',
+    type: 'text',
+},]
+
+
+export const fieldSatuan = [{
+    label: 'ID Satuan',
+    key: 'idSatuan',
+    type: 'number',
+    primaryKey:true
+},{
+    label: 'Nama Satuan',
+    key: 'namaSatuan',
+    type: 'text',
+},]
+
+
+export const fieldSupplier = [{
+    label: 'ID Supplier',
+    key: 'idSupplier',
+    type: 'text',
+    primaryKey: true
+},{
+    label: 'Nama Supplier',
+    key: 'nmSupplier',
+    type: 'text',
+},{
+    label: 'No Telp',
+    key: 'noTelp',
+    type: 'text',
+},{
+    label: 'Alamat',
+    key: 'alamat',
+    type: 'text',
+},{
+    label: 'Penanggung Jawab',
+    key: 'penanggungJawab',
+    type: 'text',
+},]
+
+
+export const fieldPegawai = [{
+    label: 'ID Pegawai',
+    key: 'idPegawai',
+    type: 'text',
+    primaryKey: true
+},{
+    label: 'Nama Pegawai',
+    key: 'nmPegawai',
+    type: 'text',
+},{
+    label: 'Alamat',
+    key: 'alamat',
+    type: 'text',
+},{
+    label: 'No Telp',
+    key: 'noTelp',
+    type: 'text',
+},{
+    label: 'Jabatan',
+    key: 'jabatan',
+    type: 'select',
+}]

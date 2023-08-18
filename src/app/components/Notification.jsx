@@ -18,7 +18,7 @@ const Notification = ({ desc, alertTitle, handleClickResponseNotif }) => {
   return (
     <div className='fixed w-full h-full bg-black flex items-center justify-center top-0 bg-opacity-60 z-30 p-5'>
         <div className='w-80 h-40 bg-white rounded-lg overflow-hidden flex flex-col'>
-            <div className='w-full flex items-center justify-center bg-blue-200 py-3 gap-2'>
+            <div className='w-full flex items-center justify-center bg-blue-200 py-1 gap-2'>
                 { alertTitle === 'info' ?  <AiOutlineInfoCircle className='w-6 h-6 text-blue-600' /> : <ImWarning className='text-red-600 w-6 h-6'/>}
                 <p className='text-lg font-semibold'>{alertTitle.charAt(0).toUpperCase() + alertTitle.slice(1)}</p>
             </div>

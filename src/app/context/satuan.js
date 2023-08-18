@@ -18,7 +18,7 @@ export const SatuanProvider = ({ children }) => {
     }, [])
 
     return (
-        <SatuanContext.Provider value={{ satuan }} >
+        <SatuanContext.Provider value={{ satuan, setSatuan }} >
             {children}
         </SatuanContext.Provider>
     )

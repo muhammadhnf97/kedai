@@ -7,6 +7,7 @@ import Footer from './components/Footer';
 import Loading from './components/Loading';
 import Header from './components/Header';
 import Providers from './context/providers';
+import { usePathname } from 'next/navigation';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -21,24 +22,11 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
 
-  const [isLoginPage, setIsLoginPage] = useState(null)
-  const [isLoading, setIsLoading] = useState(true)
+  const pathname = usePathname()
+  const [isLoginPage, setIsLoginPage] = useState(pathname)
   let renderPage
 
-  useEffect(() => {
-    const isLoginPage = window.location.pathname === '/login' ? true : false;
-    setIsLoginPage(isLoginPage);
-  }, []); 
-
-  useEffect(()=>{
-    if(isLoginPage !== null){
-      setIsLoading(prev=>!prev)
-    }
-  }, [isLoginPage])
-
-  if(isLoading){
-    renderPage = ( <Loading /> )
-  } else if(isLoginPage){
+  if(isLoginPage === '/login'){
     renderPage = ( 
       <>
         {children}
@@ -49,7 +37,7 @@ export default function RootLayout({ children }) {
     renderPage = (
       <>
         <Header />
-        <main className=' mt-20 py-5'>
+        <main className='mt-20 py-5'>
           {children}
         </main>
         <Footer />
@@ -62,9 +50,9 @@ export default function RootLayout({ children }) {
         <title>{metadata.title}</title>
         <meta name="description" content={metadata.description} />
       </head>
-      <body className={`h-full flex flex-col bg-white ${poppins.className}`}>
+      <body className={`h-full flex flex-col bg-slate-100 ${poppins.className}`}>
           <Providers>
-            <CustomeBackground />
+            {/* <CustomeBackground /> */}
               { renderPage }
           </Providers>
       </body>

@@ -15,14 +15,17 @@ export async function GET(req) {
         const data = await dbConnect(query);
 
         return NextResponse.json({
+            status: 200,
             data,
-            paggination: true
+            paggination: true,
+            isLoading: false
         })
     } catch (error) {
         return NextResponse.json({
+            status:500,
             showNotif: true,
             alertTitle: 'info',
-            desc: "error masbro",
+            desc: "Gagal menghubungkan ke database",
         })
     }
 }
@@ -95,7 +98,7 @@ export async function DELETE(req) {
         return NextResponse.json({
             showNotif: true,
             alertTitle: 'info',
-            desc: "error masbro",
+            desc: "Gagal menghapus data",
             isLoading: false
         })
         
@@ -123,7 +126,7 @@ export async function PUT(req){
             data: 'success',
             showNotif: true,
             alertTitle: 'info',
-            desc: "Data berhasil disimpan",
+            desc: "Data berhasil diubah",
             isLoading: false,
             data: { idBarang, namaBarang, stok, modalBeli, hargaJual, namaSatuan, nmKategori, oldAsset, newAsset }
             

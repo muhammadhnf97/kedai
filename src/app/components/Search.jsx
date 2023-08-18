@@ -1,13 +1,14 @@
 import React from 'react'
 import { useKategori } from '../context/kategori'
 import { AiOutlineClear } from 'react-icons/ai'
+import { FaMagnifyingGlass } from 'react-icons/fa6'
 
 const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClickResetSearching }) => {
 
     const { listKategori } = useKategori()
   return (
-    <div className='w-full px-2 md:px-5 space-y-5 bg-white rounded-lg shadow-md p-3 border border-black'>
-        <p className='font-semibold text-lg border-b-2 border-emerald-800'>Cari data {page.toLocaleLowerCase()}</p>
+    <div className='w-full space-y-5 bg-white rounded-lg shadow-md p-3 border-2 border-black md:px-5'>
+        <div className='font-semibold text-lg flex items-center justify-start gap-2'><FaMagnifyingGlass /> Cari data {page.toLocaleLowerCase()}</div>
         <div className='space-y-3'>
             {
                 searchUtils.map((value, index)=>{

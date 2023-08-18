@@ -9,7 +9,7 @@ export default function KategoriProvider({ children }){
     useEffect(()=>{
         const getKategori = async() => {
             try {
-                const response = await fetch('/api/kategori')
+                const response = await fetch('/api/kategori/getall')
                 const data = await response.json()
                 return data.data
             } catch (error) {
@@ -19,12 +19,13 @@ export default function KategoriProvider({ children }){
                 })
             }
         }
+        
 
         getKategori().then(data=>setListKategori(data))
     }, [])
 
     return(
-        <KategoriContext.Provider value={{listKategori}}>
+        <KategoriContext.Provider value={{listKategori, setListKategori}}>
             {children}
         </KategoriContext.Provider>
     )

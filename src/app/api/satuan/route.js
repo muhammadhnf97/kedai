@@ -7,69 +7,93 @@ export async function GET(req) {
     const offsed = (page - 1) * itemsPerPage
 
     try {
-        const query = `SELECT * FROM satuan`
+        const query = `SELECT idSatuan, namaSatuan FROM satuan ORDER BY dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`
         const data = await dbConnect(query);
-        const newData = data.map(prev=>{
-            return {
-                nama: prev.namaSatuan
-            }
-        })
 
         return NextResponse.json({
-            newData,
+            data,
             status: 200,
-            page
+            paggination: true
         })
     } catch (error) {
         return NextResponse.json({
             showNotif: true,
             alertTitle: 'caution',
-            desc: "error masbro",
+            desc: "Error saat mengambil data dari database",
         })
     }
 }
 
 export async function POST(req) {
+
+    const querySatuan = await dbConnect('SELECT idSatuan FROM satuan')
+    const satuan = querySatuan.map(kat=>kat.idSatuan)
+    const newId = satuan.length > 0 ? Math.max(...satuan) + 1 : 1
+
+    const { namaSatuan } = await req.json()
+   
+    const query = `INSERT INTO satuan ( idSatuan, namaSatuan ) VALUES (?, ?)`
+    const values = [newId, namaSatuan]
+    await dbConnect(query, values)
+
+    return NextResponse.json({
+        isLoading: false,
+        status: 200,
+        showNotif: true,
+        alertTitle: 'info',
+        desc: 'Data telah disimpan ke database',
+        data : {
+            idSatuan : newId, namaSatuan
+        }
+    })
+}
+
+export async function DELETE(req) {
+    const { idSatuan } = await req.json()
     try {
-        const { namaBarang, stok, modalBeli,hargaJual, satuan,idKategori } = await req.json()
-
-        const lastIdQuery = `SELECT barang.idBarang FROM barang WHERE idKategori = ${parseInt(idKategori)}`
-        const listOfID = await dbConnect(lastIdQuery)
-        const sliceID = listOfID.map(dataID=>Number(dataID.idBarang.substr(7))) 
-        const maxID = Math.max(...sliceID) + 1 || 1
-        const newID = '9999'+idKategori.toString()+maxID.toString().padStart(3, '0') 
-
-        const queryNamaKategori = `SELECT nmKategori FROM kategori WHERE idKategori = ${idKategori}`
-        const dataNama = await dbConnect(queryNamaKategori)
-        const nmKategori = dataNama[0]
-
-        const PostQuery = `INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, satuan, idKategori) VALUES (?, ?, ?, ?, ?, ?, ?)`
-        const values = [newID, namaBarang, stok, modalBeli,hargaJual, satuan, idKategori]
-        await dbConnect(PostQuery, values)
-
-        const newTotalAset = hargaJual * stok
-
+        const query = `DELETE FROM satuan WHERE idSatuan = ?`
+        const values = [idSatuan]
+        await dbConnect(query, values)
+    
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
-            desc: "Data berhasil disimpan",
-            input : {
-                newID, 
-                namaBarang, 
-                stok, 
-                modalBeli,
-                hargaJual, 
-                satuan, 
-                nmKategori,
-                newTotalAset
-            }
+            alertTitle: 'info',
+            desc: "Data telah dihapus",
+            isLoading: false
         })
     } catch (error) {
         return NextResponse.json({
             showNotif: true,
-            alertTitle: 'caution',
-            desc: "error masbro",
+            alertTitle: 'info',
+            desc: "Gagal menghapus data",
+            isLoading: false,
+            error
         })
     }
 }
 
+export async function PUT(req){
+    try {
+        const {idSatuan, namaSatuan} = await req.json()
+        const query = 'UPDATE satuan SET namaSatuan = ? WHERE idSatuan = ?'
+        const values = [namaSatuan, idSatuan]
+        await dbConnect(query, values)
+
+        return NextResponse.json({
+            data: 'success',
+            showNotif: true,
+            alertTitle: 'info',
+            desc: "Data berhasil diubah",
+            isLoading: false,
+            data: { idSatuan, namaSatuan }
+            
+        })
+    } catch (error) {
+        return NextResponse.json({
+            showNotif: true,
+            alertTitle: 'info',
+            desc: "Error saat mengubah data",
+            isLoading: false
+        })
+    }
+}

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React from 'react'
 import { useKategori } from '../context/kategori'
 import { useSatuan } from '../context/satuan'
 import { RxCross1 } from 'react-icons/rx'
@@ -7,7 +7,6 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
 
     const { listKategori } = useKategori()
     const { satuan } = useSatuan()
-       
 
   return (
     <form onSubmit={(e)=>handleSubmitEdit(e)}>
@@ -25,8 +24,7 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                             let inputType
                             let listOf
 
-                            const defaultValue = initalValue[value.key] || ''
-                            console.log(initalValue)                       
+                            const defaultValue = initalValue[value.key] || ''        
 
                             if(value.type === 'text' || value.type === 'number'){
                                 if(value.primaryKey){
@@ -35,11 +33,11 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                     inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' onChange={(e)=>handleChangeEdit(e)} /> )
                                 }
                             } else if(value.type === 'select'){
-                                if(value.key === 'nmKategori'){
+                                if(value.key === 'idKategori'){
                                     listOf = listKategori.map(kategori => (
                                         <option key={kategori.idKategori} value={kategori.idKategori}>{kategori.idKategori} {kategori.nmKategori}</option>
                                     ))
-                                } else if(value.key === 'namaSatuan'){
+                                } else if(value.key === 'idSatuan'){
                                     listOf = satuan.map(sat => (
                                         <option key={sat.idSatuan} value={sat.idSatuan}>{sat.idSatuan} {sat.namaSatuan}</option>
                                     ))

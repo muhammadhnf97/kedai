@@ -3,7 +3,7 @@ import { NextResponse } from "next/server"
 
 export async function GET() {
 
-    const query = "SELECT COUNT(*) FROM satuan "
+    const query = "SELECT COUNT(*) FROM kategori "
     const data = await dbConnect(query)
     const totalRow = data[0]["COUNT(*)"]
 

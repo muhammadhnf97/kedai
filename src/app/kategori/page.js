@@ -6,24 +6,28 @@ import TableWithAction from '../components/TableWithAction'
 import Loading from '../components/Loading'
 import Notification from '../components/Notification'
 import EditForm from '../components/EditForm'
-import { fieldSatuan } from '../utils/tableName'
-import { searchSatuanBy } from '../utils/searchutils'
+import { fieldKategori } from '../utils/tableName'
+import { searchKategoriBy } from '../utils/searchutils'
+import { useKategori } from '../context/kategori'
 import { useSearchParams } from 'next/navigation'
 
 const Home = () => {
 
-    const page = 'Satuan Barang'
     const searchParam = useSearchParams().get('page')
+
+    const { setListKategori } = useKategori() 
+
+    const page = 'Kategori Barang'
 
     const [isLoading, setIsLoading] = useState(true)
     const [showPaggination, setShowPaggination] = useState(true)
     const [currentPage, setCurrentPage] = useState(searchParam || 1)
-    const [dataSatuan, setDataSatuan] = useState([])
+    const [initialData, setInitialData] = useState([])
     const [totalRow, setTotalRow] = useState(0)
 
     useEffect(()=>{
       const getTotalRow = async() => {
-        const response = await fetch('/api/satuan/totalrow')
+        const response = await fetch('/api/kategori/totalrow')
         const data = await response.json()
         return data.totalRow
       }
@@ -47,13 +51,13 @@ const Home = () => {
     }
 
     useEffect(()=>{
-      const getDataSatuan = async() => {
+      const getinitialData = async() => {
         setIsLoading(true)
         try {
-          const response = await fetch(`/api/satuan?page=${currentPage}`)
+          const response = await fetch(`/api/kategori?page=${currentPage}`)
           const data = await response.json()
           if(data.status === 200){
-            setDataSatuan(data.data)
+            setInitialData(data.data)
             setIsLoading(data.isLoading)
           } else {
             makeNotif(data.showNotif, data.alertTitle, data.desc)
@@ -62,7 +66,7 @@ const Home = () => {
           makeNotif(true, 'info', "Backend tidak ada")
         }
       }
-      getDataSatuan()
+      getinitialData()
     }, [currentPage])
 
     useEffect(()=>{
@@ -81,7 +85,7 @@ const Home = () => {
       const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
       setIsLoading(prev=>!prev)
       try {
-        const response = await fetch(`/api/satuan/searching?id=${id}`)
+        const response = await fetch(`/api/kategori/searching?id=${id}`)
         const data = await response.json()
         setTempData(data.data[0])
         setIsLoading(prev=>!prev)
@@ -90,6 +94,7 @@ const Home = () => {
         
       }
     }
+    console.log(tempData, isNotif)
 
     const [showEditForm, setShowEditForm] = useState(false)
 
@@ -98,23 +103,24 @@ const Home = () => {
         if(isNotif.action === 'delete'){
           setIsLoading(prev=>!prev)
           try {
-            const response = await fetch('/api/satuan', {
+            const response = await fetch('/api/kategori', {
               method: 'DELETE',
               headers: {
                 'Content-Type': 'application/json'
               },
               body: JSON.stringify({
-                idSatuan: tempData?.idSatuan
+                idKategori: tempData?.idKategori
               })
             })
 
             const data = await response.json()
         
-            setDataSatuan(prev=>prev.filter(data=>data.idSatuan !== tempData?.idSatuan))
+            setInitialData(prev=>prev.filter(data=>data.idKategori !== tempData?.idKategori))
             makeNotif(data.showNotif, data.alertTitle, data.desc)
             setIsLoading(data.isLoading)
             setTotalRow(prev=>prev-1)
             setTempData({})
+            console.log(data)
           } catch (error) {
             setTempData({})
           }
@@ -130,25 +136,25 @@ const Home = () => {
     const handleSubmitEdit = async(e) =>{
       e.preventDefault()
       try {
-        const response = await fetch('/api/satuan', {
+        const response = await fetch('/api/kategori', {
           method: 'PUT',
           headers: {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            idSatuan: tempData?.idSatuan,
-            namaSatuan: tempData?.namaSatuan
+            idKategori: tempData?.idKategori,
+            nmKategori: tempData?.nmKategori
           })
         })
   
         const data = await response.json()
   
-        setDataSatuan(prev=>{
+        setInitialData(prev=>{
           return prev.map(prevItem => {
-              if(prevItem.idSatuan === data.data.idSatuan){
+              if(prevItem.idKategori === data.data.idKategori){
                   return {
-                    idSatuan: data.data.idSatuan,
-                    namaSatuan: data.data.namaSatuan
+                    idKategori: data.data.idKategori,
+                    nmKategori: data.data.nmKategori
                   }
               } else {
                   return prevItem
@@ -181,7 +187,7 @@ const Home = () => {
 
 
     const [insertData, setInsertData] = useState({
-        namaSatuan: ''
+        nmKategori: ''
     })
 
     const handleChangeInsertData = (e) =>{
@@ -196,29 +202,29 @@ const Home = () => {
 
     const handleSubmitInsert = async(e) => {
       e.preventDefault()
-      if(insertData.namaSatuan.length < 1){
+      if(insertData.nmKategori.length < 1){
         makeNotif(true, 'info', 'Data tidak boleh kosong')
         return
       }
 
       setIsLoading(prev=>!prev)
       try {
-          const response = await fetch('/api/satuan', {
+          const response = await fetch('/api/kategori', {
             method:'POST',
             headers: {
               'Content-type': 'application/json'
             },
             body: JSON.stringify({
-              namaSatuan: insertData.namaSatuan
+              nmKategori: insertData.nmKategori
             })            
           })
           const data = await response.json()
 
-          setDataSatuan(prev=>{
+          setInitialData(prev=>{
             return [
               {
-                idSatuan: data.data.idSatuan,
-                namaSatuan: data.data.namaSatuan
+                idKategori: data.data.idKategori,
+                nmKategori: data.data.nmKategori
               },
               ...prev
             ]
@@ -226,11 +232,11 @@ const Home = () => {
 
           makeNotif(data.showNotif, data.alertTitle, data.desc)
           setIsLoading(data.isLoading)
-          setSatuan(prev=>{
+          setListKategori(prev=>{
             return [
               {
-                idSatuan: data.data.idSatuan,
-                namaSatuan: data.data.namaSatuan
+                idKategori: data.data.idKategori,
+                nmKategori: data.data.nmKategori
               },
               ...prev
             ]
@@ -240,14 +246,15 @@ const Home = () => {
         makeNotif(true, 'info', 'Ada kesalahan saat mengirim data')        
       }
       setInsertData({
-        namaSatuan: ''
+        nmKategori: ''
       })
     }
 
     const handleClickEmptyInsert = () => {
       setInsertData({
-        namaSatuan: ''
+        nmKategori: ''
       })
+
     }
 
     const [searchQuery, setSearchQuery] = useState({
@@ -265,20 +272,20 @@ const Home = () => {
     }
 
     useEffect(()=>{
-      const getBasedSearch = async() => {
+      const getBarangBasedSearch = async() => {
         let response
         if(searchQuery.keyword.length > 0){
-          response = await fetch(`/api/satuan/searching?keyword=${searchQuery.keyword}`)
+          response = await fetch(`/api/kategori/searching?keyword=${searchQuery.keyword}`)
         } else {
-          response = await fetch(`/api/satuan?page=${currentPage}`)
+          response = await fetch(`/api/kategori?page=${currentPage}`)
         }
   
         const data = await response.json()
         return data
       }
   
-      getBasedSearch().then(data=>{
-        setDataSatuan(data.data)
+      getBarangBasedSearch().then(data=>{
+        setInitialData(data.data)
         setShowPaggination(data.paggination)
       })
     }, [searchQuery])
@@ -288,7 +295,6 @@ const Home = () => {
         keyword: ''
       })
     }
-
     
 
   return (
@@ -296,7 +302,7 @@ const Home = () => {
     { showEditForm && 
     <EditForm
       page={page}
-      listField={fieldSatuan}
+      listField={fieldKategori}
       initalValue={tempData}
       handleSubmitEdit={handleSubmitEdit}
       handleClickCloseEditForm={handleClickCloseEditForm}
@@ -316,7 +322,7 @@ const Home = () => {
         <section className='flex-1'>
           <AddItem
             page={page}
-            field={fieldSatuan} 
+            field={fieldKategori} 
             inputData={insertData} 
             handleChangeInsertData={handleChangeInsertData}
             handleSubmitInsert={handleSubmitInsert}
@@ -327,7 +333,7 @@ const Home = () => {
           <Search 
             page={page}
             searchValue={searchQuery}
-            searchUtils={searchSatuanBy}
+            searchUtils={searchKategoriBy}
             handleChangeSearch={handleChangeSearchQuery}
             handleClickResetSearching={handleChangeResetQuery}
            />
@@ -336,8 +342,8 @@ const Home = () => {
       <section className="w-full px-2 md:px-5">
           <TableWithAction
             page={page}
-            field={fieldSatuan} 
-            row={dataSatuan}
+            field={fieldKategori} 
+            initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}
             handleClickCurrentPage={handleClickCurrentPage}
