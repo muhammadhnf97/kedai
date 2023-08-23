@@ -10,7 +10,7 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
 
   return (
     <form onSubmit={(e)=>handleSubmitEdit(e)}>
-        <div className='fixed h-full w-full bg-black bg-opacity-60 top-0 flex items-center justify-center z-10'>
+        <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-10'>
             <div className='w-fit h-fit bg-white rounded-lg shadow-md px-10 space-y-2 py-5'>
                 <div className='flex justify-between text-lg'>
                     <p className='font-semibold text-center'>Edit {page}</p>
@@ -41,7 +41,15 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                     listOf = satuan.map(sat => (
                                         <option key={sat.idSatuan} value={sat.idSatuan}>{sat.idSatuan} {sat.namaSatuan}</option>
                                     ))
-                                }
+                                } else if(value.key === 'jabatan'){
+                                    listOf = (
+                                        <>
+                                        <option value='administrator'>Administrator</option>
+                                        <option value='pimpinan'>Pimpinan</option>
+                                        <option value='pegawai'>Pegawai</option>
+                                        </>
+                                    )
+                                } 
                                 
                                 inputType = ( 
                                 <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm' onChange={(e)=>handleChangeEdit(e)}>

@@ -11,7 +11,7 @@ const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitI
     
   return (
     <form onSubmit={(e)=>handleSubmitInsert(e)}>
-        <div className='w-full p-2 space-y-5 bg-white rounded-lg shadow-md border-2 border-black md:px-5'>
+        <div className='w-full p-2 space-y-5 bg-white rounded-lg shadow-md border border-slate-300 md:px-5'>
             <p className='font-semibold text-lg'>+ Tambah data {page.toLocaleLowerCase()} baru</p>
             <div className='w-full flex flex-wrap'>
                 {
@@ -43,6 +43,7 @@ const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitI
                                 inputElement =
                                 <select name={inp.key} onChange={(e)=>handleChangeInsertData(e)} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
                                     <option>Pilih {inp.label}</option>
+                                    <option value={'administrator'}>Administrator</option>
                                     <option value={'pimpinan'}>Pimpinan</option>
                                     <option value={'pegawai'}>Pegawai</option>
                                 </select>

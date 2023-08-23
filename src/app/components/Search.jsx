@@ -7,7 +7,7 @@ const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClic
 
     const { listKategori } = useKategori()
   return (
-    <div className='w-full space-y-5 bg-white rounded-lg shadow-md p-3 border-2 border-black md:px-5'>
+    <div className='w-full space-y-5 bg-white rounded-lg shadow-md p-3 border border-slate-300 md:px-5'>
         <div className='font-semibold text-lg flex items-center justify-start gap-2'><FaMagnifyingGlass /> Cari data {page.toLocaleLowerCase()}</div>
         <div className='space-y-3'>
             {

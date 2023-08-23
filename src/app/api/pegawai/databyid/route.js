@@ -4,12 +4,25 @@ import { NextResponse } from "next/server"
 export async function GET(req){
     const id = new URL(req.url).searchParams.get("id")
     
-    const query = "SELECT idPegawai, nmPegawai, alamat, noTelp, jabatan FROM pegawai WHERE idPegawai = ?"
-    const values = [id]
+    try {
+        const data = await dbConnect("SELECT idPegawai, nmPegawai, alamat, noTelp, jabatan, email FROM pegawai WHERE idPegawai = ?", [id])
 
-    const data = await dbConnect(query, values)
-    
-    return NextResponse.json({
-        data
-    })
+        if(data.length > 0){
+            return NextResponse.json({
+                status : 200,
+                data: data[0]
+            })
+        } else {
+            return NextResponse.json({
+                status : 404,
+                message: "Pegawai tidak ditemukan"
+            })
+        }
+    } catch (error) {
+        console.error("Error while fetching employee data:", error);
+        return NextResponse.json({
+            status: 500,
+            message: "Terjadi kesalahan saat mengambil data pegawai"
+        });
+    }
 } 

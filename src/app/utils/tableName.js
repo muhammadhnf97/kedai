@@ -101,4 +101,36 @@ export const fieldPegawai = [{
     label: 'Jabatan',
     key: 'jabatan',
     type: 'select',
+},{
+    label: 'Email',
+    key: 'email',
+    type: 'text'
+}]
+
+
+export const fieldUser = [{
+    label: 'ID User',
+    key: 'userId',
+    type: 'text',
+    primaryKey: true
+},{
+    label: 'Nama Pegawai',
+    key: 'nmPegawai',
+    type: 'text',
+},{
+    label: 'ID Pegawai',
+    key: 'idPegawai',
+    type: 'text',
+},{
+    label: 'email',
+    key: 'email',
+    type: 'text',
+},{
+    label: 'Jabatan',
+    key: 'jabatan',
+    type: 'text',
+},{
+    label: 'Status',
+    key: 'status',
+    type: 'text',
 }]

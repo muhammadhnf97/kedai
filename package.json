@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "autoprefixer": "10.4.14",
+    "bcrypt": "^5.1.1",
     "eslint": "8.45.0",
     "eslint-config-next": "13.4.10",
     "mysql2": "^3.5.2",

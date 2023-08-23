@@ -11,7 +11,7 @@ export async function GET(req) {
         `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
-        INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan ORDER BY barang.dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed} `
+        INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan ORDER BY barang.dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`
         const data = await dbConnect(query);
 
         return NextResponse.json({

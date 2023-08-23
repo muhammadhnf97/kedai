@@ -35,6 +35,10 @@ const Header = () => {
             label: 'Pegawai',
             pathName: '/pegawai',
             child: null
+        },{
+            label: 'User',
+            pathName: '/user',
+            child: null
         }]
     },{
         label: 'Transaksi',
@@ -66,12 +70,12 @@ const Header = () => {
         child: null
     },]
 
-    const { loginData, handleClickSaveLoginData } = useLogin()
+    const { loginData } = useLogin()
 
     const renderUsernameAndStatus = (
         <div className='leading-3'>
             <h3 className='text-2xl font-bold text-[#293241]'>{loginData.nmPegawai}</h3>
-            <h3 className='text-sml font-bold text-[#3D5A80]'>{loginData.status}</h3>
+            <h3 className='text-sml font-bold text-[#3D5A80]'>{loginData.jabatan}</h3>
         </div>
     )
 

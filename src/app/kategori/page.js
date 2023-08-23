@@ -7,17 +7,17 @@ import Loading from '../components/Loading'
 import Notification from '../components/Notification'
 import EditForm from '../components/EditForm'
 import { fieldKategori } from '../utils/tableName'
-import { searchKategoriBy } from '../utils/searchutils'
-import { useKategori } from '../context/kategori'
+import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
+import { useLogin } from '../context/login'
+import TableWithoutAction from '../components/TableWithoutAction'
 
 const Home = () => {
 
+    const { loginData } = useLogin()
+
+    const page = 'Kategori'
     const searchParam = useSearchParams().get('page')
-
-    const { setListKategori } = useKategori() 
-
-    const page = 'Kategori Barang'
 
     const [isLoading, setIsLoading] = useState(true)
     const [showPaggination, setShowPaggination] = useState(true)
@@ -58,7 +58,7 @@ const Home = () => {
           const data = await response.json()
           if(data.status === 200){
             setInitialData(data.data)
-            setIsLoading(data.isLoading)
+            setIsLoading(false)
           } else {
             makeNotif(data.showNotif, data.alertTitle, data.desc)
           }
@@ -79,29 +79,30 @@ const Home = () => {
 
     const [tempData, setTempData] = useState({})
 
-    const handleClickAction = async(id, nama, action) => {
+    const handleClickActionFromTable = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
-      const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
-      setIsLoading(prev=>!prev)
+      const desc = `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
+
+      setIsLoading(true)
       try {
-        const response = await fetch(`/api/kategori/searching?id=${id}`)
+        const response = await fetch(`/api/kategori/databyid?id=${id}`)
         const data = await response.json()
         setTempData(data.data[0])
-        setIsLoading(prev=>!prev)
+        setIsLoading(false)
+        setIsShowDetai(false)
         makeNotif(isNotif, alertTitle, desc, action)
       } catch (error) {
-        
+        makeNotif(isNotif, alertTitle, desc, action)
       }
     }
-    console.log(tempData, isNotif)
-
     const [showEditForm, setShowEditForm] = useState(false)
 
-    const handleClickResponseNotif = async(res = null) => {
+    const handleClickResponseNotif = async(res) => {
+      makeNotif()
       if(res){
         if(isNotif.action === 'delete'){
-          setIsLoading(prev=>!prev)
+          setIsLoading(true)
           try {
             const response = await fetch('/api/kategori', {
               method: 'DELETE',
@@ -117,20 +118,16 @@ const Home = () => {
         
             setInitialData(prev=>prev.filter(data=>data.idKategori !== tempData?.idKategori))
             makeNotif(data.showNotif, data.alertTitle, data.desc)
-            setIsLoading(data.isLoading)
+            setIsLoading(false)
             setTotalRow(prev=>prev-1)
-            setTempData({})
-            console.log(data)
           } catch (error) {
             setTempData({})
           }
-        } else {
-          if(isNotif?.action === 'edit'){
-            setShowEditForm(prev=>!prev)
-          }
+        } else if(isNotif?.action === 'edit'){
+          setShowEditForm(true)
+          setIsShowDetai(false)
         }
       }
-      makeNotif()
     }
 
     const handleSubmitEdit = async(e) =>{
@@ -162,8 +159,9 @@ const Home = () => {
           })
         })
         makeNotif(data.showNotif, data.alertTitle, data.desc)
-        setIsLoading(data.isLoading)
-        setShowEditForm(prev=>!prev)
+        setIsLoading(false)
+        setShowEditForm(false)
+        setIsShowDetai(false)
         setTempData({})
       } catch (error) {
         makeNotif(true, 'info', 'Ada kesalahan')
@@ -171,7 +169,7 @@ const Home = () => {
     }
 
     const handleClickCloseEditForm = () => {
-      setShowEditForm(prev=>!prev)
+      setShowEditForm(false)
       setTempData({})
     }
 
@@ -185,9 +183,8 @@ const Home = () => {
       })
     }
 
-
     const [insertData, setInsertData] = useState({
-        nmKategori: ''
+        nmKategori: '',
     })
 
     const handleChangeInsertData = (e) =>{
@@ -202,12 +199,12 @@ const Home = () => {
 
     const handleSubmitInsert = async(e) => {
       e.preventDefault()
-      if(insertData.nmKategori.length < 1){
+      if(insertData.nmKategori.length < 1 ){
         makeNotif(true, 'info', 'Data tidak boleh kosong')
         return
       }
 
-      setIsLoading(prev=>!prev)
+      setIsLoading(true)
       try {
           const response = await fetch('/api/kategori', {
             method:'POST',
@@ -215,7 +212,7 @@ const Home = () => {
               'Content-type': 'application/json'
             },
             body: JSON.stringify({
-              nmKategori: insertData.nmKategori
+              nmKategori: insertData?.nmKategori
             })            
           })
           const data = await response.json()
@@ -224,23 +221,14 @@ const Home = () => {
             return [
               {
                 idKategori: data.data.idKategori,
-                nmKategori: data.data.nmKategori
+                nmKategori: data.data.nmKategori            
               },
               ...prev
             ]
           })
 
           makeNotif(data.showNotif, data.alertTitle, data.desc)
-          setIsLoading(data.isLoading)
-          setListKategori(prev=>{
-            return [
-              {
-                idKategori: data.data.idKategori,
-                nmKategori: data.data.nmKategori
-              },
-              ...prev
-            ]
-          })
+          setIsLoading(false)
           setTotalRow(prev=>prev+1)
       } catch (error) {
         makeNotif(true, 'info', 'Ada kesalahan saat mengirim data')        
@@ -254,7 +242,6 @@ const Home = () => {
       setInsertData({
         nmKategori: ''
       })
-
     }
 
     const [searchQuery, setSearchQuery] = useState({
@@ -272,7 +259,7 @@ const Home = () => {
     }
 
     useEffect(()=>{
-      const getBarangBasedSearch = async() => {
+      const getBasedSearch = async() => {
         let response
         if(searchQuery.keyword.length > 0){
           response = await fetch(`/api/kategori/searching?keyword=${searchQuery.keyword}`)
@@ -284,7 +271,7 @@ const Home = () => {
         return data
       }
   
-      getBarangBasedSearch().then(data=>{
+      getBasedSearch().then(data=>{
         setInitialData(data.data)
         setShowPaggination(data.paggination)
       })
@@ -294,9 +281,19 @@ const Home = () => {
       setSearchQuery({
         keyword: ''
       })
+    }   
+
+    const [isShowDetail, setIsShowDetai] = useState(false)
+    const [detailItem, setDetailItem] = useState({})
+    const handleClickDetail = (item = null) => {
+        if(item){
+            setDetailItem(item)
+        } else {
+            setDetailItem({})
+        }
+        setIsShowDetai(prev=>!prev)
     }
     
-
   return (
     <>
     { showEditForm && 
@@ -319,7 +316,7 @@ const Home = () => {
     <div className='max-w-7xl mx-auto space-y-5'>
       <h3 className='text-center text-3xl font-semibold'>{page}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
-        <section className='flex-1'>
+        { loginData.jabatan !== 'pegawai' && <section className='flex-1'>
           <AddItem
             page={page}
             field={fieldKategori} 
@@ -328,28 +325,46 @@ const Home = () => {
             handleSubmitInsert={handleSubmitInsert}
             handleClickReset={handleClickEmptyInsert}
           />
-        </section>
+        </section> }
         <section className='flex-1'>
           <Search 
             page={page}
             searchValue={searchQuery}
-            searchUtils={searchKategoriBy}
+            searchUtils={searchBy}
             handleChangeSearch={handleChangeSearchQuery}
             handleClickResetSearching={handleChangeResetQuery}
            />
         </section>
       </div>
       <section className="w-full px-2 md:px-5">
-          <TableWithAction
+          { 
+          loginData.jabatan === 'administrator' || loginData.jabatan === 'pimpinan' ? <TableWithAction
             page={page}
-            field={fieldKategori} 
+            isShowDetail={isShowDetail}
+            detailItem={detailItem}
+            handleClickDetail={handleClickDetail}
+            initialField={fieldKategori} 
             initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}
-            handleClickCurrentPage={handleClickCurrentPage}
             showPaggination={showPaggination}
-            handleClickAction={handleClickAction}
-          />
+            handleClickCurrentPage={handleClickCurrentPage}
+            handleClickActionFromTable={handleClickActionFromTable}
+          /> 
+          :
+          <TableWithoutAction
+            page={page}
+            isShowDetail={isShowDetail}
+            detailItem={detailItem}
+            handleClickDetail={handleClickDetail}
+            initialField={fieldKategori} 
+            initialData={initialData}
+            totalRow={totalRow}
+            currentPage={currentPage}
+            showPaggination={showPaggination}
+            handleClickCurrentPage={handleClickCurrentPage}
+            handleClickActionFromTable={handleClickActionFromTable}
+          />}
       </section>
     </div>
     </>

@@ -9,15 +9,15 @@ export const LoginProvider = ({ children }) => {
     const [loginData, setLoginData] = useState({
         userId: 'id0012391823',
         nmPegawai: 'Hanif',
-        status : 'Administrator',
-        token: '32s1df8er12we5t7uy1g2m3kl5o3',
+        jabatan : 'administrator',
+        token: '75483211a3sd13assgkjhasiudaskdjhaksd098123as2d162j1yte32f18reh31rh7w3e2r',
     })
 
     const handleClickSaveLoginData = () => {
         setLoginData({
             userId : '',
             nmPegawai : '',
-            status : '',
+            jabatan : '',
             token : '',
         })
     }

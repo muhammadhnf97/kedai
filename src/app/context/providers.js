@@ -4,6 +4,7 @@ import BarangProvider from './barang'
 import KategoriProvider from './kategori'
 import { SatuanProvider } from './satuan'
 import { LoginContext, LoginProvider } from './login'
+import { UserProvider } from './user'
 
 const Providers = ({ children }) => {
   return (
@@ -11,7 +12,9 @@ const Providers = ({ children }) => {
       <KategoriProvider>
         <SatuanProvider>
           <LoginProvider>
-          {children}
+            <UserProvider>
+             {children}
+            </UserProvider>
           </LoginProvider>
         </SatuanProvider>
       </KategoriProvider>

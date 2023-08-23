@@ -8,7 +8,7 @@ export async function GET(req) {
 
     try {
         const query = 
-        `SELECT idPegawai, nmPegawai, alamat, noTelp, jabatan FROM pegawai ORDER BY dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed} `
+        `SELECT idPegawai, nmPegawai, alamat, noTelp, jabatan, email FROM pegawai ORDER BY dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed} `
         const data = await dbConnect(query);
 
         return NextResponse.json({
@@ -20,7 +20,7 @@ export async function GET(req) {
     } catch (error) {
         return NextResponse.json({
             status:500,
-            showNotif: true,
+            isNotif: true,
             alertTitle: 'info',
             desc: "Gagal menghubungkan ke database",
         })
@@ -29,59 +29,53 @@ export async function GET(req) {
 
 export async function POST(req) {
     try {
-        const { nmPegawai, noTelp, alamat, jabatan } = await req.json()
+        const { insertData } = await req.json()
+        const { nmPegawai, noTelp, alamat, jabatan, email } = insertData
 
         const lastIdQuery = `SELECT idPegawai FROM pegawai`
         const listOfID = await dbConnect(lastIdQuery)
         const sliceID = listOfID.map(dataID=>Number(dataID.idPegawai.substr(4)))
         const maxID = sliceID.length > 0 ? Math.max(...sliceID) + 1 : 1
+
+        //NEW ID
         const newID = 'PEG-' + maxID.toString().padStart(3, '0') 
 
+        //GET DATE
         const dateCreated = new Date 
 
-        const PostQuery = `INSERT INTO pegawai (idPegawai, nmPegawai, noTelp, alamat, jabatan, dateCreated) VALUES (?, ?, ?, ?, ?, ?)`
-        const values = [newID, nmPegawai, noTelp, alamat, jabatan, dateCreated]
+        const PostQuery = `INSERT INTO pegawai (idPegawai, nmPegawai, noTelp, alamat, jabatan, email, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?)`
+        const values = [newID, nmPegawai, noTelp, alamat, jabatan, email, dateCreated]
         await dbConnect(PostQuery, values)
 
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil disimpan",
-            isLoading: false,
-            data : {
-                idPegawai: newID, nmPegawai, noTelp, alamat, jabatan
-            }
+            status: 200,
+            idPegawai: newID,
+            message: "Data berhasil disimpan",
         })
     } catch (error) {
+        console.log("Gagal menyimpan data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Error saat menyimpan data",
-            error
+            status: 500,
+            message: "Gagal menyimpan data"
         })
     }
 }
 
 export async function DELETE(req) {
     try {
-        const { idPegawai } = await req.json()
-        const query = `DELETE FROM pegawai WHERE idPegawai = ?`
-        const values = [idPegawai]
-        await dbConnect(query, values)
+        const { tempData } = await req.json()
+        const idPegawai = tempData.idPegawai
+        await dbConnect(`DELETE FROM pegawai WHERE idPegawai = ?`, [idPegawai])
 
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data telah dihapus",
-            isLoading: false
+            status: 200,
+            message: "Data telah dihapus"
         })
     } catch (error) {
+        console.error("Gagal menghapus data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Gagal menghapus data",
-            isLoading: false,
-            error
+            status: 500,
+            message: "Gagal menghapus data"
         })
         
     }
@@ -89,27 +83,21 @@ export async function DELETE(req) {
 
 export async function PUT(req){
     try {
-        const {idPegawai, nmPegawai, noTelp, alamat,  jabatan} = await req.json()
-        const query = 'UPDATE pegawai SET nmPegawai = ?, noTelp = ?, alamat  = ?, jabatan = ?  WHERE idPegawai = ?'
-
-        const values = [nmPegawai, noTelp, alamat, jabatan, idPegawai]
+        const { tempData } = await req.json()
+        const { idPegawai, nmPegawai, noTelp, alamat, jabatan, email  } = tempData
+        const query = 'UPDATE pegawai SET nmPegawai = ?, noTelp = ?, alamat  = ?, jabatan = ?, email = ?  WHERE idPegawai = ?'
+        const values = [nmPegawai, noTelp, alamat, jabatan, email, idPegawai]
         await dbConnect(query, values)
 
         return NextResponse.json({
-            data: 'success',
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil diubah",
-            isLoading: false,
-            data: { idPegawai, nmPegawai, noTelp, alamat }
-            
+            status: 200,
+            message: "Berhasil mengubah data "
         })
     } catch (error) {
+        console.error("Gagal mengupdate data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "error masbro",
-            isLoading: false
+            status: 500,
+            message: "Gagal mengupdate data"
         })
     }
 }

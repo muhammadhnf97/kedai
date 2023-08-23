@@ -27,7 +27,7 @@ export const searchSupplierBy = [{
     type: 'text'
 }]  
 
-export const searchPegawaiBy = [{
+export const searchBy = [{
     label: 'Masukan Keywords ...',
     key: 'keyword',
     type: 'text'
