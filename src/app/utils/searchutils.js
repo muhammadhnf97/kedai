@@ -1,4 +1,4 @@
-export const searchUtilsBarang = [{
+export const searchBarangBy = [{
     label: 'Masukan keywords ...',
     key: 'keyword',
     type: 'text'
@@ -8,24 +8,6 @@ export const searchUtilsBarang = [{
     type: 'select',
     table: 'barang'
 },]
-
-export const searchKategoriBy = [{
-    label: 'Masukan Keywords ...',
-    key: 'keyword',
-    type: 'text'
-}]  
-
-export const searchSatuanBy = [{
-    label: 'Masukan Keywords ...',
-    key: 'keyword',
-    type: 'text'
-}]  
-
-export const searchSupplierBy = [{
-    label: 'Masukan Keywords ...',
-    key: 'keyword',
-    type: 'text'
-}]  
 
 export const searchBy = [{
     label: 'Masukan Keywords ...',

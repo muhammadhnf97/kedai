@@ -1,4 +1,4 @@
-export const fieldTableBarang = [{
+export const fieldBarang = [{
         label: 'ID Barang',
         key: 'idBarang',
         type: 'text',

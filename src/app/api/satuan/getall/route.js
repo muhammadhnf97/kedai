@@ -7,9 +7,13 @@ export async function GET () {
         const data = await dbConnect(query)
         
         return NextResponse.json({
+            status: 200,
             data
         })
     } catch (error) {
-        
+        return NextResponse.json({
+            status: 200,
+            message : "Ada kesalahan"
+        })
     }
 }

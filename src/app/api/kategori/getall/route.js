@@ -11,9 +11,9 @@ export async function GET(){
             data
         })
     } catch (error) {
-        console.log({
-            message : "Terjadi kesalahan masbro",
-            error
+        return NextResponse.json({
+            status: 200,
+            message : "Ada kesalahan"
         })
     }
 }

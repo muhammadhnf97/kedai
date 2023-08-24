@@ -7,10 +7,14 @@ export async function GET () {
         const data = await dbConnect(query)
         
         return NextResponse.json({
-            data,
-            status: 200
+            status: 200,
+            data
         }) 
     } catch (error) {
-        
+        console.log(error)
+        return NextResponse.json({
+            status: 500,
+            message: 'Gagal mengambil data'
+        }) 
     }
 }

@@ -281,7 +281,7 @@ const Home = () => {
       />
     }
     <div className='max-w-7xl mx-auto space-y-5'>
-      <h3 className='text-center text-3xl font-semibold'>{page}</h3>
+      <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
         { loginData.jabatan !== 'pegawai' && <section className='flex-1'>
           <AddItem

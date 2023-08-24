@@ -14,8 +14,7 @@ export async function GET(req) {
         return NextResponse.json({
             status: 200,
             data,
-            paggination: true,
-            isLoading: false
+            paggination: true
         })
     } catch (error) {
         return NextResponse.json({
@@ -77,7 +76,6 @@ export async function DELETE(req) {
             status: 500,
             message: "Gagal menghapus data"
         })
-        
     }
 }
 

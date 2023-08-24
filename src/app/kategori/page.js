@@ -1,22 +1,25 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import AddItem from '../components/AddItem'
-import Search from '../components/Search'
-import TableWithAction from '../components/TableWithAction'
 import Loading from '../components/Loading'
 import Notification from '../components/Notification'
+import AddItem from '../components/AddItem'
 import EditForm from '../components/EditForm'
+import Search from '../components/Search'
+import TableWithAction from '../components/TableWithAction'
+import TableWithoutAction from '../components/TableWithoutAction'
 import { fieldKategori } from '../utils/tableName'
 import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
 import { useLogin } from '../context/login'
-import TableWithoutAction from '../components/TableWithoutAction'
+import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postData, getBasedSearch } from '../utils/fetchingdata'
+import { useKategori } from '../context/kategori'
 
 const Home = () => {
 
     const { loginData } = useLogin()
+    const { setListKategori } = useKategori()
 
-    const page = 'Kategori'
+    const page = 'kategori'
     const searchParam = useSearchParams().get('page')
 
     const [isLoading, setIsLoading] = useState(true)
@@ -26,12 +29,7 @@ const Home = () => {
     const [totalRow, setTotalRow] = useState(0)
 
     useEffect(()=>{
-      const getTotalRow = async() => {
-        const response = await fetch('/api/kategori/totalrow')
-        const data = await response.json()
-        return data.totalRow
-      }
-      getTotalRow().then(data=>setTotalRow(data))
+      getTotalRow(page).then(data=>setTotalRow(data))
     }, [])
 
     const [isNotif, setIsNotif] = useState({
@@ -41,37 +39,22 @@ const Home = () => {
       action: null
     })
 
-    const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null, answer = null) => {
+    const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null) => {
         setIsNotif(prev=>{
             return {
                 ...prev,
-                showNotif, alertTitle, desc, action, answer
+                showNotif, alertTitle, desc, action
             }
         })
     }
 
     useEffect(()=>{
-      const getinitialData = async() => {
-        setIsLoading(true)
-        try {
-          const response = await fetch(`/api/kategori?page=${currentPage}`)
-          const data = await response.json()
-          if(data.status === 200){
-            setInitialData(data.data)
-            setIsLoading(false)
-          } else {
-            makeNotif(data.showNotif, data.alertTitle, data.desc)
-          }
-        } catch (error) {
-          makeNotif(true, 'info', "Backend tidak ada")
-        }
-      }
-      getinitialData()
+      setIsLoading(true)
+      getInitialData(page, currentPage).then(data=>{
+        setIsLoading(false)
+        setInitialData(data.data)
+      })
     }, [currentPage])
-
-    useEffect(()=>{
-
-    }, [])
 
     const handleClickCurrentPage = (page) => {
         setCurrentPage(page)
@@ -82,20 +65,19 @@ const Home = () => {
     const handleClickActionFromTable = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
-      const desc = `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
+      const desc = action === 'aktifakun' ? 
+      `Aktifkan akun dengan ID ${id} ${nama} ? ` : action === 'nonaktifakun' ? `Nonaktifkan akun dengan ID ${id} ${nama} ? ` :
+      `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
 
       setIsLoading(true)
-      try {
-        const response = await fetch(`/api/kategori/databyid?id=${id}`)
-        const data = await response.json()
-        setTempData(data.data[0])
+      getDataById(page, id).then(data=>{
+        setTempData(data.data)
         setIsLoading(false)
         setIsShowDetai(false)
         makeNotif(isNotif, alertTitle, desc, action)
-      } catch (error) {
-        makeNotif(isNotif, alertTitle, desc, action)
-      }
+      })
     }
+
     const [showEditForm, setShowEditForm] = useState(false)
 
     const handleClickResponseNotif = async(res) => {
@@ -103,69 +85,43 @@ const Home = () => {
       if(res){
         if(isNotif.action === 'delete'){
           setIsLoading(true)
-          try {
-            const response = await fetch('/api/kategori', {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                idKategori: tempData?.idKategori
-              })
-            })
-
-            const data = await response.json()
-        
-            setInitialData(prev=>prev.filter(data=>data.idKategori !== tempData?.idKategori))
-            makeNotif(data.showNotif, data.alertTitle, data.desc)
+          deleteData(page, tempData).then(data=>{
+            setInitialData(prevData=>prevData.filter(data=>data.idKategori !== Object.values(tempData)[0]))
             setIsLoading(false)
-            setTotalRow(prev=>prev-1)
-          } catch (error) {
-            setTempData({})
-          }
+            setTotalRow(prevData=>prevData-1)
+            setListKategori(prevData=>prevData.filter(data=>data.idKategori !== tempData.idKategori))
+            makeNotif(data.isNotif, data.alertTitle, data.desc)
+          })
+          setTempData({})
         } else if(isNotif?.action === 'edit'){
           setShowEditForm(true)
           setIsShowDetai(false)
-        }
+        } 
       }
     }
 
     const handleSubmitEdit = async(e) =>{
       e.preventDefault()
-      try {
-        const response = await fetch('/api/kategori', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            idKategori: tempData?.idKategori,
-            nmKategori: tempData?.nmKategori
-          })
-        })
-  
-        const data = await response.json()
-  
+      setIsLoading(true)
+      updateData(page, tempData).then(data=>{
+        setIsLoading(false)
+        setShowEditForm(false)
+        setIsShowDetai(false)
+        makeNotif(data.isNotif, data.alertTitle, data.desc)
         setInitialData(prev=>{
           return prev.map(prevItem => {
-              if(prevItem.idKategori === data.data.idKategori){
+              if(prevItem.idKategori === tempData.idKategori){
                   return {
-                    idKategori: data.data.idKategori,
-                    nmKategori: data.data.nmKategori
+                    idKategori: tempData?.idKategori,
+                    nmKategori: tempData?.nmKategori,
                   }
               } else {
                   return prevItem
               }
           })
         })
-        makeNotif(data.showNotif, data.alertTitle, data.desc)
-        setIsLoading(false)
-        setShowEditForm(false)
-        setIsShowDetai(false)
         setTempData({})
-      } catch (error) {
-        makeNotif(true, 'info', 'Ada kesalahan')
-      }
+      })
     }
 
     const handleClickCloseEditForm = () => {
@@ -178,13 +134,13 @@ const Home = () => {
       setTempData(prev=>{
         return {
           ...prev,
-          [name]:value
+          [name]: value
         }
       })
     }
 
     const [insertData, setInsertData] = useState({
-        nmKategori: '',
+        nmKategori: ''
     })
 
     const handleChangeInsertData = (e) =>{
@@ -199,40 +155,33 @@ const Home = () => {
 
     const handleSubmitInsert = async(e) => {
       e.preventDefault()
-      if(insertData.nmKategori.length < 1 ){
+      if(insertData.nmKategori.length < 1){
         makeNotif(true, 'info', 'Data tidak boleh kosong')
         return
       }
 
       setIsLoading(true)
-      try {
-          const response = await fetch('/api/kategori', {
-            method:'POST',
-            headers: {
-              'Content-type': 'application/json'
+      postData(page, insertData).then(data=>{
+        setInitialData(prev=>{
+          return [
+            {
+              idKategori: data.data.idKategori,
+              nmKategori: insertData.nmKategori, 
             },
-            body: JSON.stringify({
-              nmKategori: insertData?.nmKategori
-            })            
-          })
-          const data = await response.json()
-
-          setInitialData(prev=>{
-            return [
-              {
-                idKategori: data.data.idKategori,
-                nmKategori: data.data.nmKategori            
-              },
-              ...prev
-            ]
-          })
-
-          makeNotif(data.showNotif, data.alertTitle, data.desc)
-          setIsLoading(false)
-          setTotalRow(prev=>prev+1)
-      } catch (error) {
-        makeNotif(true, 'info', 'Ada kesalahan saat mengirim data')        
-      }
+            ...prev
+          ]
+        })
+        setIsLoading(false)
+        setTotalRow(prevData=>prevData + 1)
+        setListKategori(prevData=>{
+          return [
+            ...prevData, {
+            idKategori: data.data.idKategori,
+            nmKategori: insertData.nmKategori,
+          }]
+        })
+        makeNotif(data.isNotif, data.alertTitle, data.desc)
+      })
       setInsertData({
         nmKategori: ''
       })
@@ -258,20 +207,8 @@ const Home = () => {
       })
     }
 
-    useEffect(()=>{
-      const getBasedSearch = async() => {
-        let response
-        if(searchQuery.keyword.length > 0){
-          response = await fetch(`/api/kategori/searching?keyword=${searchQuery.keyword}`)
-        } else {
-          response = await fetch(`/api/kategori?page=${currentPage}`)
-        }
-  
-        const data = await response.json()
-        return data
-      }
-  
-      getBasedSearch().then(data=>{
+    useEffect(()=>{  
+      getBasedSearch(page, searchQuery, currentPage).then(data=>{
         setInitialData(data.data)
         setShowPaggination(data.paggination)
       })
@@ -314,9 +251,9 @@ const Home = () => {
       />
     }
     <div className='max-w-7xl mx-auto space-y-5'>
-      <h3 className='text-center text-3xl font-semibold'>{page}</h3>
+      <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
-        { loginData.jabatan !== 'pegawai' && <section className='flex-1'>
+        { loginData.penanggungJawab !== 'kategori' && <section className='flex-1'>
           <AddItem
             page={page}
             field={fieldKategori} 

@@ -17,23 +17,21 @@ export async function GET(req) {
         return NextResponse.json({
             status: 200,
             data,
-            paggination: true,
-            isLoading: false
+            paggination: true
         })
     } catch (error) {
         return NextResponse.json({
             status:500,
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Gagal menghubungkan ke database",
+            message: "Gagal mengambil data dari database"
         })
     }
 }
 
 export async function POST(req) {
-    try {
-        const { namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori } = await req.json()
+    const { insertData } = await req.json()
+    const { namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori } = insertData
 
+    try {
         const lastIdQuery = `SELECT barang.idBarang FROM barang WHERE idKategori = ${parseInt(idKategori)}`
         const listOfID = await dbConnect(lastIdQuery)
         const sliceID = listOfID.map(dataID=>Number(dataID.idBarang.substr(7)))
@@ -41,102 +39,81 @@ export async function POST(req) {
         const newID = '9999' + idKategori.toString().padStart(3, '0') + maxID.toString().padStart(3, '0') 
 
         const dateCreated = new Date 
+        
+        const listNamaKategori = await dbConnect(`SELECT nmKategori FROM kategori WHERE idKategori = ${idKategori}`)
+        const nmKategori = listNamaKategori[0]
 
-        const queryNamaKategori = `SELECT nmKategori FROM kategori WHERE idKategori = ${idKategori}`
-        const dataNama = await dbConnect(queryNamaKategori)
-        const nmKategori = dataNama[0]
+        const listNamaSatuan = await dbConnect(`SELECT namaSatuan FROM satuan WHERE idSatuan = ${idSatuan}`)
+        const namaSatuan = listNamaSatuan[0]
 
-        const queryNamaSatuan = `SELECT namaSatuan FROM satuan WHERE idSatuan = ${idSatuan}`
-        const dataNamaSatuan = await dbConnect(queryNamaSatuan)
-        const namaSatuan = dataNamaSatuan[0]
-
-        const PostQuery = `INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-        const values = [newID, namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori, dateCreated]
-        await dbConnect(PostQuery, values)
+        await dbConnect(`INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [newID, namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori, dateCreated])
 
         const newTotalAset = hargaJual * stok
 
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil disimpan",
-            isLoading: false,
-            input : {
-                newID, 
-                namaBarang, 
-                stok, 
-                modalBeli,
-                hargaJual, 
-                namaSatuan, 
-                nmKategori,
-                newTotalAset
-            }
+            status: 200,
+            data,
+            idBarang: newID,
+            nmKategori,
+            namaSatuan,
+            newTotalAset,
+            message: "Data berhasil disimpan"
         })
     } catch (error) {
+        console.log("Gagal menyimpan data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "error masbro",
+            status: 500,
+            message: "Gagal menyimpan data"
         })
     }
 }
 
 export async function DELETE(req) {
+    const { tempData } = await req.json()
+    const { idBarang } = tempData
+
     try {
-        const { idBarang } = await req.json()
-        const query = `DELETE FROM barang WHERE idBarang = ?`
-        const values = [idBarang]
-        await dbConnect(query, values)
+        await dbConnect(`DELETE FROM barang WHERE idBarang = ?`, [idBarang])
 
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data telah dihapus",
-            isLoading: false
+            status: 200,
+            message: "Data telah dihapus"
         })
     } catch (error) {
+        console.error("Gagal menghapus data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Gagal menghapus data",
-            isLoading: false
+            status: 500,
+            message: "Gagal menghapus data"
         })
-        
     }
 }
 
 export async function PUT(req){
+    const { tempData } = await req.json()
+    const {idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori} = tempData
+    
     try {
-        const {idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori} = await req.json()
-        const query = 'UPDATE barang SET namaBarang = ?, stok = ?, modalBeli = ?, hargaJual = ?, idSatuan = ?, idKategori = ? WHERE idBarang = ?'
-
-        const getKategori = await dbConnect(`SELECT * FROM kategori WHERE idKategori = ?`, [idKategori])
-        const nmKategori = getKategori[0]?.nmKategori
-        const getSatuan = await dbConnect(`SELECT * FROM satuan WHERE idSatuan = ?`, [idSatuan])
-        const namaSatuan = getSatuan[0]?.namaSatuan
+        const listNamaKategori = await dbConnect(`SELECT * FROM kategori WHERE idKategori = ?`, [idKategori])
+        const nmKategori = listNamaKategori[0]?.nmKategori
+        const listNamaSatuan = await dbConnect(`SELECT * FROM satuan WHERE idSatuan = ?`, [idSatuan])
+        const namaSatuan = listNamaSatuan[0]?.namaSatuan
         const getBarang = await dbConnect(`SELECT barang.stok, barang.hargaJual FROM barang WHERE idBarang = ?`, [idBarang])
+
         const oldAsset = getBarang[0]?.stok * getBarang[0]?.hargaJual
-        
         const newAsset = stok * hargaJual
 
-        const values = [namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, idBarang]
-        await dbConnect(query, values)
+        await dbConnect('UPDATE barang SET namaBarang = ?, stok = ?, modalBeli = ?, hargaJual = ?, idSatuan = ?, idKategori = ? WHERE idBarang = ?', [namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, idBarang])
 
         return NextResponse.json({
-            data: 'success',
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil diubah",
-            isLoading: false,
-            data: { idBarang, namaBarang, stok, modalBeli, hargaJual, namaSatuan, nmKategori, oldAsset, newAsset }
-            
+            status: 200,
+            message: "Data berhasil diubah",
+            namaSatuan, nmKategori, oldAsset, newAsset
         })
     } catch (error) {
+        console.error("Gagal mengupdate data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "error masbro",
-            isLoading: false
+            status: 500,
+            message: "Gagal mengupdate data"
         })
     }
 }

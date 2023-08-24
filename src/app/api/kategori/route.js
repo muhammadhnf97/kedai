@@ -5,6 +5,7 @@ export async function GET(req){
     const page = new URL(req.url).searchParams.get("page") || 1
     const itemsPerPage = 10
     const offsed = (page - 1) * itemsPerPage
+
     try {
         const query = `SELECT idKategori, nmKategori FROM kategori ORDER BY dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`
         const data = await dbConnect(query)
@@ -12,88 +13,76 @@ export async function GET(req){
         return NextResponse.json({
             status: 200,
             data,
-            isLoading: false,
             paggination: true
         })
     } catch (error) {
         return NextResponse.json({
-            status: 500,
-            message: "Tidak bisa memanggil database",
-            isLoading: false
+            status:500,
+            message: "Gagal mengambil data dari database"
         })
     }
 }
 
 export async function POST(req) {
+    const { insertData } = await req.json()
+    const { nmKategori } = insertData
 
-    const queryKategori = await dbConnect('SELECT idKategori FROM kategori')
-    const kategori = queryKategori.map(kat=>kat.idKategori)
-    const newId = kategori.length > 0 ? Math.max(...kategori) + 1 : 1
-
-    const { nmKategori } = await req.json()
-   
-    const query = `INSERT INTO kategori ( idKategori, nmKategori ) VALUES (?, ?)`
-    const values = [newId, nmKategori]
-    await dbConnect(query, values)
-
-    return NextResponse.json({
-        isLoading: false,
-        status: 200,
-        showNotif: true,
-        alertTitle: 'info',
-        desc: 'Data telah disimpan ke database',
-        data : {
-            idKategori : newId, nmKategori
-        }
-    })
+    try {
+        const queryKategori = await dbConnect('SELECT idKategori FROM kategori')
+        const kategori = queryKategori.map(kat=>kat.idKategori)
+        const newID = kategori.length > 0 ? Math.max(...kategori) + 1 : 1
+        
+        await dbConnect(`INSERT INTO kategori ( idKategori, nmKategori ) VALUES (?, ?)`, [newID, nmKategori])
+       
+        return NextResponse.json({
+            status: 200,
+            idKategori: newID,
+            message: "Data berhasil disimpan",
+        })
+    } catch (error) {
+        console.log("Gagal menyimpan data", error)
+        return NextResponse.json({
+            status: 500,
+            message: "Gagal menyimpan data"
+        })
+    }
 }
 
 export async function DELETE(req) {
-    const { idKategori } = await req.json()
+    const { tempData } = await req.json()
+    const { idKategori } = tempData
     try {
-        const query = `DELETE FROM kategori WHERE idKategori = ?`
-        const values = [idKategori]
-        await dbConnect(query, values)
+        await dbConnect(`DELETE FROM kategori WHERE idKategori = ?`, [idKategori])
     
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data telah dihapus",
-            isLoading: false
+            status: 200,
+            message: "Data telah dihapus"
         })
     } catch (error) {
+        console.error("Gagal menghapus data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Gagal menghapus data",
-            isLoading: false,
-            error
+            status: 500,
+            message: "Gagal menghapus data"
         })
     }
 }
 
 export async function PUT(req){
+    const { tempData } = await req.json()
+    const { idKategori, nmKategori } = tempData
+
     try {
-        const {idKategori, nmKategori} = await req.json()
-        const query = 'UPDATE kategori SET nmKategori = ? WHERE idKategori = ?'
-        const values = [nmKategori, idKategori]
-        await dbConnect(query, values)
+        await dbConnect('UPDATE kategori SET nmKategori = ? WHERE idKategori = ?', [nmKategori, idKategori])
 
         return NextResponse.json({
-            data: 'success',
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil diubah",
-            isLoading: false,
-            data: { idKategori, nmKategori }
-            
+            status: 200,
+            message: "Berhasil mengubah data "
         })
     } catch (error) {
+        console.error("Gagal mengupdate data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Error saat mengubah data",
-            isLoading: false
+            status: 500,
+            message: "Gagal mengupdate data"
         })
     }
 }

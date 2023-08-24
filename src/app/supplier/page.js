@@ -1,33 +1,33 @@
 'use client'
 import React, { useEffect, useState } from 'react'
-import AddItem from '../components/AddItem'
-import Search from '../components/Search'
-import TableWithAction from '../components/TableWithAction'
 import Loading from '../components/Loading'
 import Notification from '../components/Notification'
+import AddItem from '../components/AddItem'
 import EditForm from '../components/EditForm'
+import Search from '../components/Search'
+import TableWithAction from '../components/TableWithAction'
+import TableWithoutAction from '../components/TableWithoutAction'
 import { fieldSupplier } from '../utils/tableName'
-import { searchSupplierBy } from '../utils/searchutils'
+import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
+import { useLogin } from '../context/login'
+import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postData, getBasedSearch } from '../utils/fetchingdata'
 
 const Home = () => {
 
-    const page = 'Supplier'
+    const { loginData } = useLogin()
+
+    const page = 'supplier'
     const searchParam = useSearchParams().get('page')
 
     const [isLoading, setIsLoading] = useState(true)
     const [showPaggination, setShowPaggination] = useState(true)
     const [currentPage, setCurrentPage] = useState(searchParam || 1)
-    const [dataSupplier, setDataSupplier] = useState([])
+    const [initialData, setInitialData] = useState([])
     const [totalRow, setTotalRow] = useState(0)
 
     useEffect(()=>{
-      const getTotalRow = async() => {
-        const response = await fetch('/api/supplier/totalrow')
-        const data = await response.json()
-        return data.totalRow
-      }
-      getTotalRow().then(data=>setTotalRow(data))
+      getTotalRow(page).then(data=>setTotalRow(data))
     }, [])
 
     const [isNotif, setIsNotif] = useState({
@@ -37,37 +37,22 @@ const Home = () => {
       action: null
     })
 
-    const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null, answer = null) => {
+    const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null) => {
         setIsNotif(prev=>{
             return {
                 ...prev,
-                showNotif, alertTitle, desc, action, answer
+                showNotif, alertTitle, desc, action
             }
         })
     }
 
     useEffect(()=>{
-      const getDataSupplier = async() => {
-        setIsLoading(true)
-        try {
-          const response = await fetch(`/api/supplier?page=${currentPage}`)
-          const data = await response.json()
-          if(data.status === 200){
-            setDataSupplier(data.data)
-            setIsLoading(data.isLoading)
-          } else {
-            makeNotif(data.showNotif, data.alertTitle, data.desc)
-          }
-        } catch (error) {
-          makeNotif(true, 'info', "Backend tidak ada")
-        }
-      }
-      getDataSupplier()
+      setIsLoading(true)
+      getInitialData(page, currentPage).then(data=>{
+        setIsLoading(false)
+        setInitialData(data.data)
+      })
     }, [currentPage])
-
-    useEffect(()=>{
-
-    }, [])
 
     const handleClickCurrentPage = (page) => {
         setCurrentPage(page)
@@ -75,103 +60,72 @@ const Home = () => {
 
     const [tempData, setTempData] = useState({})
 
-    const handleClickAction = async(id, nama, action) => {
+    const handleClickActionFromTable = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
-      const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
-      setIsLoading(prev=>!prev)
-      try {
-        const response = await fetch(`/api/supplier/databyid?id=${id}`)
-        const data = await response.json()
-        setTempData(data.data[0])
-        setIsLoading(prev=>!prev)
+      const desc = action === 'aktifakun' ? 
+      `Aktifkan akun dengan ID ${id} ${nama} ? ` : action === 'nonaktifakun' ? `Nonaktifkan akun dengan ID ${id} ${nama} ? ` :
+      `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
+
+      setIsLoading(true)
+      getDataById(page, id).then(data=>{
+        setTempData(data.data)
+        setIsLoading(false)
+        setIsShowDetai(false)
         makeNotif(isNotif, alertTitle, desc, action)
-      } catch (error) {
-        makeNotif(isNotif, alertTitle, desc, action)
-      }
+      })
     }
 
     const [showEditForm, setShowEditForm] = useState(false)
 
-    const handleClickResponseNotif = async(res = null) => {
+    const handleClickResponseNotif = async(res) => {
+      makeNotif()
       if(res){
         if(isNotif.action === 'delete'){
-          setIsLoading(prev=>!prev)
-          try {
-            const response = await fetch('/api/supplier', {
-              method: 'DELETE',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                idSupplier: tempData?.idSupplier
-              })
-            })
-
-            const data = await response.json()
-        
-            setDataSupplier(prev=>prev.filter(data=>data.idSupplier !== tempData?.idSupplier))
-            makeNotif(data.showNotif, data.alertTitle, data.desc)
-            setIsLoading(data.isLoading)
-            setTotalRow(prev=>prev-1)
-            setTempData({})
-          } catch (error) {
-            setTempData({})
-          }
-        } else {
-          if(isNotif?.action === 'edit'){
-            setShowEditForm(prev=>!prev)
-          }
-        }
+          setIsLoading(true)
+          deleteData(page, tempData).then(data=>{
+            setInitialData(prevData=>prevData.filter(data=>data.idSupplier !== Object.values(tempData)[0]))
+            makeNotif(data.isNotif, data.alertTitle, data.desc)
+            setIsLoading(false)
+            setTotalRow(prevData=>prevData-1)
+          })
+          setTempData({})
+        } else if(isNotif?.action === 'edit'){
+          setShowEditForm(true)
+          setIsShowDetai(false)
+        } 
       }
-      makeNotif()
     }
 
     const handleSubmitEdit = async(e) =>{
       e.preventDefault()
-      try {
-        const response = await fetch('/api/supplier', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            idSupplier: tempData?.idSupplier,
-            nmSupplier: tempData?.nmSupplier,
-            alamat: tempData?.alamat,
-            noTelp: tempData?.noTelp,
-            penanggungJawab: tempData?.penanggungJawab
-          })
-        })
-  
-        const data = await response.json()
-  
-        setDataSupplier(prev=>{
+      setIsLoading(true)
+      updateData(page, tempData).then(data=>{
+        setIsLoading(false)
+        setShowEditForm(false)
+        setIsShowDetai(false)
+        makeNotif(data.isNotif, data.alertTitle, data.desc)
+        setInitialData(prev=>{
           return prev.map(prevItem => {
-              if(prevItem.idSupplier === data.data.idSupplier){
+              if(prevItem.idSupplier === tempData.idSupplier){
                   return {
-                    idSupplier: data.data.idSupplier,
-                    nmSupplier: data.data.nmSupplier,
-                    alamat: data.data.alamat,
-                    noTelp: data.data.noTelp,
-                    penanggungJawab: data.data.penanggungJawab
+                    idSupplier: tempData?.idSupplier,
+                    nmSupplier: tempData?.nmSupplier,
+                    noTelp: tempData?.noTelp,
+                    alamat: tempData?.alamat,
+                    penanggungJawab: tempData.penanggungJawab
                   }
               } else {
                   return prevItem
               }
           })
         })
-        makeNotif(data.showNotif, data.alertTitle, data.desc)
-        setIsLoading(data.isLoading)
-        setShowEditForm(prev=>!prev)
         setTempData({})
-      } catch (error) {
-        makeNotif(true, 'info', 'Ada kesalahan')
-      }
+      })
     }
 
     const handleClickCloseEditForm = () => {
-      setShowEditForm(prev=>!prev)
+      setShowEditForm(false)
       setTempData({})
     }
 
@@ -180,17 +134,16 @@ const Home = () => {
       setTempData(prev=>{
         return {
           ...prev,
-          [name]:value
+          [name]: value
         }
       })
     }
-
 
     const [insertData, setInsertData] = useState({
         nmSupplier: '',
         alamat: '',
         noTelp: '',
-        penanggungJawab: '', 
+        penanggungJawab: '',
     })
 
     const handleChangeInsertData = (e) =>{
@@ -210,41 +163,24 @@ const Home = () => {
         return
       }
 
-      setIsLoading(prev=>!prev)
-      try {
-          const response = await fetch('/api/supplier', {
-            method:'POST',
-            headers: {
-              'Content-type': 'application/json'
+      setIsLoading(true)
+      postData(page, insertData).then(data=>{
+        setInitialData(prev=>{
+          return [
+            {
+              idSupplier: data.data.idSupplier,
+              nmSupplier: insertData.nmSupplier,
+              alamat: insertData.alamat,
+              noTelp: insertData.noTelp,
+              penanggungJawab: insertData.penanggungJawab,     
             },
-            body: JSON.stringify({
-              nmSupplier: insertData?.nmSupplier,
-              alamat: insertData?.alamat,
-              noTelp: insertData?.noTelp,
-              penanggungJawab: insertData?.penanggungJawab
-            })            
-          })
-          const data = await response.json()
-
-          setDataSupplier(prev=>{
-            return [
-              {
-                idSupplier: data.data.idSupplier,
-                nmSupplier: data.data.nmSupplier,
-                alamat: data.data.alamat,
-                noTelp: data.data.noTelp,
-                penanggungJawab: data.data.penanggungJawab
-              },
-              ...prev
-            ]
-          })
-
-          makeNotif(data.showNotif, data.alertTitle, data.desc)
-          setIsLoading(data.isLoading)
-          setTotalRow(prev=>prev+1)
-      } catch (error) {
-        makeNotif(true, 'info', 'Ada kesalahan saat mengirim data')        
-      }
+            ...prev
+          ]
+        })
+        setIsLoading(false)
+        setTotalRow(prevData=>prevData + 1)
+        makeNotif(data.isNotif, data.alertTitle, data.desc)
+      })
       setInsertData({
         nmSupplier: '',
         alamat: '',
@@ -258,7 +194,7 @@ const Home = () => {
         nmSupplier: '',
         alamat: '',
         noTelp: '',
-        penanggungJawab: ''
+        penanggungJawab: '',
       })
     }
 
@@ -276,21 +212,9 @@ const Home = () => {
       })
     }
 
-    useEffect(()=>{
-      const getBasedSearch = async() => {
-        let response
-        if(searchQuery.keyword.length > 0){
-          response = await fetch(`/api/supplier/searching?keyword=${searchQuery.keyword}`)
-        } else {
-          response = await fetch(`/api/supplier?page=${currentPage}`)
-        }
-  
-        const data = await response.json()
-        return data
-      }
-  
-      getBasedSearch().then(data=>{
-        setDataSupplier(data.data)
+    useEffect(()=>{  
+      getBasedSearch(page, searchQuery, currentPage).then(data=>{
+        setInitialData(data.data)
         setShowPaggination(data.paggination)
       })
     }, [searchQuery])
@@ -299,10 +223,19 @@ const Home = () => {
       setSearchQuery({
         keyword: ''
       })
+    }   
+
+    const [isShowDetail, setIsShowDetai] = useState(false)
+    const [detailItem, setDetailItem] = useState({})
+    const handleClickDetail = (item = null) => {
+        if(item){
+            setDetailItem(item)
+        } else {
+            setDetailItem({})
+        }
+        setIsShowDetai(prev=>!prev)
     }
-
     
-
   return (
     <>
     { showEditForm && 
@@ -323,9 +256,9 @@ const Home = () => {
       />
     }
     <div className='max-w-7xl mx-auto space-y-5'>
-      <h3 className='text-center text-3xl font-semibold'>{page}</h3>
+      <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
-        <section className='flex-1'>
+        { loginData.penanggungJawab !== 'supplier' && <section className='flex-1'>
           <AddItem
             page={page}
             field={fieldSupplier} 
@@ -334,28 +267,46 @@ const Home = () => {
             handleSubmitInsert={handleSubmitInsert}
             handleClickReset={handleClickEmptyInsert}
           />
-        </section>
+        </section> }
         <section className='flex-1'>
           <Search 
             page={page}
             searchValue={searchQuery}
-            searchUtils={searchSupplierBy}
+            searchUtils={searchBy}
             handleChangeSearch={handleChangeSearchQuery}
             handleClickResetSearching={handleChangeResetQuery}
            />
         </section>
       </div>
       <section className="w-full px-2 md:px-5">
-          <TableWithAction
+          { 
+          loginData.jabatan === 'administrator' || loginData.jabatan === 'pimpinan' ? <TableWithAction
             page={page}
-            field={fieldSupplier} 
-            row={dataSupplier}
+            isShowDetail={isShowDetail}
+            detailItem={detailItem}
+            handleClickDetail={handleClickDetail}
+            initialField={fieldSupplier} 
+            initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}
-            handleClickCurrentPage={handleClickCurrentPage}
             showPaggination={showPaggination}
-            handleClickAction={handleClickAction}
-          />
+            handleClickCurrentPage={handleClickCurrentPage}
+            handleClickActionFromTable={handleClickActionFromTable}
+          /> 
+          :
+          <TableWithoutAction
+            page={page}
+            isShowDetail={isShowDetail}
+            detailItem={detailItem}
+            handleClickDetail={handleClickDetail}
+            initialField={fieldSupplier} 
+            initialData={initialData}
+            totalRow={totalRow}
+            currentPage={currentPage}
+            showPaggination={showPaggination}
+            handleClickCurrentPage={handleClickCurrentPage}
+            handleClickActionFromTable={handleClickActionFromTable}
+          />}
       </section>
     </div>
     </>

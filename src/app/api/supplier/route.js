@@ -14,8 +14,7 @@ export async function GET(req) {
         return NextResponse.json({
             status: 200,
             data,
-            paggination: true,
-            isLoading: false
+            paggination: true
         })
     } catch (error) {
         return NextResponse.json({
@@ -29,7 +28,8 @@ export async function GET(req) {
 
 export async function POST(req) {
     try {
-        const { nmSupplier, noTelp, alamat, penanggungJawab } = await req.json()
+        const { insertData } = await req.json()
+        const { nmSupplier, noTelp, alamat, penanggungJawab } = insertData
 
         const lastIdQuery = `SELECT idSupplier FROM supplier`
         const listOfID = await dbConnect(lastIdQuery)
@@ -44,70 +44,56 @@ export async function POST(req) {
         await dbConnect(PostQuery, values)
 
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil disimpan",
-            isLoading: false,
-            data : {
-                idSupplier: newID, nmSupplier, noTelp, alamat, penanggungJawab
-            }
+            status: 200,
+            idSupplier: newID,
+            message: "Data berhasil disimpan",
         })
     } catch (error) {
+        console.log("Gagal menyimpan data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "error masbro",
+            status: 500,
+            message: "Gagal menyimpan data"
         })
     }
 }
 
 export async function DELETE(req) {
     try {
-        const { idSupplier } = await req.json()
-        const query = `DELETE FROM supplier WHERE idSupplier = ?`
-        const values = [idSupplier]
-        await dbConnect(query, values)
+        const { tempData } = await req.json()
+        const { idSupplier } = tempData
+        await dbConnect(`DELETE FROM supplier WHERE idSupplier = ?`, [idSupplier])
 
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data telah dihapus",
-            isLoading: false
+            status: 200,
+            message: "Data telah dihapus"
         })
     } catch (error) {
+        console.error("Gagal menghapus data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Gagal menghapus data",
-            isLoading: false
+            status: 500,
+            message: "Gagal menghapus data"
         })
-        
     }
 }
 
 export async function PUT(req){
     try {
-        const {idSupplier, nmSupplier, noTelp, alamat,  penanggungJawab} = await req.json()
+        const { tempData } = await req.json()
+        const { idSupplier, nmSupplier, noTelp, alamat,  penanggungJawab } = tempData
         const query = 'UPDATE supplier SET nmSupplier = ?, noTelp = ?, alamat  = ?, penanggungJawab = ? WHERE idSupplier = ?'
 
         const values = [nmSupplier, noTelp, alamat,  penanggungJawab, idSupplier]
         await dbConnect(query, values)
 
         return NextResponse.json({
-            data: 'success',
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil diubah",
-            isLoading: false,
-            data: { idSupplier, nmSupplier, noTelp, alamat,  penanggungJawab }
-            
+            status: 200,
+            message: "Berhasil mengubah data "
         })
     } catch (error) {
+        console.error("Gagal mengupdate data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "error masbro",
-            isLoading: false
+            status: 500,
+            message: "Gagal mengupdate data"
         })
     }
 }

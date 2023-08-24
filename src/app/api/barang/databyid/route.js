@@ -5,7 +5,12 @@ export async function GET(req){
     const id = new URL(req.url).searchParams.get("id")
 
     try {
-        const data = await dbConnect("SELECT idKategori, nmKategori FROM kategori WHERE idKategori = ?", [id])
+        const data = await dbConnect(`SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.idSatuan, kategori.idKategori 
+        FROM barang 
+        INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
+        INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan 
+        WHERE idBarang = ${id}`, [id])
+        
 
         if(data.length > 0){
             return NextResponse.json({
@@ -15,7 +20,7 @@ export async function GET(req){
         } else {
             return NextResponse.json({
                 status : 404,
-                message: "Satuan tidak ditemukan"
+                message: "Barang tidak ditemukan"
             })
         }
     } catch (error) {

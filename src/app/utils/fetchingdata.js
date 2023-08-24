@@ -111,6 +111,7 @@ export const updateData = async(page, tempData) => {
         const data = await response.json()
 
       return {
+        data,
         isNotif: true,
         alertTitle: 'info',
         desc: data.message

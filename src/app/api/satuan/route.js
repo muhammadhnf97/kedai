@@ -11,89 +11,79 @@ export async function GET(req) {
         const data = await dbConnect(query);
 
         return NextResponse.json({
-            data,
             status: 200,
+            data,
             paggination: true
         })
     } catch (error) {
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'caution',
-            desc: "Error saat mengambil data dari database",
+            status:500,
+            message: "Gagal mengambil data dari database"
         })
     }
 }
 
 export async function POST(req) {
+    const { insertData } = await req.json()
+    const { namaSatuan } = insertData
+    
+    try {
+        const querySatuan = await dbConnect('SELECT idSatuan FROM satuan')
+        const satuan = querySatuan.map(kat=>kat.idSatuan)
+        const newID = satuan.length > 0 ? Math.max(...satuan) + 1 : 1
 
-    const querySatuan = await dbConnect('SELECT idSatuan FROM satuan')
-    const satuan = querySatuan.map(kat=>kat.idSatuan)
-    const newId = satuan.length > 0 ? Math.max(...satuan) + 1 : 1
+        await dbConnect(`INSERT INTO satuan ( idSatuan, namaSatuan ) VALUES (?, ?)`, [newID, namaSatuan])
 
-    const { namaSatuan } = await req.json()
-   
-    const query = `INSERT INTO satuan ( idSatuan, namaSatuan ) VALUES (?, ?)`
-    const values = [newId, namaSatuan]
-    await dbConnect(query, values)
-
-    return NextResponse.json({
-        isLoading: false,
-        status: 200,
-        showNotif: true,
-        alertTitle: 'info',
-        desc: 'Data telah disimpan ke database',
-        data : {
-            idSatuan : newId, namaSatuan
-        }
-    })
+        return NextResponse.json({
+            status: 200,
+            idSatuan: newID,
+            message: "Data berhasil disimpan",
+        })
+    } catch (error) {
+        console.log("Gagal menyimpan data", error)
+        return NextResponse.json({
+            status: 500,
+            message: "Gagal menyimpan data"
+        })
+    }
 }
 
 export async function DELETE(req) {
-    const { idSatuan } = await req.json()
+    const { tempData } = await req.json()
+    const { idSatuan } = tempData
+
     try {
-        const query = `DELETE FROM satuan WHERE idSatuan = ?`
-        const values = [idSatuan]
-        await dbConnect(query, values)
+        await dbConnect(`DELETE FROM satuan WHERE idSatuan = ?`, [idSatuan])
     
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data telah dihapus",
-            isLoading: false
+            status: 200,
+            message: "Data telah dihapus"
         })
     } catch (error) {
+        console.error("Gagal menghapus data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Gagal menghapus data",
-            isLoading: false,
-            error
+            status: 500,
+            message: "Gagal menghapus data"
         })
     }
 }
 
 export async function PUT(req){
+    const { tempData } = await req.json()
+    const { idSatuan, namaSatuan } = tempData
+    
     try {
-        const {idSatuan, namaSatuan} = await req.json()
-        const query = 'UPDATE satuan SET namaSatuan = ? WHERE idSatuan = ?'
-        const values = [namaSatuan, idSatuan]
-        await dbConnect(query, values)
+        await dbConnect('UPDATE satuan SET namaSatuan = ? WHERE idSatuan = ?', [namaSatuan, idSatuan])
 
         return NextResponse.json({
-            data: 'success',
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Data berhasil diubah",
-            isLoading: false,
-            data: { idSatuan, namaSatuan }
-            
+            status: 200,
+            message: "Berhasil mengubah data "
         })
     } catch (error) {
+        console.error("Gagal mengupdate data", error)
         return NextResponse.json({
-            showNotif: true,
-            alertTitle: 'info',
-            desc: "Error saat mengubah data",
-            isLoading: false
+            status: 500,
+            message: "Gagal mengupdate data"
         })
     }
 }

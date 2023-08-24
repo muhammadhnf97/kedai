@@ -1,337 +1,274 @@
 'use client'
-import React from 'react'
-import { useState, useEffect } from 'react'
-import { fieldTableBarang } from '../utils/tableName'
-import { useBarang } from '../context/barang'
-import { searchUtilsBarang } from '../utils/searchutils'
-import TableAset from '../components/TableAset'
-import TableWithAction from '../components/TableWithAction'
-import AddItem from '../components/AddItem'
-import Notification from '../components/Notification'
-import Search from '../components/Search'
+import React, { useEffect, useState } from 'react'
 import Loading from '../components/Loading'
+import Notification from '../components/Notification'
+import AddItem from '../components/AddItem'
 import EditForm from '../components/EditForm'
+import Search from '../components/Search'
+import TableWithAction from '../components/TableWithAction'
+import TableWithoutAction from '../components/TableWithoutAction'
+import { fieldBarang } from '../utils/tableName'
+import { searchBarangBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
+import { useLogin } from '../context/login'
+import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postData, getBasedSearch } from '../utils/fetchingdata'
+import { useKategori } from '../context/kategori'
 
 const Home = () => {
-  const pathname = useSearchParams().get('page')
 
-  const page = 'Barang'
-  const { totalAset, handleTotalAset, handleDeleteTotalAset, handleUpdateTotalAsset } = useBarang()
-  
-  const [isNotif, setIsNotif] = useState({
-    showNotif: false,
-    alertTitle : null,
-    desc: null,
-    action: null,
-    answer: null
-  })
+    const { loginData } = useLogin()
+    const { listKategori, setListKategori } = useKategori()
 
-  const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null, answer = null) => {
-      setIsNotif(prev=>{
-          return {
-              ...prev,
-              showNotif, alertTitle, desc, action, answer
-          }
+    const page = 'barang'
+    const searchParam = useSearchParams().get('page')
+
+    const [isLoading, setIsLoading] = useState(true)
+    const [showPaggination, setShowPaggination] = useState(true)
+    const [currentPage, setCurrentPage] = useState(searchParam || 1)
+    const [initialData, setInitialData] = useState([])
+    const [totalRow, setTotalRow] = useState(0)
+
+    useEffect(()=>{
+      getTotalRow(page).then(data=>setTotalRow(data))
+    }, [])
+
+    const [isNotif, setIsNotif] = useState({
+      showNotif: false,
+      alertTitle : null,
+      desc: null,
+      action: null
+    })
+
+    const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null) => {
+        setIsNotif(prev=>{
+            return {
+                ...prev,
+                showNotif, alertTitle, desc, action
+            }
+        })
+    }
+
+    useEffect(()=>{
+      setIsLoading(true)
+      getInitialData(page, currentPage).then(data=>{
+        setIsLoading(false)
+        setInitialData(data.data)
       })
-  }
-  const [tempData, setTempData] = useState({})
-  const [isLoading, setIsLoading] = useState(true)
-  const [showPaggination, setShowPaggination] = useState(true)
-  const [totalRow, setTotalRow] = useState(0)
-  const [currentPage, setCurrentPage] = useState(pathname || 1)
-  const [tableBarang, setTableBarang] = useState([])
+    }, [currentPage])
 
-  const [inputData, setInputData] = useState({
-    namaBarang : '',
-    stok : '',
-    modalBeli : '',
-    hargaJual : '',
-    idSatuan : '',
-    idKategori : '',
-    notif: null
-  })
+    console.log(initialData)
 
-  const [searchValue, setSearchValue] = useState({
-    keyword: '',
-    idKategori: ''
-  })
+    const handleClickCurrentPage = (page) => {
+        setCurrentPage(page)
+    }
 
-  const [showEditForm, setShowEditForm] = useState(false)
+    const [tempData, setTempData] = useState({})
 
-  const handleClickResetSearching = () => {
-    setSearchValue({
-      keyword: '',
-      idKategori: ''
-    })
-  }
+    const handleClickActionFromTable = async(id, nama, action) => {
+      const isNotif = true
+      const alertTitle = 'Peringatan'
+      const desc = `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
 
-  const handleChangeSearch = (e) => {
-    const {name, value} = e.target
-    setSearchValue(prev=>{
-      return {
-        ...prev,
-        [name]: value
+      setIsLoading(true)
+      getDataById(page, id).then(data=>{
+        setTempData(data.data)
+        setIsLoading(false)
+        setIsShowDetai(false)
+        makeNotif(isNotif, alertTitle, desc, action)
+      })
+    }
+
+    const [showEditForm, setShowEditForm] = useState(false)
+
+    const handleClickResponseNotif = async(res) => {
+      makeNotif()
+      if(res){
+        if(isNotif.action === 'delete'){
+          setIsLoading(true)
+          deleteData(page, tempData).then(data=>{
+            setInitialData(prevData=>prevData.filter(data=>data.idBarang !== Object.values(tempData)[0]))
+            setIsLoading(false)
+            setTotalRow(prevData=>prevData-1)
+            setListKategori(prevData=>prevData.filter(data=>data.idBarang !== tempData.idBarang))
+            makeNotif(data.isNotif, data.alertTitle, data.desc)
+          })
+          setTempData({})
+        } else if(isNotif?.action === 'edit'){
+          setShowEditForm(true)
+          setIsShowDetai(false)
+        } 
       }
-    })
-  }
-  
-  const handleChangeInsertData = (e) => {
-    const {name, value} = e.target
-    setInputData(prev=>{
-        return {
-            ...prev,
-            [name] : value
-        }
-    })
-  }
+    }
 
-  const handleChangeEdit = (e) => {
-    const {name, value} = e.target
+    const handleSubmitEdit = async(e) =>{
+      e.preventDefault()
+      setIsLoading(true)
+      updateData(page, tempData).then(data=>{
+        setIsLoading(false)
+        setShowEditForm(false)
+        setIsShowDetai(false)
+        makeNotif(data.isNotif, data.alertTitle, data.desc)
+        setInitialData(prev=>{
+          return prev.map(prevItem => {
+              if(prevItem.idBarang === tempData.idBarang){
+                  return {
+                    idBarang: tempData?.idBarang,
+                    namaBarang: tempData?.namaBarang,
+                    stok: tempData?.stok,
+                    modalBeli: tempData?.modalBeli,
+                    hargaJual: tempData?.hargaJual,
+                    namaSatuan: data.data.namaSatuan,
+                    nmKategori: data.data.nmKategori
+                  }
+              } else {
+                  return prevItem
+              }
+          })
+        })
+        setTempData({})
+      })
+    }
 
-    setTempData(prev=>{
+    const handleClickCloseEditForm = () => {
+      setShowEditForm(false)
+      setTempData({})
+    }
+
+    const handleChangeEdit = (e) => {
+      const {name, value} = e.target
+      setTempData(prev=>{
         return {
           ...prev,
           [name]: value
         }
-    })
-  }
-  
-  const handleSubmitInsert = async(e) => { 
-    e.preventDefault()
-    setIsLoading(prev=>!prev)
-    try {
-      if(inputData.namaBarang.length > 0 && inputData.stok.length > 0 && inputData.modalBeli.length > 0 && inputData.hargaJual.length > 0 && inputData.idSatuan.length > 0 && inputData.idKategori.length > 0){
-        const response = await fetch('/api/barang',{
-          method: 'POST',
-          headers: {
-            "Content-Type": 'application/json'
-          },
-          body: JSON.stringify({
-            namaBarang: inputData.namaBarang,
-            stok: inputData.stok,
-            modalBeli: inputData.modalBeli,
-            hargaJual: inputData.hargaJual,
-            idSatuan: inputData.idSatuan,
-            idKategori: inputData.idKategori,
-            notif: null,
-          })
-        })
-        const data = await response.json()
+      })
+    }
 
-        setTableBarang(prev=>[
-          {  
-            idBarang: data.input.newID,
-            namaBarang: data.input.namaBarang,
-            stok: data.input.stok,
-            modalBeli: data.input.modalBeli,
-            hargaJual: data.input.hargaJual,
-            namaSatuan: data.input.namaSatuan.namaSatuan,
-            nmKategori: data.input.nmKategori.nmKategori,
-          },
-            ...prev 
-          ]
-        )
-        handleTotalAset(data.input.newTotalAset)
-        setIsLoading(data.isLoading)
-        makeNotif(data.showNotif, data.alertTitle, data.desc)
-        setTotalRow(prev=>prev+1)
-        
-      } else {
-        setIsLoading(prev=>!prev)
+    const [insertData, setInsertData] = useState({
+        namaBarang: '',
+        stok: '',
+        modalBeli: '',
+        hargaJual: '',
+        idSatuan: '',
+        idKategori: ''
+    })
+
+    const handleChangeInsertData = (e) =>{
+      const {name, value} = e.target
+      setInsertData(prev=>{
+        return {
+          ...prev,
+          [name]: value
+        }
+      })
+    }
+
+    const handleSubmitInsert = async(e) => {
+      e.preventDefault()
+      if(insertData.namaBarang.length < 1 && insertData.stok.length < 1 && insertData.modalBeli.length < 1 && insertData.hargaJual.length < 1 && insertData.idSatuan.length < 1 && insertData.idKategori.length < 1){
         makeNotif(true, 'info', 'Data tidak boleh kosong')
+        return
       }
-    } catch (error) {
-      makeNotif(true, 'info', 'Data tidak dapat dikirim ke database')
+
+      setIsLoading(true)
+      postData(page, insertData).then(data=>{
+        setInitialData(prev=>{
+          return [
+            {
+              idBarang: data.data.idBarang,
+              namaBarang: insertData?.namaBarang,
+              stok: insertData?.stok,
+              modalBeli: insertData?.modalBeli,
+              hargaJual: insertData?.hargaJual,
+              idSatuan: insertData?.idSatuan,
+              idKategori: insertData?.idKategori
+            },
+            ...prev
+          ]
+        })
+        setIsLoading(false)
+        setTotalRow(prevData=>prevData + 1)
+        setListKategori(prevData=>{
+          return [
+            ...prevData, {
+            idBarang: data.data.idBarang,
+            namaBarang: insertData?.namaBarang,
+            stok: insertData?.stok,
+            modalBeli: insertData?.modalBeli,
+            hargaJual: insertData?.hargaJual,
+            idSatuan: insertData?.idSatuan,
+            idKategori: insertData?.idKategori
+          }]
+        })
+        makeNotif(data.isNotif, data.alertTitle, data.desc)
+      })
+      setInsertData({
+        namaBarang: '',
+        stok: '',
+        modalBeli: '',
+        hargaJual: '',
+        idSatuan: '',
+        idKategori: ''
+      })
     }
-    handleClickReset()
-  }
 
-  const handleClickCurrentPage = (page) => {
-    setCurrentPage(page)
-  }
+    const handleClickEmptyInsert = () => {
+      setInsertData({
+        namaBarang: '',
+        stok: '',
+        modalBeli: '',
+        hargaJual: '',
+        idSatuan: '',
+        idKategori: ''
+      })
+    }
 
-  const handleClickReset = () => {
-    setInputData({
-      namaBarang : '',
-      stok : '',
-      modalBeli : '',
-      hargaJual : '',
-      idSatuan : '',
-      idKategori : '',
-      notif : '',
+    const [searchQuery, setSearchQuery] = useState({
+      keyword: '',
+      idKategori: ''
     })
-  }
 
-  const handleClickAction = async(idBarang, namaBarang, action) => {
-    const isNotif = true
-    const alertTitle = 'Peringatan'
-    const desc = `${action?.charAt(0).toUpperCase()}${action.slice(1)} data ${idBarang} ${namaBarang} ?`
+    const handleChangeSearchQuery = (e) => {
+      const {name, value} = e.target
+      setSearchQuery(prev=>{
+        return {
+          ...prev,
+          [name]: value
+        }
+      })
+    }
 
-    setIsLoading(prev=>!prev)
+    useEffect(()=>{  
+      getBasedSearch(page, searchQuery, currentPage).then(data=>{
+        setInitialData(data.data)
+        setShowPaggination(data.paggination)
+      })
+    }, [searchQuery])
+
+    const handleChangeResetQuery = () => {
+      setSearchQuery({
+        keyword: '',
+        idKategori: ''
+      })
+    }   
+
+    const [isShowDetail, setIsShowDetai] = useState(false)
+    const [detailItem, setDetailItem] = useState({})
+    const handleClickDetail = (item = null) => {
+        if(item){
+            setDetailItem(item)
+        } else {
+            setDetailItem({})
+        }
+        setIsShowDetai(prev=>!prev)
+    }
     
-    try {
-      const response = await fetch(`/api/barang/searching?id=${idBarang}`)
-      const data = await response.json()
-      setTempData(data.data[0])
-      setIsLoading(prev=>!prev)
-      makeNotif(isNotif, alertTitle, desc, action)
-    } catch (error) {
-      makeNotif(true, 'info', 'Ada Kesalahan')
-    }
-  }
-
-  const handleClickResponseNotif = (res) => {
-    if(res){
-      if(isNotif?.action === 'delete'){
-        (async()=>{
-          setIsLoading(prev=>!prev)
-          try {
-            const response = await fetch('/api/barang', {
-                method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body:JSON.stringify({
-                    idBarang: tempData?.idBarang
-                })
-            })
-            const data = await response.json()
-            const totalAsetToDelete = tempData?.hargaJual * tempData?.stok
-        
-            setTableBarang(prev=>prev.filter(data=>data.idBarang !== tempData.idBarang))
-            handleDeleteTotalAset(totalAsetToDelete)
-            makeNotif(data.showNotif, data.alertTitle, data.desc)
-            setIsLoading(data.isLoading)
-
-          } catch (error) {
-            makeNotif(true, 'info', 'Ada kesalahan')
-          }  
-          setTempData({}) 
-          setTotalRow(prev=>prev-1)
-        })()
-      }
-
-      if(isNotif?.action === 'edit'){
-        setShowEditForm(prev=>!prev)
-      }
-    } else {
-      setTempData({})
-    }
-    makeNotif()
-  }
-  
-  const handleSubmitEdit = async(e) => {
-    e.preventDefault()
-    setIsLoading(prev=>!prev)
-    try {
-      const response = await fetch('/api/barang', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          idBarang: tempData?.idBarang,
-          namaBarang: tempData?.namaBarang,
-          stok: tempData?.stok,
-          modalBeli: tempData?.modalBeli,
-          hargaJual: tempData?.hargaJual,
-          idSatuan: tempData?.idSatuan,
-          idKategori: tempData?.idKategori,
-        })
-      })
-
-      const data = await response.json()
-
-      handleUpdateTotalAsset(data.data.oldAsset, data.data.newAsset)
-
-      setTableBarang(prev=>{
-        return prev.map(prevItem => {
-            if(prevItem.idBarang === data.data.idBarang){
-                return {
-                  idBarang: data.data.idBarang,
-                  namaBarang: data.data.namaBarang,
-                  stok: data.data.stok,
-                  modalBeli: data.data.modalBeli,
-                  hargaJual: data.data.hargaJual,
-                  namaSatuan: data.data.namaSatuan,
-                  nmKategori: data.data.nmKategori,
-                }
-            } else {
-                return prevItem
-            }
-        })
-      })
-      makeNotif(data.showNotif, data.alertTitle, data.desc)
-      setIsLoading(data.isLoading)
-
-      setShowEditForm(prev=>!prev)
-    } catch (error) {
-      makeNotif(true, 'info', 'Ada kesalahan')
-    }
-  }
-
-  const handleClickCloseEditForm = () => {
-    setShowEditForm(prev=>!prev)
-    setTempData({})
-  }
-  
-  useEffect(()=>{
-    const getTotalRow = async() => {
-      const response = await fetch('/api/barang/totalrow')
-      const data = await response.json()
-      return data.totalRow
-    }
-    getTotalRow().then(data=>setTotalRow(data))
-  }, [])
-
-  useEffect(()=>{
-    const getDataBarang = async() => {
-      try {
-        const response = await fetch(`/api/barang?page=${currentPage}`)
-        const data = await response.json()
-        return data
-      } catch (error) {
-        console.log('error : ', error)
-      }
-    }
-    getDataBarang().then(barang=>{
-      setTableBarang(barang?.data)
-      setShowPaggination(barang?.paggination)
-      setIsLoading(barang?.isLoading)
-    })
-  }, [currentPage])
-
-  useEffect(()=>{
-    const getBarangBasedSearch = async() => {
-      let response
-      if(searchValue.idKategori.length > 0){
-        response = await fetch(`/api/barang/searching?kategori=${searchValue.idKategori}`)
-      } else if(searchValue.keyword.length > 0){
-        response = await fetch(`/api/barang/searching?keyword=${searchValue.keyword}`)
-      } else if(searchValue.idKategori.length > 0 && searchValue.keyword.length > 0){
-        response = await fetch(`/api/barang/searching?kategori=${searchValue.idKategori}&&keyword=${searchValue.keyword}`)
-      } else {
-        response = await fetch(`/api/barang?page=${currentPage}`)
-      }
-
-      const data = await response.json()
-      return data
-    }
-
-    getBarangBasedSearch().then(data=>{
-      setTableBarang(data.data)
-      setShowPaggination(data.paggination)
-    })
-  }, [searchValue])
-
   return (
     <>
-    {/* { isLoading && <Loading /> } */}
     { showEditForm && 
     <EditForm
       page={page}
-      listField={fieldTableBarang}
+      listField={fieldBarang}
       initalValue={tempData}
       handleSubmitEdit={handleSubmitEdit}
       handleClickCloseEditForm={handleClickCloseEditForm}
@@ -346,43 +283,57 @@ const Home = () => {
       />
     }
     <div className='max-w-7xl mx-auto space-y-5'>
-      <h3 className='text-center text-3xl font-semibold'>{page}</h3>
+      <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
-        <section className='flex-1'>
+        { loginData.penanggungJawab !== 'kategori' && <section className='flex-1'>
           <AddItem
             page={page}
-            field={fieldTableBarang} 
-            inputData={inputData} 
+            field={fieldBarang} 
+            inputData={insertData} 
             handleChangeInsertData={handleChangeInsertData}
             handleSubmitInsert={handleSubmitInsert}
-            handleClickReset={handleClickReset}
+            handleClickReset={handleClickEmptyInsert}
           />
-        </section>
+        </section> }
         <section className='flex-1'>
           <Search 
             page={page}
-            searchValue={searchValue}
-            searchUtils={searchUtilsBarang}
-            handleChangeSearch={handleChangeSearch}
-            handleClickResetSearching={handleClickResetSearching}
+            searchValue={searchQuery}
+            searchUtils={searchBarangBy}
+            handleChangeSearch={handleChangeSearchQuery}
+            handleClickResetSearching={handleChangeResetQuery}
            />
         </section>
       </div>
       <section className="w-full px-2 md:px-5">
-          <TableWithAction
+          { 
+          loginData.jabatan === 'administrator' || loginData.jabatan === 'pimpinan' ? <TableWithAction
             page={page}
-            field={fieldTableBarang} 
-            initialData={tableBarang}
+            isShowDetail={isShowDetail}
+            detailItem={detailItem}
+            handleClickDetail={handleClickDetail}
+            initialField={fieldBarang} 
+            initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}
-            handleClickCurrentPage={handleClickCurrentPage}
             showPaggination={showPaggination}
-            handleClickAction={handleClickAction}
-          />
-          <TableAset 
-            desc={'Total Aset'} 
-            nominal={totalAset}
-          />
+            handleClickCurrentPage={handleClickCurrentPage}
+            handleClickActionFromTable={handleClickActionFromTable}
+          /> 
+          :
+          <TableWithoutAction
+            page={page}
+            isShowDetail={isShowDetail}
+            detailItem={detailItem}
+            handleClickDetail={handleClickDetail}
+            initialField={fieldBarang} 
+            initialData={initialData}
+            totalRow={totalRow}
+            currentPage={currentPage}
+            showPaggination={showPaggination}
+            handleClickCurrentPage={handleClickCurrentPage}
+            handleClickActionFromTable={handleClickActionFromTable}
+          />}
       </section>
     </div>
     </>
