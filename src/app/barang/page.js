@@ -7,17 +7,20 @@ import EditForm from '../components/EditForm'
 import Search from '../components/Search'
 import TableWithAction from '../components/TableWithAction'
 import TableWithoutAction from '../components/TableWithoutAction'
+import TableAset from '../components/TableAset'
 import { fieldBarang } from '../utils/tableName'
 import { searchBarangBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
 import { useLogin } from '../context/login'
-import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postData, getBasedSearch } from '../utils/fetchingdata'
 import { useKategori } from '../context/kategori'
+import { useBarang } from '../context/barang'
+import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postData, getBasedSearch } from '../utils/fetchingdata'
 
 const Home = () => {
 
     const { loginData } = useLogin()
     const { listKategori, setListKategori } = useKategori()
+    const { totalAset, handleIncreaseAsset, handleDecreaseAsset, handleUpdateAsset } = useBarang()
 
     const page = 'barang'
     const searchParam = useSearchParams().get('page')
@@ -55,8 +58,6 @@ const Home = () => {
         setInitialData(data.data)
       })
     }, [currentPage])
-
-    console.log(initialData)
 
     const handleClickCurrentPage = (page) => {
         setCurrentPage(page)
@@ -180,12 +181,13 @@ const Home = () => {
               stok: insertData?.stok,
               modalBeli: insertData?.modalBeli,
               hargaJual: insertData?.hargaJual,
-              idSatuan: insertData?.idSatuan,
-              idKategori: insertData?.idKategori
+              namaSatuan: data.data.namaSatuan,
+              nmKategori: data.data.nmKategori
             },
             ...prev
           ]
         })
+        handleIncreaseAsset(data.data.newTotalAset)
         setIsLoading(false)
         setTotalRow(prevData=>prevData + 1)
         setListKategori(prevData=>{
@@ -334,6 +336,11 @@ const Home = () => {
             handleClickCurrentPage={handleClickCurrentPage}
             handleClickActionFromTable={handleClickActionFromTable}
           />}
+      </section>
+      <section className='w-full px-2 md:px-5'>
+        <TableAset
+        desc={"Total Aset"}
+        nominal={totalAset} />
       </section>
     </div>
     </>

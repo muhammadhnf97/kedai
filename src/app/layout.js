@@ -4,7 +4,6 @@ import CustomeBackground from './components/CustomeBackground';
 import './globals.css';
 import { Poppins } from 'next/font/google';
 import Footer from './components/Footer';
-import Loading from './components/Loading';
 import Header from './components/Header';
 import Providers from './context/providers';
 import { usePathname } from 'next/navigation';

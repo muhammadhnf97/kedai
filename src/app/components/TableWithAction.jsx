@@ -57,15 +57,25 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                         let accountActiveButton
                         if(values !== Object.values(detailItem)[0]){
                             accountActiveButton = (
-                                <button className='w-full flex-1 py-1 border px-2 flex flex-col justify-center items-center bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 rounded-lg text-sm' onClick={()=>handleClickActionFromTable(Object.values(detailItem)[0], Object.values(detailItem)[1], 'aktifakun' )}><BiUserPlus className='w-4 h-4' /><p>Aktifkan Akun</p></button>
+                                <button 
+                                className='w-full flex-1 py-1 border px-2 flex flex-col justify-center items-center bg-yellow-400 hover:bg-yellow-500 active:bg-yellow-600 rounded-lg text-sm' 
+                                onClick={()=>handleClickActionFromTable(Object.values(detailItem)[0], Object.values(detailItem)[1], 'aktifakun' )}>
+                                    <BiUserPlus className='w-4 h-4' />
+                                    <p>Aktifkan Akun</p>
+                                </button>
                             )
                         } else {
                             accountActiveButton = (
-                                <button className='w-full flex-1 py-1 border px-2 flex flex-col justify-center items-center bg-slate-400 hover:bg-slate-500 active:bg-slate-600 rounded-lg text-sm' onClick={()=>handleClickActionFromTable(Object.values(detailItem)[0], Object.values(detailItem)[1], 'nonaktifakun' )}><BiUserMinus className='w-4 h-4' /><p>Nonaktifkan Akun</p></button>
+                                <button 
+                                className='w-full flex-1 py-1 border px-2 flex flex-col justify-center items-center bg-slate-400 hover:bg-slate-500 active:bg-slate-600 rounded-lg text-sm' 
+                                onClick={()=>handleClickActionFromTable(Object.values(detailItem)[0], Object.values(detailItem)[1], 'nonaktifakun' )}>
+                                    <BiUserMinus className='w-4 h-4' />
+                                    <p>Nonaktifkan Akun</p>
+                                </button>
                             )
                         }
                         return (
-                            <div className='flex gap-2'>
+                            <div key={values.key} className='flex gap-2'>
                                 <button 
                                 className='flex-1 py-1 border flex flex-col justify-center items-center bg-green-400 hover:bg-green-500 active:bg-green-600 rounded-lg text-sm'
                                 onClick={()=>handleClickActionFromTable(Object.values(detailItem)[0], Object.values(detailItem)[1], 'edit' )}>
@@ -95,34 +105,35 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                 :
                 // MOBILE VIEW
                 <>
-                <section className='md:hidden w-full flex flex-col items-center justify-center gap-1'>
+                {/* <section className='md:hidden w-full flex flex-col items-center justify-center gap-1'>
                     {initialData.map((dataList, index)=>(
                         <div key={dataList.key} className='w-full flex border border-blue-400 rounded-lg overflow-hidden'>
                             <div className='flex items-center justify-center w-7 bg-blue-400'>{startIndex + (index + 1)}</div>
                             <div className='flex-1'>
                                 {
-                                    initialField.map((fieldList)=>(
-                                        <div key={fieldList.key} className='flex flex-1 bg-blue-200 border-b border-blue-300'>
+                                    initialField.map((fieldList, childIndex)=>{
+                                        return (
+                                        <div key={index.toString()+childIndex.toString()} className='flex flex-1 bg-blue-200 border-b border-blue-300'>
                                             <div className='flex-1 px-5'>
-                                                <p>{fieldList.label}</p>
+                                                <p>{fieldList.label} {index.toString()+childIndex.toString()}</p>
                                             </div>
                                             <div className='flex-1 bg-white px-5'>
                                                 <p>{dataList[fieldList.key]}</p>
                                             </div>
                                         </div>
-                                    )).slice(0, 2)
+                                    )}).slice(0, 2)
                                 }
                             </div>
                             <button className='w-10 text-white flex items-center justify-center bg-blue-400 hover:bg-blue-500 active:bg-blue-600' onClick={()=>handleClickDetail(initialData[index])}><FaMagnifyingGlass /></button>
                         </div>
                     ))}
-                </section>
+                </section> */}
                 {/* DESKTOP VIEW */}
                 <section className='hidden md:block'>
                     <table className='w-full text-center h-full'>
                         <thead>
                             <tr className='w-full h-10 bg-slate-700 text-white'>
-                            <th>No. </th>
+                                <th>No. </th>
                                 {
                                     initialField?.map((fieldData)=>(
                                         <th key={fieldData.key}>{fieldData.label}</th>

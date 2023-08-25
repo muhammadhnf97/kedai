@@ -177,7 +177,6 @@ const Home = () => {
       })
     }
 
-    console.log(insertData, tempData)
     const handleSubmitInsert = async(e) => {
       e.preventDefault()
       if(insertData.nmPegawai.length < 1 && insertData.alamat.length < 1 && insertData.noTelp.length < 1){

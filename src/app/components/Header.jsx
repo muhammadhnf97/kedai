@@ -9,62 +9,77 @@ import { useLogin } from '../context/login'
 const Header = () => {
     const currentPathname = usePathname()
     const menu = [{
+        id: 'home',
         label: 'Home',
         pathName: '/',
         child: null
     },{
+        id: 'master',
         label: 'Master',
         pathName: '/',
         child: [{
+            id: 'barang',
             label: 'Barang',
             pathName: '/barang',
             child: null
         },{
+            id: 'kategori',
             label: 'Kategori Barang',
             pathName: '/kategori',
             child: null
         },{
+            id: 'satuan',
             label: 'Satuan Barang',
             pathName: '/satuan',
             child: null
         },{
+            id: 'supplier',
             label: 'Supplier',
             pathName: '/supplier',
             child: null
         },{
+            id: 'pegawai',
             label: 'Pegawai',
             pathName: '/pegawai',
             child: null
         },{
+            id: 'user',
             label: 'User',
             pathName: '/user',
             child: null
         }]
     },{
+        id: 'transaksi',
         label: 'Transaksi',
         pathName: '/',
         child: [{
+            id: 'pembelian',
             label: 'Pembelian',
             pathName: '/pembelian',
             child: null
         },{
+            id: 'penjualan',
             label: 'Kategori Barang',
             pathName: '/penjualan',
             child: null
         }]
     },{
+        id: 'hutangpituang',
         label: 'Hutang/Piutang',
         pathName: '/',
         child: [{
+            id: 'hutang',
             label: 'Hutang',
             pathName: '/hutang',
             child: null
         },{
+            id: 'piutang',
             label: 'Piutang',
             pathName: '/piutang',
             child: null
         }]
     },{
+        id: 'laporan',
         label: 'Laporan',
         pathName: '/laporan',
         child: null
@@ -95,22 +110,26 @@ const Header = () => {
                 menu.map((listmenu)=>{
                     if(!listmenu.child){
                         return (
-                            <Link key={listmenu.pathName} href={listmenu.pathName} as={Link}>
-                                <li>
-                                    <p className={`py-1 px-2 hover:bg-[#98C1D9] hover:rounded-full duration-150 ease-out rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300'}`}>{listmenu.label}</p>
-                                    </li>
-                            </Link>
+                            <div key={listmenu.id}>
+                                <Link href={listmenu.pathName}>
+                                    <li>
+                                        <p className={`py-1 px-2 hover:bg-[#98C1D9] hover:rounded-full duration-150 ease-out rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300'}`}>{listmenu.label}</p>
+                                        </li>
+                                </Link>
+                            </div>
                         )
                     } else {
                         return (
-                        <div className='group leading-7'>
+                        <div key={listmenu.id} className='group leading-7'>
                             <div className='flex items-center justify-center gap-1'>{listmenu.label}<IoIosArrowDown /></div>
                             <ul className='absolute invisible origin-top scale-0 border-2 border-black rounded-lg duration-200 ease-out bg-white p-1 group-hover:scale-100 group-hover:visible '>
                             {
                                 listmenu.child.map(childmenu=>(
-                                    <Link key={childmenu.pathName} href={childmenu.pathName} as={Link}>
-                                        <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
-                                    </Link>
+                                    <div key={childmenu.id}>
+                                        <Link href={childmenu.pathName}>
+                                            <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
+                                        </Link>
+                                    </div>
                                 ))
                             }
                             </ul>
@@ -135,19 +154,23 @@ const Header = () => {
                     menu.map(listmenu=>{
                         if(!listmenu.child){
                             return (
-                                <Link key={listmenu.pathName} href={listmenu.pathName}>
-                                    <li><p className={`px-2 hover   :bg-[#98C1D9] hover:rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{listmenu.label}</p></li>
-                                </Link>
+                                <div key={listmenu.id}>
+                                    <Link href={listmenu.pathName}>
+                                        <li><p className={`px-2 hover   :bg-[#98C1D9] hover:rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{listmenu.label}</p></li>
+                                    </Link>
+                                </div>
                             )
                         } else {
                             return (
-                                <div className='group leading-7 my-2 rounded-lg'>
+                                <div key={listmenu.id} className='group leading-7 my-2 rounded-lg'>
                                     <ul className='border-t-2 border-blue-500 bg-white p-1'>
                                     {
                                         listmenu.child.map(childmenu=>(
-                                            <Link href={childmenu.pathName}>
-                                                <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
-                                            </Link>
+                                            <div key={childmenu.id}>
+                                                <Link href={childmenu.pathName}>
+                                                    <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
+                                                </Link>
+                                            </div>
                                         ))
                                     }
                                     </ul>

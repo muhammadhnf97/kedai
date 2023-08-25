@@ -35,20 +35,20 @@ export default function BarangProvider({ children }) {
         fetchStokDanHargaJual().then(data=>setTotalAset(data))
     }, [])
 
-    const handleTotalAset = (newAsset) => {
+    const handleIncreaseAsset = (newAsset) => {
       setTotalAset(prev=> prev + newAsset)
     }
 
-    const handleDeleteTotalAset = (newAsset) => {
+    const handleDecreaseAsset = (newAsset) => {
       setTotalAset(prev=> prev - newAsset )
     }
 
-    const handleUpdateTotalAsset = (oldAsset, newAsset) => {
+    const handleUpdateAsset = (oldAsset, newAsset) => {
       setTotalAset(prev=>prev - oldAsset + newAsset)
     }
 
   return (
-    <BarangContext.Provider value={{totalAset, handleTotalAset, handleDeleteTotalAset, handleUpdateTotalAsset}}>
+    <BarangContext.Provider value={{totalAset, handleIncreaseAsset, handleDecreaseAsset, handleUpdateAsset}}>
       {children}
     </BarangContext.Provider>
   )

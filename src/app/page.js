@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react"
 import StickyNote from "./components/StickyNote"
 import Table from "./components/Table"
-import { fieldTableBarang } from "./utils/tableName"
+import { fieldBarang } from "./utils/tableName"
 import TableAset from "./components/TableAset"
 import { useBarang } from "./context/barang"
 
@@ -38,7 +38,7 @@ export default function Home() {
       </section>
       <section className="w-full px-2 md:px-5">
         <h4 className="font-semibold text-xl">Barang</h4>
-        <Table field={fieldTableBarang} row={tableBarang} />
+        <Table field={fieldBarang} row={tableBarang} />
         <TableAset desc={'Total Aset'} nominal={totalAset} />
       </section>
     </div>

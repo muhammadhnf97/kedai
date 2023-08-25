@@ -23,12 +23,10 @@ export const fieldBarang = [{
         label: 'Satuan',
         key: 'idSatuan',
         type: 'select',
-        detail: 'namaSatuan'
     },{
         label: 'Kategori',
         key: 'idKategori',
-        type: 'select',
-        detail: 'nmKategori'
+        type: 'select'
     }
 ]
 

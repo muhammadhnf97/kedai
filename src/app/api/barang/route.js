@@ -41,10 +41,10 @@ export async function POST(req) {
         const dateCreated = new Date 
         
         const listNamaKategori = await dbConnect(`SELECT nmKategori FROM kategori WHERE idKategori = ${idKategori}`)
-        const nmKategori = listNamaKategori[0]
+        const nmKategori = listNamaKategori[0].nmKategori
 
         const listNamaSatuan = await dbConnect(`SELECT namaSatuan FROM satuan WHERE idSatuan = ${idSatuan}`)
-        const namaSatuan = listNamaSatuan[0]
+        const namaSatuan = listNamaSatuan[0].namaSatuan
 
         await dbConnect(`INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [newID, namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori, dateCreated])
 
@@ -52,7 +52,6 @@ export async function POST(req) {
 
         return NextResponse.json({
             status: 200,
-            data,
             idBarang: newID,
             nmKategori,
             namaSatuan,
