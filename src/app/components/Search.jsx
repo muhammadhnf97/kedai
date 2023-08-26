@@ -11,9 +11,8 @@ const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClic
     <div className='w-full space-y-5 bg-white rounded-lg shadow-md p-3 border border-slate-300 md:px-5'>
         <div className='font-semibold text-lg flex items-center justify-start gap-2'><FaMagnifyingGlass /> Cari data {page.toLocaleLowerCase()}</div>
         <div className='space-y-3'>
-            {/* {
+            {
                 searchUtils.map(value=>{
-                    console.log(value)
                     let inputType
                     if(value.type === "text"){
                         inputType = ( 
@@ -36,7 +35,7 @@ const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClic
                             { inputType }
                         </div>
                 )})
-            } */}
+            }
             <button className='py-1 px-2 w-full text-center rounded-md shadow-sm shadow-gray-400 bg-orange-300 hover:bg-orange-400 active:bg-orange-500 flex justify-center items-center gap-2' onClick={handleClickResetSearching}><AiOutlineClear className='w-6 h-6 text-blue-600' />Reset Keyword</button>
         </div>      
     </div>

@@ -35,6 +35,7 @@ const Table = ({ field, row }) => {
                     <table className='w-full text-center h-full'>
                         <thead className=''>
                             <tr className='w-full h-10'>
+                                <th>No</th>
                                 {
                                     field?.map((fieldData, index)=>(
                                         <th key={index}>{fieldData.label}</th>

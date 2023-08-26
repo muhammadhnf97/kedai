@@ -38,6 +38,11 @@ const Header = () => {
             pathName: '/supplier',
             child: null
         },{
+            id: 'konsumen',
+            label: 'Konsumen',
+            pathName: '/konsumen',
+            child: null
+        },{
             id: 'pegawai',
             label: 'Pegawai',
             pathName: '/pegawai',

@@ -23,10 +23,14 @@ export const fieldBarang = [{
         label: 'Satuan',
         key: 'idSatuan',
         type: 'select',
+        join: true,
+        altKey: 'namaSatuan'
     },{
         label: 'Kategori',
         key: 'idKategori',
-        type: 'select'
+        type: 'select',
+        join: true,
+        altKey: 'nmKategori'
     }
 ]
 
@@ -105,7 +109,6 @@ export const fieldPegawai = [{
     type: 'text'
 }]
 
-
 export const fieldUser = [{
     label: 'ID User',
     key: 'userId',
@@ -130,5 +133,24 @@ export const fieldUser = [{
 },{
     label: 'Status',
     key: 'status',
+    type: 'text',
+}]
+
+export const fieldKonsumen = [{
+    label: 'ID Konsumen',
+    key: 'idKonsumen',
+    type: 'text',
+    primaryKey: true
+},{
+    label: 'Nama Konsumen',
+    key: 'nmKonsumen',
+    type: 'text',
+},{
+    label: 'No Telp',
+    key: 'noTelp',
+    type: 'text',
+},{
+    label: 'Alamat',
+    key: 'alamat',
     type: 'text',
 }]
