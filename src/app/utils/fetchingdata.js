@@ -201,3 +201,52 @@ export const updateUser = async(tempData) => {
         }
     }
 }
+
+export const logoutAuth = async(loginData) => {
+  try {
+    const checkLocalStorage = localStorage.getItem('auth')
+
+    if ( checkLocalStorage ){
+        const response = await fetch('/api/auth/logout', {
+          method:'POST',
+          headers:{
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            loginData
+          })
+        })
+        const data = await response.json()
+        
+        if(data.status === 200){
+          localStorage.removeItem("auth")
+
+          return {
+            status: 200,
+            isNotif: true,
+            desc: data.message
+          }
+        } else {
+          return {
+            status: 401,
+            message: "Gagal Logout"
+          }
+      }
+    }
+
+
+
+
+
+
+
+    
+  } catch (error) {
+    
+  }
+
+
+  
+
+
+}
