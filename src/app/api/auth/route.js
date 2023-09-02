@@ -18,27 +18,39 @@ export async function POST (req) {
             //TOKEN
             const secretKey = 'iwannaberichman'
             const payload = {userId: UID}
-            const token = jwt.sign(payload, secretKey, { expiresIn: '7d'})
+            const token = jwt.sign(payload, secretKey, { expiresIn: '1d'})
     
             //CURRENT DATE DAN EXPIREDDATE
             const currentDate = new Date
-            const oneWeekFromNow = new Date(currentDate)
-            oneWeekFromNow.setDate(currentDate.getDate() + 7)
-            const expiredDate = oneWeekFromNow.toISOString()
+            const oneDayFromNow = new Date(currentDate)
+            oneDayFromNow.setDate(currentDate.getDate() + 1)
+            const expiredDate = oneDayFromNow.toISOString()
             
             //NEW ID
             const totalSession = await dbConnect('SELECT sessionId FROM session')
-            const SID = totalSession.map(values=>values.userId)
+            const SID = totalSession.map(values=>values.sessionId)
             const sessionId = SID.length > 0 ? Math.max(...SID) + 1 : 1
-
-            await dbConnect("INSERT INTO session (sessionId, userId, token, dateCreated, dateExpired) VALUES (?, ?, ?, ?, ?)", [sessionId, UID, token, currentDate, expiredDate])
-    
+            
             const getUser = await dbConnect('SELECT user.userId, user.jabatan, pegawai.nmPegawai, user.email FROM user INNER JOIN pegawai ON pegawai.idPegawai = user.idPegawai WHERE user.email = ?', [email])
             const jabatan = getUser[0].jabatan
             const nmPegawai = getUser[0].nmPegawai
 
-            cookies().set('auth', true)
-            cookies().set('jabatan', jabatan)
+            const cekSession = await dbConnect(`SELECT * FROM session WHERE userId = ?`, [UID])
+
+            if (cekSession.length > 0) {
+                await dbConnect('UPDATE session SET token = ?, dateCreated = ?, dateExpired = ? WHERE userId = ?', [token, currentDate, expiredDate, UID])
+
+            } else {
+                await dbConnect("INSERT INTO session (sessionId, userId, token, dateCreated, dateExpired) VALUES (?, ?, ?, ?, ?)", [sessionId, UID, token, currentDate, expiredDate])
+        
+            }
+
+            const oneDay = 24 * 60 * 60 * 1000
+            
+            cookies().set('auth', true, { expires: Date.now() + oneDay})
+            cookies().set('jabatan', jabatan, { expires: Date.now() + oneDay})
+            cookies().set('sessionId', sessionId, { expires: Date.now() + oneDay})
+            cookies().set('userId', UID, { expires: Date.now() + oneDay})
     
             return NextResponse.json({
                 status: 200,

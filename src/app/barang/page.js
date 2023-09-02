@@ -19,7 +19,7 @@ import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postD
 const Home = () => {
 
     const { loginData } = useLogin()
-    const { listKategori, setListKategori } = useKategori()
+    const { setListKategori } = useKategori()
     const { totalAset, handleIncreaseAsset, handleDecreaseAsset, handleUpdateAsset } = useBarang()
 
     const page = 'barang'
@@ -65,6 +65,32 @@ const Home = () => {
 
     const [tempData, setTempData] = useState({})
 
+    const handleChange = (e, action) => {
+      const {name, value} = e.target
+      if (action === 'edit'){
+        setTempData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        });
+      } else if (action === 'search'){
+        setSearchQuery(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
+      } else if (action === 'add') {
+        setInsertData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
+      }
+    }
+
     const handleClickActionFromTable = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
@@ -86,9 +112,11 @@ const Home = () => {
       if(res){
         if(isNotif.action === 'delete'){
           setIsLoading(true)
+          setDisable(true)
           deleteData(page, tempData).then(data=>{
             setInitialData(prevData=>prevData.filter(data=>data.idBarang !== Object.values(tempData)[0]))
             setIsLoading(false)
+            setDisable(false)
             setTotalRow(prevData=>prevData-1)
             setListKategori(prevData=>prevData.filter(data=>data.idBarang !== tempData.idBarang))
             makeNotif(data.isNotif, data.alertTitle, data.desc)
@@ -102,49 +130,91 @@ const Home = () => {
       }
     }
 
-    const handleSubmitEdit = async(e) =>{
+    const handleSubmit = async(e, action) => {
       e.preventDefault()
       setIsLoading(true)
-      updateData(page, tempData).then(data=>{
-        setIsLoading(false)
-        setShowEditForm(false)
-        setIsShowDetai(false)
-        makeNotif(data.isNotif, data.alertTitle, data.desc)
-        handleUpdateAsset(data.data.oldAsset, data.data.newAsset)
-        setInitialData(prev=>{
-          return prev.map(prevItem => {
-              if(prevItem.idBarang === tempData.idBarang){
-                  return {
-                    idBarang: tempData?.idBarang,
-                    namaBarang: tempData?.namaBarang,
-                    stok: tempData?.stok,
-                    modalBeli: tempData?.modalBeli,
-                    hargaJual: tempData?.hargaJual,
-                    namaSatuan: data.data.namaSatuan,
-                    nmKategori: data.data.nmKategori
-                  }
-              } else {
-                  return prevItem
-              }
+      if (action === 'edit'){
+        updateData(page, tempData).then(data=>{
+          setIsLoading(false)
+          setDisable(false)
+          setShowEditForm(false)
+          setIsShowDetai(false)
+          makeNotif(data.isNotif, data.alertTitle, data.desc)
+          handleUpdateAsset(data.data.oldAsset, data.data.newAsset)
+          setInitialData(prev=>{
+            return prev.map(prevItem => {
+                if(prevItem.idBarang === tempData.idBarang){
+                    return {
+                      idBarang: tempData?.idBarang,
+                      namaBarang: tempData?.namaBarang,
+                      stok: tempData?.stok,
+                      modalBeli: tempData?.modalBeli,
+                      hargaJual: tempData?.hargaJual,
+                      namaSatuan: data.data.namaSatuan,
+                      nmKategori: data.data.nmKategori
+                    }
+                } else {
+                    return prevItem
+                }
+            })
           })
+          setTempData({})
         })
-        setTempData({})
-      })
-    }
+      } else if (action === 'add') {
+        if(insertData.namaBarang.length < 1 && insertData.stok.length < 1 && insertData.modalBeli.length < 1 && insertData.hargaJual.length < 1 && insertData.idSatuan.length < 1 && insertData.idKategori.length < 1){
+          setIsLoading(false)
+          setDisable(false)
+          makeNotif(true, 'info', 'Data tidak boleh kosong')
+          return
+        }
+
+        postData(page, insertData).then(data=>{
+          setInitialData(prev=>{
+            return [
+              {
+                idBarang: data.data.idBarang,
+                namaBarang: insertData?.namaBarang,
+                stok: insertData?.stok,
+                modalBeli: insertData?.modalBeli,
+                hargaJual: insertData?.hargaJual,
+                namaSatuan: data.data.namaSatuan,
+                nmKategori: data.data.nmKategori
+              },
+              ...prev
+            ]
+          })
+          handleIncreaseAsset(data.data.newTotalAset)
+          setIsLoading(false)
+          setDisable(false)
+          setTotalRow(prevData=>prevData + 1)
+          setListKategori(prevData=>{
+            return [
+              ...prevData, {
+              idBarang: data.data.idBarang,
+              namaBarang: insertData?.namaBarang,
+              stok: insertData?.stok,
+              modalBeli: insertData?.modalBeli,
+              hargaJual: insertData?.hargaJual,
+              idSatuan: insertData?.idSatuan,
+              idKategori: insertData?.idKategori
+            }]
+          })
+          makeNotif(data.isNotif, data.alertTitle, data.desc)
+        })
+        setInsertData({
+          namaBarang: '',
+          stok: '',
+          modalBeli: '',
+          hargaJual: '',
+          idSatuan: '',
+          idKategori: ''
+        })
+      }
+    } 
 
     const handleClickCloseEditForm = () => {
       setShowEditForm(false)
       setTempData({})
-    }
-
-    const handleChangeEdit = (e) => {
-      const {name, value} = e.target
-      setTempData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
     }
 
     const [insertData, setInsertData] = useState({
@@ -155,66 +225,6 @@ const Home = () => {
         idSatuan: '',
         idKategori: ''
     })
-
-    const handleChangeInsertData = (e) =>{
-      const {name, value} = e.target
-      setInsertData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
-    const handleSubmitInsert = async(e) => {
-      e.preventDefault()
-      if(insertData.namaBarang.length < 1 && insertData.stok.length < 1 && insertData.modalBeli.length < 1 && insertData.hargaJual.length < 1 && insertData.idSatuan.length < 1 && insertData.idKategori.length < 1){
-        makeNotif(true, 'info', 'Data tidak boleh kosong')
-        return
-      }
-
-      setIsLoading(true)
-      postData(page, insertData).then(data=>{
-        setInitialData(prev=>{
-          return [
-            {
-              idBarang: data.data.idBarang,
-              namaBarang: insertData?.namaBarang,
-              stok: insertData?.stok,
-              modalBeli: insertData?.modalBeli,
-              hargaJual: insertData?.hargaJual,
-              namaSatuan: data.data.namaSatuan,
-              nmKategori: data.data.nmKategori
-            },
-            ...prev
-          ]
-        })
-        handleIncreaseAsset(data.data.newTotalAset)
-        setIsLoading(false)
-        setTotalRow(prevData=>prevData + 1)
-        setListKategori(prevData=>{
-          return [
-            ...prevData, {
-            idBarang: data.data.idBarang,
-            namaBarang: insertData?.namaBarang,
-            stok: insertData?.stok,
-            modalBeli: insertData?.modalBeli,
-            hargaJual: insertData?.hargaJual,
-            idSatuan: insertData?.idSatuan,
-            idKategori: insertData?.idKategori
-          }]
-        })
-        makeNotif(data.isNotif, data.alertTitle, data.desc)
-      })
-      setInsertData({
-        namaBarang: '',
-        stok: '',
-        modalBeli: '',
-        hargaJual: '',
-        idSatuan: '',
-        idKategori: ''
-      })
-    }
 
     const handleClickEmptyInsert = () => {
       setInsertData({
@@ -232,16 +242,6 @@ const Home = () => {
       idKategori: ''
     })
 
-    const handleChangeSearchQuery = (e) => {
-      const {name, value} = e.target
-      setSearchQuery(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
     useEffect(()=>{  
       getBasedSearch(page, searchQuery, currentPage).then(data=>{
         setInitialData(data.data)
@@ -258,12 +258,9 @@ const Home = () => {
 
     const [isShowDetail, setIsShowDetai] = useState(false)
     const [detailItem, setDetailItem] = useState({})
+
     const handleClickDetail = (item = null) => {
-        if(item){
-            setDetailItem(item)
-        } else {
-            setDetailItem({})
-        }
+      item ? setDetailItem(item) : setDetailItem({})
         setIsShowDetai(prev=>!prev)
     }
     
@@ -272,11 +269,12 @@ const Home = () => {
     { showEditForm && 
     <EditForm
       page={page}
+      disable={isLoading}
       listField={fieldBarang}
       initalValue={tempData}
-      handleSubmitEdit={handleSubmitEdit}
+      handleSubmitEdit={handleSubmit}
       handleClickCloseEditForm={handleClickCloseEditForm}
-      handleChangeEdit={handleChangeEdit}  /> }
+      handleChange={handleChange}  /> }
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
@@ -292,10 +290,11 @@ const Home = () => {
         { loginData.penanggungJawab !== 'kategori' && <section className='flex-1'>
           <AddItem
             page={page}
+            disable={isLoading}
             field={fieldBarang} 
             inputData={insertData} 
-            handleChangeInsertData={handleChangeInsertData}
-            handleSubmitInsert={handleSubmitInsert}
+            handleChange={handleChange}
+            handleSubmitInsert={handleSubmit}
             handleClickReset={handleClickEmptyInsert}
           />
         </section> }
@@ -304,7 +303,7 @@ const Home = () => {
             page={page}
             searchValue={searchQuery}
             searchUtils={searchBarangBy}
-            handleChangeSearch={handleChangeSearchQuery}
+            handleChange={handleChange}
             handleClickResetSearching={handleChangeResetQuery}
            />
         </section>

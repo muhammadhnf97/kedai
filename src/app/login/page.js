@@ -4,14 +4,16 @@ import { AiOutlineInfoCircle } from 'react-icons/ai'
 import { RxCross1 } from 'react-icons/rx'
 import Loading from '../components/Loading'
 import { useLogin } from '../context/login'
-import { useRouter } from 'next/navigation'
+import { redirect, useRouter } from 'next/navigation'
+import { loginAuth } from '../utils/fetchingdata'
 
 const Home = () => {
-    const router = useRouter()
 
-    const { loginData, handleClickSaveLoginData } = useLogin()
-    
+    const [disableElement, setDisableElement] = useState(false)
+
     const [isLoading, setIsLoading] = useState(false)
+    const router = useRouter()
+    const { handleClickSaveLoginData } = useLogin()
 
     const [isNotif, setIsNotif] = useState({
         showNotif: false,
@@ -51,45 +53,28 @@ const Home = () => {
     }
     const handleSubmitAuth = async(e) => {
         e.preventDefault()
-
         if(user.email.length < 1 || user.password.length < 1){
-            makeNotif(true, 'Email dan password tidak boleh kosong')
+            makeNotif(true, "Email dan password tidak boleh kosong")
             return
         }
-        
+        setDisableElement(true)
         setIsLoading(true)
-        try {
-            const response = await fetch('/api/auth', {
-                method: 'POST',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({
-                    user
-                })
-            });
 
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-
-            const data = await response.json();
-            setIsLoading(false)
-
-            console.log(data)
-
-            if (data.response !== 401){
-                handleClickSaveLoginData(true, data.data.userId, data.data.email, data.data.nmPegawai, data.data.jabatan, data.data.token )
-                localStorage.setItem("auth", JSON.stringify({ data: data.data}))
+        loginAuth(user).then(values=>{
+            if(values.data.status === 200){
+                const { userId, sessionId, email, nmPegawai, jabatan, token } = values.data.data
+                handleClickSaveLoginData( userId, sessionId, email, nmPegawai, jabatan, token )
+                localStorage.setItem("auth", JSON.stringify({ data: {
+                    nmPegawai: nmPegawai,
+                    jabatan : jabatan
+                }}))
                 router.push('/')
-                setIsLoading(true)
             } else {
-                makeNotif(true, data.message)
+                setDisableElement(false)
+                makeNotif(true, values.data.message)
             }
-
-        } catch (error) {
-            makeNotif(true, "Ada kesalahan")
-        }
+            setIsLoading(false)
+        })
     }
 
   return (
@@ -105,9 +90,9 @@ const Home = () => {
                         <AiOutlineInfoCircle />
                         <p>Info</p>
                     </div>
-                    <button onClick={handleClickNotification}><RxCross1 /></button>
+                    <button onClick={handleClickNotification} disabled={disableElement}><RxCross1 /></button>
                 </div>
-                <div className='p-3'>
+                <div className='p-3 w-full text-center'>
                     <p>{isNotif.desc}</p>
                 </div>
                 <button className='py-2 px-5 w-fit rounded-lg shadow-md bg-blue-300 hover:bg-blue-400 active:bg-blue-500' onClick={handleClickNotification}>Ok</button>
@@ -126,11 +111,11 @@ const Home = () => {
                     <div className='space-y-2'>
                         <div className='flex text-white'>
                             <p className='w-24'>Email</p>
-                            <input type='text' name='email' value={user.email} onChange={(e)=>handleChangeUser(e)} className='flex-1 rounded-sm px-1 text-sm w-full text-black' />
+                            <input type='text' name='email' value={user.email} onChange={(e)=>handleChangeUser(e)} className='flex-1 rounded-sm px-1 text-sm w-full text-black' disabled={disableElement} />
                         </div>
                         <div className='flex text-white'>
                             <p className='w-24'>Password</p>
-                            <input type='password' name='password' value={user.password} onChange={(e)=>handleChangeUser(e)} className='flex-1 rounded-sm px-1 text-sm w-full text-black' />
+                            <input type='password' name='password' value={user.password} onChange={(e)=>handleChangeUser(e)} className='flex-1 rounded-sm px-1 text-sm w-full text-black' disabled={disableElement} />
                         </div>
                     </div>
                     <button className='w-full bg-[#A5AEFF] text-center py-2 rounded-lg text-sm'>Login</button>

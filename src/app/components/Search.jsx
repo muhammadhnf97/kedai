@@ -3,7 +3,7 @@ import { useKategori } from '../context/kategori'
 import { AiOutlineClear } from 'react-icons/ai'
 import { FaMagnifyingGlass } from 'react-icons/fa6'
 
-const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClickResetSearching }) => {
+const Search = ({ page, searchValue, handleChange, searchUtils, handleClickResetSearching }) => {
 
     const { listKategori } = useKategori()
 
@@ -16,11 +16,11 @@ const Search = ({ page, searchValue, handleChangeSearch, searchUtils, handleClic
                     let inputType
                     if(value.type === "text"){
                         inputType = ( 
-                            <input type={value.type} name={value.key} value={searchValue[value.key]} className=' border border-gray-400 w-full rounded-sm outline-none duration-150 px-2 focus:border-blue-400' placeholder={value.label} onChange={(e)=>handleChangeSearch(e)} />
+                            <input type={value.type} name={value.key} value={searchValue[value.key]} className=' border border-gray-400 w-full rounded-sm outline-none duration-150 px-2 focus:border-blue-400' placeholder={value.label}  onChange={(e)=>handleChangeSearch(e, 'search')} />
                         )
                     } else {
                         inputType = (
-                            <select name={value.key} value={searchValue[value.key]} className='border border-gray-400 w-full rounded-sm outline-none duration-150 px-1 focus:border-blue-400' onChange={handleChangeSearch}>
+                            <select name={value.key} value={searchValue[value.key]} className='border border-gray-400 w-full rounded-sm outline-none duration-150 px-1 focus:border-blue-400'  onChange={(e)=>handleChangeSearch(e, 'search')}>
                                 <option value="">Cari berdasarkan {value.label} ..</option>
                                 { 
                                     value.key === 'idKategori' && listKategori.map(data=>(

@@ -62,6 +62,32 @@ const Home = () => {
 
     const [tempData, setTempData] = useState({})
 
+    const handleChange = (e, action) => {
+      const {name, value} = e.target
+      if (action === 'edit'){
+        setTempData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        });
+      } else if (action === 'search'){
+        setSearchQuery(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
+      } else if (action === 'add') {
+        setInsertData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
+      }
+    }
+
     const handleClickActionFromTable = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
@@ -85,9 +111,11 @@ const Home = () => {
       if(res){
         if(isNotif.action === 'delete'){
           setIsLoading(true)
+          setDisable(true)
           deleteData(page, tempData).then(data=>{
             setInitialData(prevData=>prevData.filter(data=>data.idKategori !== Object.values(tempData)[0]))
             setIsLoading(false)
+            setDisable(false)
             setTotalRow(prevData=>prevData-1)
             setListKategori(prevData=>prevData.filter(data=>data.idKategori !== tempData.idKategori))
             makeNotif(data.isNotif, data.alertTitle, data.desc)
@@ -100,28 +128,65 @@ const Home = () => {
       }
     }
 
-    const handleSubmitEdit = async(e) =>{
+    const handleSubmit = async(e, action) => {
       e.preventDefault()
       setIsLoading(true)
-      updateData(page, tempData).then(data=>{
-        setIsLoading(false)
-        setShowEditForm(false)
-        setIsShowDetai(false)
-        makeNotif(data.isNotif, data.alertTitle, data.desc)
-        setInitialData(prev=>{
-          return prev.map(prevItem => {
-              if(prevItem.idKategori === tempData.idKategori){
-                  return {
-                    idKategori: tempData?.idKategori,
-                    nmKategori: tempData?.nmKategori,
-                  }
-              } else {
-                  return prevItem
-              }
+
+      if (action === 'edit') {
+        updateData(page, tempData).then(data=>{
+          setIsLoading(false)
+          setDisable(false)
+          setShowEditForm(false)
+          setIsShowDetai(false)
+          makeNotif(data.isNotif, data.alertTitle, data.desc)
+          setInitialData(prev=>{
+            return prev.map(prevItem => {
+                if(prevItem.idKategori === tempData.idKategori){
+                    return {
+                      idKategori: tempData?.idKategori,
+                      nmKategori: tempData?.nmKategori,
+                    }
+                } else {
+                    return prevItem
+                }
+            })
           })
+          setTempData({})
         })
-        setTempData({})
-      })
+      } else if (action === 'add') {
+        if(insertData.nmKategori.length < 1){
+          setIsLoading(false)
+          setDisable(false)
+          makeNotif(true, 'info', 'Data tidak boleh kosong')
+          return
+        }
+  
+        postData(page, insertData).then(data=>{
+          setInitialData(prev=>{
+            return [
+              {
+                idKategori: data.data.idKategori,
+                nmKategori: insertData.nmKategori, 
+              },
+              ...prev
+            ]
+          })
+          setIsLoading(false)
+          setDisable(false)
+          setTotalRow(prevData=>prevData + 1)
+          setListKategori(prevData=>{
+            return [
+              ...prevData, {
+              idKategori: data.data.idKategori,
+              nmKategori: insertData.nmKategori,
+            }]
+          })
+          makeNotif(data.isNotif, data.alertTitle, data.desc)
+        })
+        setInsertData({
+          nmKategori: ''
+        })
+      }
     }
 
     const handleClickCloseEditForm = () => {
@@ -129,63 +194,9 @@ const Home = () => {
       setTempData({})
     }
 
-    const handleChangeEdit = (e) => {
-      const {name, value} = e.target
-      setTempData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
     const [insertData, setInsertData] = useState({
         nmKategori: ''
     })
-
-    const handleChangeInsertData = (e) =>{
-      const {name, value} = e.target
-      setInsertData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
-    const handleSubmitInsert = async(e) => {
-      e.preventDefault()
-      if(insertData.nmKategori.length < 1){
-        makeNotif(true, 'info', 'Data tidak boleh kosong')
-        return
-      }
-
-      setIsLoading(true)
-      postData(page, insertData).then(data=>{
-        setInitialData(prev=>{
-          return [
-            {
-              idKategori: data.data.idKategori,
-              nmKategori: insertData.nmKategori, 
-            },
-            ...prev
-          ]
-        })
-        setIsLoading(false)
-        setTotalRow(prevData=>prevData + 1)
-        setListKategori(prevData=>{
-          return [
-            ...prevData, {
-            idKategori: data.data.idKategori,
-            nmKategori: insertData.nmKategori,
-          }]
-        })
-        makeNotif(data.isNotif, data.alertTitle, data.desc)
-      })
-      setInsertData({
-        nmKategori: ''
-      })
-    }
 
     const handleClickEmptyInsert = () => {
       setInsertData({
@@ -196,16 +207,6 @@ const Home = () => {
     const [searchQuery, setSearchQuery] = useState({
         keyword: ''
     })
-
-    const handleChangeSearchQuery = (e) => {
-      const {name, value} = e.target
-      setSearchQuery(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
 
     useEffect(()=>{  
       getBasedSearch(page, searchQuery, currentPage).then(data=>{
@@ -236,15 +237,16 @@ const Home = () => {
     { showEditForm && 
     <EditForm
       page={page}
+      disable={isLoading}
       listField={fieldKategori}
       initalValue={tempData}
-      handleSubmitEdit={handleSubmitEdit}
+      handleSubmitEdit={handleSubmit}
       handleClickCloseEditForm={handleClickCloseEditForm}
-      handleChangeEdit={handleChangeEdit}  /> }
+      handleChange={handleChange}  /> }
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
-      <Notification 
+      <Notification
         alertTitle={isNotif.alertTitle} 
         desc={isNotif.desc} 
         handleClickResponseNotif={handleClickResponseNotif} 
@@ -256,10 +258,11 @@ const Home = () => {
         { loginData.penanggungJawab !== 'kategori' && <section className='flex-1'>
           <AddItem
             page={page}
+            disable={isLoading}
             field={fieldKategori} 
             inputData={insertData} 
-            handleChangeInsertData={handleChangeInsertData}
-            handleSubmitInsert={handleSubmitInsert}
+            handleChange={handleChange}
+            handleSubmitInsert={handleSubmit}
             handleClickReset={handleClickEmptyInsert}
           />
         </section> }
@@ -268,7 +271,7 @@ const Home = () => {
             page={page}
             searchValue={searchQuery}
             searchUtils={searchBy}
-            handleChangeSearch={handleChangeSearchQuery}
+            handleChange={handleChange}
             handleClickResetSearching={handleChangeResetQuery}
            />
         </section>

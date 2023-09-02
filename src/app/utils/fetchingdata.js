@@ -202,51 +202,53 @@ export const updateUser = async(tempData) => {
     }
 }
 
-export const logoutAuth = async(loginData) => {
+export const loginAuth = async(user) => {
   try {
-    const checkLocalStorage = localStorage.getItem('auth')
-
-    if ( checkLocalStorage ){
-        const response = await fetch('/api/auth/logout', {
-          method:'POST',
-          headers:{
+    const response = await fetch('/api/auth', {
+        method: 'POST',
+        headers: {
             "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            loginData
-          })
+        },
+        body: JSON.stringify({
+            user
         })
-        const data = await response.json()
-        
-        if(data.status === 200){
-          localStorage.removeItem("auth")
+    });
 
-          return {
-            status: 200,
-            isNotif: true,
-            desc: data.message
-          }
-        } else {
-          return {
-            status: 401,
-            message: "Gagal Logout"
-          }
-      }
+    const data = await response.json();
+
+    return {
+      data
     }
-
-
-
-
-
-
-
     
   } catch (error) {
+    return {
+      status: 401,
+      message: "Gagal login"
+    }
     
   }
+}
 
+export const logoutAuth = async(loginData) => {
+  try {
+    const response = await fetch('/api/auth/logout', {
+      method: 'POST',
+      headers:{
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        loginData
+      })
+    })
+    const data = await response.json()
 
-  
+    if(data.status === 200){
+      localStorage.removeItem('auth')
+    }
+    return data
 
+  } catch (error) {
+    console.error('Ada kesalahan :', error)
+  }
 
 }

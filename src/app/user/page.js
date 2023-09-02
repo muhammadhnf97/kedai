@@ -3,11 +3,9 @@ import React, { useEffect, useState } from 'react'
 import Search from '../components/Search'
 import Loading from '../components/Loading'
 import Notification from '../components/Notification'
-import EditForm from '../components/EditForm'
 import { fieldUser } from '../utils/tableName'
 import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
-import { useUser } from '../context/user'
 import TableWithoutAction from '../components/TableWithoutAction'
 
 const Home = () => {
@@ -68,37 +66,37 @@ const Home = () => {
 
     }, [currentPage])
 
-    useEffect(()=>{
-
-    }, [])
-
     const handleClickCurrentPage = (page) => {
         setCurrentPage(page)
     }
 
     const [tempData, setTempData] = useState({})
 
-    const handleClickActionFromTable = async(id, nama, action) => {
-      const isNotif = true
-      const alertTitle = 'Peringatan'
-      const desc = action === 'aktifakun' ? 
-      `Aktifkan akun dengan ID ${id} ${nama} ? ` : action === 'nonaktifakun' ? `Nonaktifkan akun dengan ID ${id} ${nama} ? ` :
-      `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
-
-      setIsLoading(true)
-      try {
-        const response = await fetch(`/api/user/databyid?id=${id}`)
-        const data = await response.json()
-        setTempData(data.data[0])
-        setIsLoading(false)
-        setIsShowDetai(false)
-        makeNotif(isNotif, alertTitle, desc, action)
-      } catch (error) {
-        makeNotif(isNotif, alertTitle, desc, action)
+    const handleChange = (e, action) => {
+      const {name, value} = e.target
+      if (action === 'edit'){
+        setTempData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        });
+      } else if (action === 'search'){
+        setSearchQuery(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
+      } else if (action === 'add') {
+        setInsertData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
       }
     }
-    const [showEditForm, setShowEditForm] = useState(false)
-    const { handleClickUserCreated, handleClickInactiveUser } = useUser()
 
     const handleClickResponseNotif = async(res) => {
       makeNotif()
@@ -129,161 +127,9 @@ const Home = () => {
       }
     }
 
-    const handleSubmitEdit = async(e) =>{
-      e.preventDefault()
-      try {
-        const response = await fetch('/api/user', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            idPegawai: tempData?.idPegawai,
-            nmPegawai: tempData?.nmPegawai,
-            alamat: tempData?.alamat,
-            noTelp: tempData?.noTelp,
-            jabatan: tempData?.jabatan,
-            email: tempData?.email
-          })
-        })
-  
-        const data = await response.json()
-  
-        setInitialData(prev=>{
-          return prev.map(prevItem => {
-              if(prevItem.idPegawai === data.data.idPegawai){
-                  return {
-                    idPegawai: data.data.idPegawai,
-                    nmPegawai: data.data.nmPegawai,
-                    alamat: data.data.alamat,
-                    noTelp: data.data.noTelp,
-                    jabatan: data.data.jabatan,
-                    email: data.data.email
-                  }
-              } else {
-                  return prevItem
-              }
-          })
-        })
-        makeNotif(data.showNotif, data.alertTitle, data.desc)
-        setIsLoading(data.isLoading)
-        setShowEditForm(false)
-        setIsShowDetai(false)
-        setTempData({})
-      } catch (error) {
-        makeNotif(true, 'info', 'Ada kesalahan')
-      }
-    }
-
-    const handleClickCloseEditForm = () => {
-      setShowEditForm(prev=>!prev)
-      setTempData({})
-    }
-
-    const handleChangeEdit = (e) => {
-      const {name, value} = e.target
-      setTempData(prev=>{
-        return {
-          ...prev,
-          [name]:value
-        }
-      })
-    }
-
-    const [insertData, setInsertData] = useState({
-        nmPegawai: '',
-        alamat: '',
-        noTelp: '',
-        jabatan: '',
-        email: ''
-    })
-
-    const handleChangeInsertData = (e) =>{
-      const {name, value} = e.target
-      setInsertData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
-    const handleSubmitInsert = async(e) => {
-      e.preventDefault()
-      if(insertData.nmPegawai.length < 1 && insertData.alamat.length < 1 && insertData.noTelp.length < 1){
-        makeNotif(true, 'info', 'Data tidak boleh kosong')
-        return
-      }
-
-      setIsLoading(prev=>!prev)
-      try {
-          const response = await fetch('/api/user', {
-            method:'POST',
-            headers: {
-              'Content-type': 'application/json'
-            },
-            body: JSON.stringify({
-              nmPegawai: insertData?.nmPegawai,
-              alamat: insertData?.alamat,
-              noTelp: insertData?.noTelp,
-              jabatan: insertData?.jabatan,
-              email: insertData?.email
-            })            
-          })
-          const data = await response.json()
-
-          setInitialData(prev=>{
-            return [
-              {
-                idPegawai: data.data.idPegawai,
-                nmPegawai: data.data.nmPegawai,
-                alamat: data.data.alamat,
-                noTelp: data.data.noTelp,
-                jabatan: data.data.jabatan,
-                email: data.data.email                
-              },
-              ...prev
-            ]
-          })
-
-          makeNotif(data.showNotif, data.alertTitle, data.desc)
-          setIsLoading(data.isLoading)
-          setTotalRow(prev=>prev+1)
-      } catch (error) {
-        makeNotif(true, 'info', 'Ada kesalahan saat mengirim data')        
-      }
-      setInsertData({
-        nmPegawai: '',
-        alamat: '',
-        noTelp: '',
-        jabatan: '',
-        email: ''
-      })
-    }
-
-    const handleClickEmptyInsert = () => {
-      setInsertData({
-        nmPegawai: '',
-        alamat: '',
-        noTelp: '',
-        jabatan: '',
-        email: ''
-      })
-    }
-
     const [searchQuery, setSearchQuery] = useState({
         keyword: ''
     })
-
-    const handleChangeSearchQuery = (e) => {
-      const {name, value} = e.target
-      setSearchQuery(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
 
     useEffect(()=>{
       const getBasedSearch = async() => {
@@ -323,14 +169,6 @@ const Home = () => {
     
   return (
     <>
-    { showEditForm && 
-    <EditForm
-      page={page}
-      listField={fieldUser}
-      initalValue={tempData}
-      handleSubmitEdit={handleSubmitEdit}
-      handleClickCloseEditForm={handleClickCloseEditForm}
-      handleChangeEdit={handleChangeEdit}  /> }
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
@@ -348,7 +186,7 @@ const Home = () => {
             page={page}
             searchValue={searchQuery}
             searchUtils={searchBy}
-            handleChangeSearch={handleChangeSearchQuery}
+            handleChange={handleChange}
             handleClickResetSearching={handleChangeResetQuery}
            />
         </section>

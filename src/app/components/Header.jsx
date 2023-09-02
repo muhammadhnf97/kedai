@@ -3,11 +3,12 @@ import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { RiMenu3Fill } from 'react-icons/ri'
 import { IoIosArrowDown } from 'react-icons/io'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter, usePathname } from 'next/navigation'
 import { useLogin } from '../context/login'
 import { RxCross1 } from 'react-icons/rx'
 import { menu } from '../utils/tableName'
 import { logoutAuth } from '../utils/fetchingdata'
+import Loading from './Loading'
 
 const Header = () => {
     const currentPathname = usePathname()
@@ -29,11 +30,24 @@ const Header = () => {
         setShowMobileView(prev=>!prev)
     }
 
+    const [isLoading, setIsLoading] = useState(false)
+
     const handleClickLogout = async() => {
-        logoutAuth(loginData)
+        logoutAuth(loginData).then(values=>{
+            if(values.status === 200){
+                router.push('/login')
+                setIsLoading(true)
+            }
+        }).catch((error) => {
+            console.error("Terjadi kesalahan:", error);
+        })
     }
+    
+
   return (
     <>
+    {isLoading && <Loading />}
+    {}
     <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-20'>
         <div className='max-w-7xl h-full  px-5 mx-auto flex justify-between items-center relative'>
             { renderUsernameAndStatus }

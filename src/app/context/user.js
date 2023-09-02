@@ -6,13 +6,14 @@ export const useUser = () => useContext(UserContext)
 
 export const UserProvider = ({ children }) => {
     const [userCreated, setUserCreated] = useState([])
+    console.log()
 
-    const handleClickUserCreated = (idPegawai, status) => {
+    const handleClickUserCreated = (idPegawai) => {
         setUserCreated(prevValue=>{
             return [
                 ...prevValue, {
                     idPegawai: idPegawai,
-                    status: status
+                    status: 'active'
                 }
             ]
         })

@@ -203,33 +203,6 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                     </table>
                     </section>
                 }
-                {/* <section className='md:hidden w-full flex flex-col items-center justify-center gap-1'>
-                    {initialData.map((dataList, index)=>(
-                        <div key={dataList.key} className='w-full flex border border-blue-400 rounded-lg overflow-hidden'>
-                            <div className='flex items-center justify-center w-7 bg-blue-400'>{startIndex + (index + 1)}</div>
-                            <div className='flex-1'>
-                                {
-                                    initialField.map((fieldList, childIndex)=>{
-                                        return (
-                                        <div key={index.toString()+childIndex.toString()} className='flex flex-1 bg-blue-200 border-b border-blue-300'>
-                                            <div className='flex-1 px-5'>
-                                                <p>{fieldList.label} {index.toString()+childIndex.toString()}</p>
-                                            </div>
-                                            <div className='flex-1 bg-white px-5'>
-                                                <p>{dataList[fieldList.key]}</p>
-                                            </div>
-                                        </div>
-                                    )}).slice(0, 2)
-                                }
-                            </div>
-                            <button 
-                            className='w-10 text-white flex items-center justify-center bg-blue-400 hover:bg-blue-500 active:bg-blue-600' 
-                            onClick={()=>handleClickDetail(initialData[index])}>
-                            <FaMagnifyingGlass />
-                            </button>
-                        </div>
-                    ))}
-                </section> */}
                 {/* DESKTOP VIEW */}
                 <section className='hidden md:block'>
                     <table className='w-full text-center h-full'>
@@ -237,9 +210,10 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                             <tr className='w-full h-10 bg-slate-700 text-white'>
                                 <th>No. </th>
                                 {
-                                    initialField?.map((fieldData)=>(
-                                        <th key={fieldData.key}>{fieldData.label}</th>
-                                    ))
+                                    initialField?.map((fieldData)=>{
+                                        return (
+                                        fieldData.showOn.includes('view') && <th key={fieldData.key}>{fieldData.label}</th>
+                                    )})
                                 }
                                 <th>Action</th>
                             </tr>

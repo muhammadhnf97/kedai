@@ -4,13 +4,13 @@ import { useSatuan } from '../context/satuan'
 import { FcPlus } from 'react-icons/fc'
 import { AiOutlineClear } from 'react-icons/ai'
 
-const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitInsert, handleClickReset}) => {
+const AddItem = ({ page, field, inputData, handleChange, handleSubmitInsert, handleClickReset, disable}) => {
 
     const { listKategori } = useKategori()
     const { satuan } = useSatuan()
     
   return (
-    <form onSubmit={(e)=>handleSubmitInsert(e)}>
+    <form onSubmit={(e)=>handleSubmitInsert(e, 'add')}>
         <div className='w-full p-2 space-y-5 bg-white rounded-lg shadow-md border border-slate-300 md:px-5'>
             <p className='font-semibold text-lg'>+ Tambah data {page.toLocaleLowerCase()} baru</p>
             <div className='w-full flex flex-wrap'>
@@ -18,10 +18,10 @@ const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitI
                     field?.map(inp=>{
                         let inputElement
                         if(inp.type === 'text' || inp.type === 'number'){
-                            inputElement = <input type={inp.type} name={inp.key} value={inputData[inp.key]} className='border w-full md:w-[13rem] px-2 outline-none hover:border-blue-300 focus:border-blue-400' onChange={(e)=>handleChangeInsertData(e)}  />
+                            inputElement = <input type={inp.type} name={inp.key} value={inputData[inp.key]} className='border w-full md:w-[13rem] px-2 outline-none hover:border-blue-300 focus:border-blue-400' disabled={disable} onChange={(e)=>handleChange(e, 'add')}  />
                         } else if(inp.type === 'select'){
                             if(inp.key === 'idKategori'){
-                                inputElement = <select name={inp.key} value={inputData[inp.key]} className='border w-full md:w-[13rem] px-2 outline-none hover:border-blue-300 focus:border-blue-400' onChange={(e)=>handleChangeInsertData(e)}>
+                                inputElement = <select name={inp.key} value={inputData[inp.key]} className='border w-full md:w-[13rem] px-2 outline-none hover:border-blue-300 focus:border-blue-400' disabled={disable} onChange={(e)=>handleChange(e, 'add')}>
                                     <option>Pilih {inp.label}</option>
                                     {
                                         listKategori?.map((data, index)=>{
@@ -32,7 +32,7 @@ const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitI
                                 </select>
                             } else if(inp.key === 'idSatuan'){
                                 inputElement =  
-                                <select name={inp.key} onChange={(e)=>handleChangeInsertData(e)} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
+                                <select name={inp.key} disabled={disable} onChange={(e)=>handleChange(e, 'add')} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
                                     <option>Pilih {inp.label}</option>
                                     {
                                         satuan.map(data=>(
@@ -42,7 +42,7 @@ const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitI
                                 </select>
                             } else if(inp.key === 'jabatan'){
                                 inputElement =
-                                <select name={inp.key} onChange={(e)=>handleChangeInsertData(e)} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
+                                <select name={inp.key} disabled={disable} onChange={(e)=>handleChange(e, 'add')} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
                                     <option>Pilih {inp.label}</option>
                                     <option value={'administrator'}>Administrator</option>
                                     <option value={'pimpinan'}>Pimpinan</option>
@@ -60,8 +60,8 @@ const AddItem = ({ page, field, inputData, handleChangeInsertData, handleSubmitI
                 }
             </div>
             <div className='w-full space-y-2 mt-5 md:flex md:space-y-0 md:justify-between md:gap-5'>
-                <button type='submit' className='flex items-center justify-center gap-2 w-full rounded-md shadow-sm shadow-gray-400  bg-blue-400 py-2 hover:bg-blue-500 active:bg-blue-600'> <FcPlus className="w-6 h-6" /> Simpan </button>
-                <button type='button' className='flex items-center justify-center gap-2 w-full rounded-md shadow-sm shadow-gray-400  bg-emerald-400 py-2 hover:bg-emerald-600 active:bg-emerald-700 active:text-white' onClick={handleClickReset}> 
+                <button type='submit' disabled={disable} className='flex items-center justify-center gap-2 w-full rounded-md shadow-sm shadow-gray-400  bg-blue-400 py-2 hover:bg-blue-500 active:bg-blue-600'> <FcPlus className="w-6 h-6" /> Simpan </button>
+                <button type='button' disabled={disable} className='flex items-center justify-center gap-2 w-full rounded-md shadow-sm shadow-gray-400  bg-emerald-400 py-2 hover:bg-emerald-600 active:bg-emerald-700 active:text-white' onClick={handleClickReset}> 
                 <AiOutlineClear className="w-7 h-7 text-blue-700" /> Bersihkan </button>
             </div>
         </div>

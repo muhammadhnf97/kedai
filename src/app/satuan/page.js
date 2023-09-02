@@ -21,7 +21,6 @@ const Home = () => {
 
     const page = 'satuan'
     const searchParam = useSearchParams().get('page')
-
     const [isLoading, setIsLoading] = useState(true)
     const [showPaggination, setShowPaggination] = useState(true)
     const [currentPage, setCurrentPage] = useState(searchParam || 1)
@@ -61,13 +60,17 @@ const Home = () => {
     }
 
     const [tempData, setTempData] = useState({})
+    const [insertData, setInsertData] = useState({
+        namaSatuan: ''
+    })
+    const [searchQuery, setSearchQuery] = useState({
+        keyword: ''
+    })
 
     const handleClickActionFromTable = async(id, nama, action) => {
       const isNotif = true
       const alertTitle = 'Peringatan'
-      const desc = action === 'aktifakun' ? 
-      `Aktifkan akun dengan ID ${id} ${nama} ? ` : action === 'nonaktifakun' ? `Nonaktifkan akun dengan ID ${id} ${nama} ? ` :
-      `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
+      const desc = `${action.charAt(0).toUpperCase()}${action.slice(1)} data ${id} ${nama} ?`
 
       setIsLoading(true)
       getDataById(page, id).then(data=>{
@@ -100,28 +103,61 @@ const Home = () => {
       }
     }
 
-    const handleSubmitEdit = async(e) =>{
+    const handleSubmit = async(e, action) => {
       e.preventDefault()
       setIsLoading(true)
-      updateData(page, tempData).then(data=>{
-        setIsLoading(false)
-        setShowEditForm(false)
-        setIsShowDetai(false)
-        makeNotif(data.isNotif, data.alertTitle, data.desc)
-        setInitialData(prev=>{
-          return prev.map(prevItem => {
-              if(prevItem.idSatuan === tempData.idSatuan){
-                  return {
-                    idSatuan: tempData?.idSatuan,
-                    namaSatuan: tempData?.namaSatuan,
-                  }
-              } else {
-                  return prevItem
-              }
+      if (action === 'edit') {
+        updateData(page, tempData).then(data=>{
+          setIsLoading(false)
+          setShowEditForm(false)
+          setIsShowDetai(false)
+          makeNotif(data.isNotif, data.alertTitle, data.desc)
+          setInitialData(prev=>{
+            return prev.map(prevItem => {
+                if(prevItem.idSatuan === tempData.idSatuan){
+                    return {
+                      idSatuan: tempData?.idSatuan,
+                      namaSatuan: tempData?.namaSatuan,
+                    }
+                } else {
+                    return prevItem
+                }
+            })
           })
+          setTempData({})
         })
-        setTempData({})
-      })
+      } else if (action === 'add') {
+        if(insertData.namaSatuan.length < 1){
+          setIsLoading(false)
+          makeNotif(true, 'info', 'Data tidak boleh kosong')
+          return
+        }
+  
+        postData(page, insertData).then(data=>{
+          setInitialData(prev=>{
+            return [
+              {
+                idSatuan: data.data.idSatuan,
+                namaSatuan: insertData.namaSatuan, 
+              },
+              ...prev
+            ]
+          })
+          setIsLoading(false)
+          setTotalRow(prevData=>prevData + 1)
+          setSatuan(prevData=>{
+            return [
+              ...prevData, {
+              idSatuan: data.data.idSatuan,
+              namaSatuan: insertData.namaSatuan,
+            }]
+          })
+          makeNotif(data.isNotif, data.alertTitle, data.desc)
+        })
+        setInsertData({
+          namaSatuan: ''
+        })
+      }
     }
 
     const handleClickCloseEditForm = () => {
@@ -129,81 +165,35 @@ const Home = () => {
       setTempData({})
     }
 
-    const handleChangeEdit = (e) => {
+    const handleChange = (e, action) => {
       const {name, value} = e.target
-      setTempData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
-    const [insertData, setInsertData] = useState({
-        namaSatuan: ''
-    })
-
-    const handleChangeInsertData = (e) =>{
-      const {name, value} = e.target
-      setInsertData(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
-      })
-    }
-
-    const handleSubmitInsert = async(e) => {
-      e.preventDefault()
-      if(insertData.namaSatuan.length < 1){
-        makeNotif(true, 'info', 'Data tidak boleh kosong')
-        return
+      if (action === 'edit'){
+        setTempData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        });
+      } else if (action === 'search'){
+        setSearchQuery(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
+      } else if (action === 'add') {
+        setInsertData(prev=>{
+          return {
+            ...prev,
+            [name]: value
+          }
+        })
       }
-
-      setIsLoading(true)
-      postData(page, insertData).then(data=>{
-        setInitialData(prev=>{
-          return [
-            {
-              idSatuan: data.data.idSatuan,
-              namaSatuan: insertData.namaSatuan, 
-            },
-            ...prev
-          ]
-        })
-        setIsLoading(false)
-        setTotalRow(prevData=>prevData + 1)
-        setSatuan(prevData=>{
-          return [
-            ...prevData, {
-            idSatuan: data.data.idSatuan,
-            namaSatuan: insertData.namaSatuan,
-          }]
-        })
-        makeNotif(data.isNotif, data.alertTitle, data.desc)
-      })
-      setInsertData({
-        namaSatuan: ''
-      })
     }
 
     const handleClickEmptyInsert = () => {
       setInsertData({
         namaSatuan: ''
-      })
-    }
-
-    const [searchQuery, setSearchQuery] = useState({
-        keyword: ''
-    })
-
-    const handleChangeSearchQuery = (e) => {
-      const {name, value} = e.target
-      setSearchQuery(prev=>{
-        return {
-          ...prev,
-          [name]: value
-        }
       })
     }
 
@@ -238,9 +228,9 @@ const Home = () => {
       page={page}
       listField={fieldSatuan}
       initalValue={tempData}
-      handleSubmitEdit={handleSubmitEdit}
+      handleSubmitEdit={handleSubmit}
       handleClickCloseEditForm={handleClickCloseEditForm}
-      handleChangeEdit={handleChangeEdit}  /> }
+      handleChange={handleChange}  /> }
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
@@ -258,8 +248,8 @@ const Home = () => {
             page={page}
             field={fieldSatuan} 
             inputData={insertData} 
-            handleChangeInsertData={handleChangeInsertData}
-            handleSubmitInsert={handleSubmitInsert}
+            handleChange={handleChange}
+            handleSubmitInsert={handleSubmit}
             handleClickReset={handleClickEmptyInsert}
           />
         </section> }
@@ -268,7 +258,7 @@ const Home = () => {
             page={page}
             searchValue={searchQuery}
             searchUtils={searchBy}
-            handleChangeSearch={handleChangeSearchQuery}
+            handleChange={handleChange}
             handleClickResetSearching={handleChangeResetQuery}
            />
         </section>

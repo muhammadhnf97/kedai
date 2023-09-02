@@ -7,7 +7,7 @@ import EditForm from '../components/EditForm'
 import Search from '../components/Search'
 import TableWithAction from '../components/TableWithAction'
 import TableWithoutAction from '../components/TableWithoutAction'
-import { fieldSupplier } from '../utils/tableName'
+import { fieldPembelian } from '../utils/tableName'
 import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
 import { useLogin } from '../context/login'
@@ -17,7 +17,7 @@ const Home = () => {
 
     const { loginData } = useLogin()
 
-    const page = 'supplier'
+    const page = 'pembelian'
     const searchParam = useSearchParams().get('page')
 
     const [isLoading, setIsLoading] = useState(true)
@@ -237,7 +237,7 @@ const Home = () => {
     { showEditForm && 
     <EditForm
       page={page}
-      listField={fieldSupplier}
+      listField={fieldPembelian}
       initalValue={tempData}
       handleChange={handleChange}  
       handleSubmitEdit={handleSubmit}
@@ -259,7 +259,7 @@ const Home = () => {
           <AddItem
             page={page}
             disable={isLoading}
-            field={fieldSupplier} 
+            field={fieldPembelian} 
             inputData={insertData} 
             handleChange={handleChange}
             handleSubmitInsert={handleSubmit}
@@ -284,7 +284,7 @@ const Home = () => {
             isShowDetail={isShowDetail}
             detailItem={detailItem}
             handleClickDetail={handleClickDetail}
-            initialField={fieldSupplier} 
+            initialField={fieldPembelian} 
             initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}
@@ -298,7 +298,7 @@ const Home = () => {
             isShowDetail={isShowDetail}
             detailItem={detailItem}
             handleClickDetail={handleClickDetail}
-            initialField={fieldSupplier} 
+            initialField={fieldPembelian} 
             initialData={initialData}
             totalRow={totalRow}
             currentPage={currentPage}

@@ -3,18 +3,18 @@ import { useKategori } from '../context/kategori'
 import { useSatuan } from '../context/satuan'
 import { RxCross1 } from 'react-icons/rx'
 
-const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, handleSubmitEdit, handleChangeEdit}) => {
+const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, handleSubmitEdit, handleChange, disable}) => {
 
     const { listKategori } = useKategori()
     const { satuan } = useSatuan()
 
   return (
-    <form onSubmit={(e)=>handleSubmitEdit(e)}>
-        <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-10'>
+    <form onSubmit={(e)=>handleSubmitEdit(e, 'edit')}>
+        <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-20'>
             <div className='w-fit h-fit bg-white rounded-lg shadow-md px-10 space-y-2 py-5'>
                 <div className='flex justify-between text-lg'>
                     <p className='font-semibold text-center'>Edit {page}</p>
-                    <button className='p-2 rounded-full border hover:bg-gray-200' onClick={handleClickCloseEditForm}>
+                    <button disabled={disable} className='p-2 rounded-full border hover:bg-gray-200' onClick={handleClickCloseEditForm}>
                         <RxCross1 className="w-3 h-3" />
                     </button>
                 </div>
@@ -30,7 +30,7 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                 if(value.primaryKey){
                                     inputType = ( <p className='flex-1'> {defaultValue}</p> )
                                 } else {
-                                    inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' onChange={(e)=>handleChangeEdit(e)} /> )
+                                    inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' disabled={disable} onChange={(e)=>handleChange(e, 'edit')} /> )
                                 }
                             } else if(value.type === 'select'){
                                 if(value.key === 'idKategori'){
@@ -52,7 +52,7 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                 } 
                                 
                                 inputType = ( 
-                                <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm' onChange={(e)=>handleChangeEdit(e)}>
+                                <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm' disabled={disable} onChange={(e)=>handleChange(e, 'edit')}>
                                     <option value={defaultValue}>{defaultValue}</option>
                                     { listOf }
                                 </select> )

@@ -1,12 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react';
-import CustomeBackground from './components/CustomeBackground';
 import './globals.css';
 import { Poppins } from 'next/font/google';
 import Footer from './components/Footer';
 import Header from './components/Header';
 import Providers from './context/providers';
 import { usePathname } from 'next/navigation';
+import Loading from './components/Loading';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -24,6 +24,10 @@ export default function RootLayout({ children }) {
   const pathname = usePathname()
   const [isLoginPage, setIsLoginPage] = useState(pathname)
   let renderPage
+
+  useEffect(()=>{
+    setIsLoginPage(pathname)
+  }, [pathname])
 
   if(isLoginPage === '/login'){
     renderPage = ( 
@@ -51,7 +55,6 @@ export default function RootLayout({ children }) {
       </head>
       <body className={`h-full flex flex-col bg-slate-100 ${poppins.className}`}>
           <Providers>
-            {/* <CustomeBackground /> */}
               { renderPage }
           </Providers>
       </body>
