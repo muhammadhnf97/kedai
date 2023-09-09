@@ -8,55 +8,43 @@ const AddItem = ({ page, field, inputData, handleChange, handleSubmitInsert, han
 
     const { listKategori } = useKategori()
     const { satuan } = useSatuan()
-    
   return (
     <form onSubmit={(e)=>handleSubmitInsert(e, 'add')}>
         <div className='w-full p-2 space-y-5 bg-white rounded-lg shadow-md border border-slate-300 md:px-5'>
             <p className='font-semibold text-lg'>+ Tambah data {page.toLocaleLowerCase()} baru</p>
-            <div className='w-full flex flex-wrap'>
+            <div className='w-full grid grid-cols-1 gap-2 border-green-600 md:grid-cols-2'>
                 {
-                    field?.map(inp=>{
+                    field?.map(values=>{
                         let inputElement
-                        if(inp.type === 'text' || inp.type === 'number'){
-                            inputElement = <input type={inp.type} name={inp.key} value={inputData[inp.key]} className='border w-full md:w-[13rem] px-2 outline-none hover:border-blue-300 focus:border-blue-400' disabled={disable} onChange={(e)=>handleChange(e, 'add')}  />
-                        } else if(inp.type === 'select'){
-                            if(inp.key === 'idKategori'){
-                                inputElement = <select name={inp.key} value={inputData[inp.key]} className='border w-full md:w-[13rem] px-2 outline-none hover:border-blue-300 focus:border-blue-400' disabled={disable} onChange={(e)=>handleChange(e, 'add')}>
-                                    <option>Pilih {inp.label}</option>
-                                    {
-                                        listKategori?.map((data, index)=>{
-                                            return (
-                                            <option key={index} value={data.idKategori}>{data.nmKategori}</option>
-                                        )})
-                                    }
-                                </select>
-                            } else if(inp.key === 'idSatuan'){
-                                inputElement =  
-                                <select name={inp.key} disabled={disable} onChange={(e)=>handleChange(e, 'add')} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
-                                    <option>Pilih {inp.label}</option>
-                                    {
-                                        satuan.map(data=>(
-                                            <option key={data.idSatuan} value={data.idSatuan}>{data.namaSatuan}</option>
-                                        ))
-                                    }
-                                </select>
-                            } else if(inp.key === 'jabatan'){
-                                inputElement =
-                                <select name={inp.key} disabled={disable} onChange={(e)=>handleChange(e, 'add')} value={inputData[inp.key]} className='border w-full md:w-[13rem]'>
-                                    <option>Pilih {inp.label}</option>
-                                    <option value={'administrator'}>Administrator</option>
-                                    <option value={'pimpinan'}>Pimpinan</option>
-                                    <option value={'pegawai'}>Pegawai</option>
+                        if (values.showOn.includes('add') && values.manualInput === true) {
+                            if (values.type === 'text' || values.type === 'number') {
+                                inputElement = <input type={values.type} name={values.key} value={inputData[values.key]} className='h-8 w-full border border-gray-300 outline-none px-1 duration-150 hover:border-blue-500 focus:border-blue-600 rounded-sm md:flex-1' disabled={disable} onChange={(e)=>handleChange(e, 'add')}  />
+                            } else if (values.type === 'select') {
+                                let options
+                                if (values.label.toLowerCase() === 'kategori') {
+                                    options = listKategori.map(data=>(
+                                        <option key={data.idKategori} value={data.idKategori}>{data.nmKategori}</option>
+                                    ))
+                                } else if (values.label.toLowerCase() === 'satuan') {
+                                    options = satuan.map(data=>(
+                                        <option key={data.idSatuan} value={data.idSatuan}>{data.namaSatuan}</option>
+                                    ))
+                                }
+                                inputElement = 
+                                <select name={values.key}  value={inputData[values.key]} className='h-8 w-full border border-gray-300 outline-none px-1 duration-150 hover:border-blue-500 focus:border-blue-600 md:flex-1' disabled={disable} onChange={(e)=>handleChange(e, 'add')}>
+                                    <option>-- select --</option>
+                                    {options}
                                 </select>
 
                             }
+                            return (
+                                <div key={values.key} className='flex flex-col w-full md:flex-row'>
+                                    <div className='w-full md:flex-1'><p>{values.label}</p></div>
+                                    {inputElement}
+                                </div>
+                            )
                         }
-                        return (
-                        <div key={inp.key} className='md:flex-1 w-full md:w-fit'>
-                            <p>{inp.label}</p>
-                            {inputElement}
-                        </div>
-                    )}).slice(1)
+                    })
                 }
             </div>
             <div className='w-full space-y-2 mt-5 md:flex md:space-y-0 md:justify-between md:gap-5'>

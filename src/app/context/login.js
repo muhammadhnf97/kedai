@@ -20,7 +20,6 @@ export const LoginProvider = ({ children }) => {
         const cekLocalStorage = localStorage.getItem('auth')
         if ( cekLocalStorage ) {
             const storage = JSON.parse(cekLocalStorage)
-            console.log(storage)
 
             setLoginData({
                 userId: storage?.data?.userId,

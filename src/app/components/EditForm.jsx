@@ -8,6 +8,17 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
     const { listKategori } = useKategori()
     const { satuan } = useSatuan()
 
+    const filteredItem = {}
+    listField.forEach(value=>{
+        if (value.showOn.includes('edit')) {
+            filteredItem[value.key] = initalValue[value.key]
+        }
+    })
+
+    const newField = listField.filter(value=>{
+        return value.showOn.includes('edit')
+    })
+    console.log(listKategori)
   return (
     <form onSubmit={(e)=>handleSubmitEdit(e, 'edit')}>
         <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-20'>
@@ -20,11 +31,11 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                 </div>
                 <div className='flex flex-col py-2 gap-2'>
                     {
-                        listField.map(value=>{
+                        newField.map(value=>{
                             let inputType
                             let listOf
 
-                            const defaultValue = initalValue[value.key] || ''        
+                            const defaultValue = filteredItem[value.key] || ''        
 
                             if(value.type === 'text' || value.type === 'number'){
                                 if(value.primaryKey){
@@ -33,13 +44,13 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                     inputType = ( <input type={value.type} name={value.key} value={defaultValue} className='flex-1 border rounded-sm px-2' disabled={disable} onChange={(e)=>handleChange(e, 'edit')} /> )
                                 }
                             } else if(value.type === 'select'){
-                                if(value.key === 'idKategori'){
+                                if(value.key === 'nmKategori'){
                                     listOf = listKategori.map(kategori => (
-                                        <option key={kategori.idKategori} value={kategori.idKategori}>{kategori.idKategori} {kategori.nmKategori}</option>
+                                        <option key={kategori.idKategori} value={kategori.idKategori}>{kategori.nmKategori}</option>
                                     ))
-                                } else if(value.key === 'idSatuan'){
+                                } else if(value.key === 'namaSatuan'){
                                     listOf = satuan.map(sat => (
-                                        <option key={sat.idSatuan} value={sat.idSatuan}>{sat.idSatuan} {sat.namaSatuan}</option>
+                                        <option key={sat.idSatuan} value={sat.idSatuan}>{sat.namaSatuan}</option>
                                     ))
                                 } else if(value.key === 'jabatan'){
                                     listOf = (
@@ -52,7 +63,7 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
                                 } 
                                 
                                 inputType = ( 
-                                <select name={value.key} value={defaultValue} className='flex-1 border rounded-sm' disabled={disable} onChange={(e)=>handleChange(e, 'edit')}>
+                                <select name={value.key} value={defaultValue}  className='flex-1 border rounded-sm' disabled={disable} onChange={(e)=>handleChange(e, 'edit')}>
                                     <option value={defaultValue}>{defaultValue}</option>
                                     { listOf }
                                 </select> )

@@ -8,7 +8,7 @@ export async function GET(req) {
 
     try {
         const query = 
-        `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
+        `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, barang.idSatuan, satuan.namaSatuan, kategori.idKategori, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
         INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan ORDER BY barang.dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`

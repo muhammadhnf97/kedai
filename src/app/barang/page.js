@@ -112,11 +112,9 @@ const Home = () => {
       if(res){
         if(isNotif.action === 'delete'){
           setIsLoading(true)
-          setDisable(true)
           deleteData(page, tempData).then(data=>{
             setInitialData(prevData=>prevData.filter(data=>data.idBarang !== Object.values(tempData)[0]))
             setIsLoading(false)
-            setDisable(false)
             setTotalRow(prevData=>prevData-1)
             setListKategori(prevData=>prevData.filter(data=>data.idBarang !== tempData.idBarang))
             makeNotif(data.isNotif, data.alertTitle, data.desc)
@@ -136,7 +134,6 @@ const Home = () => {
       if (action === 'edit'){
         updateData(page, tempData).then(data=>{
           setIsLoading(false)
-          setDisable(false)
           setShowEditForm(false)
           setIsShowDetai(false)
           makeNotif(data.isNotif, data.alertTitle, data.desc)
@@ -163,7 +160,6 @@ const Home = () => {
       } else if (action === 'add') {
         if(insertData.namaBarang.length < 1 && insertData.stok.length < 1 && insertData.modalBeli.length < 1 && insertData.hargaJual.length < 1 && insertData.idSatuan.length < 1 && insertData.idKategori.length < 1){
           setIsLoading(false)
-          setDisable(false)
           makeNotif(true, 'info', 'Data tidak boleh kosong')
           return
         }
@@ -185,7 +181,6 @@ const Home = () => {
           })
           handleIncreaseAsset(data.data.newTotalAset)
           setIsLoading(false)
-          setDisable(false)
           setTotalRow(prevData=>prevData + 1)
           setListKategori(prevData=>{
             return [

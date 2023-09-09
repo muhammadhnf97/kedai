@@ -128,22 +128,31 @@ export const updateData = async(page, tempData) => {
 export const getBasedSearch = async(page, searchQuery, currentPage) => {
   let response
   if(page !== 'barang'){
-    if(searchQuery.keyword.length > 0){
-      response = await fetch(`/api/${page}/searching?keyword=${searchQuery.keyword}`)
+    if(searchQuery?.keyword?.length > 0){
+      response = await fetch(`/api/${page}/searching?keyword=${searchQuery?.keyword}`)
     } else {
       response = await fetch(`/api/${page}?page=${currentPage}`)
     } 
   } else {
-    if(searchQuery.idKategori.length > 0){
-      response = await fetch(`/api/barang/searching?kategori=${searchQuery.idKategori}`)
-    } else if(searchQuery.keyword.length > 0){
-      response = await fetch(`/api/barang/searching?keyword=${searchQuery.keyword}`)
-    } else if(searchQuery.idKategori.length > 0 && searchQuery.keyword.length > 0){
-      response = await fetch(`/api/barang/searching?kategori=${searchQuery.idKategori}&&keyword=${searchQuery.keyword}`)
+    if(searchQuery?.idKategori?.length > 0){
+      response = await fetch(`/api/barang/searching?kategori=${searchQuery?.idKategori}`)
+    } else if(searchQuery?.keyword?.length > 0 || searchQuery?.namaBarang?.length > 0 ){
+      response = await fetch(`/api/barang/searching?keyword=${searchQuery?.keyword}`)
+    } else if(searchQuery?.idKategori?.length > 0 && searchQuery?.keyword?.length > 0){
+      response = await fetch(`/api/barang/searching?kategori=${searchQuery?.idKategori}&&keyword=${searchQuery?.keyword}`)
     } else {
       response = await fetch(`/api/barang?page=${currentPage}`)
     }
   }
+  const data = await response.json()
+  return data
+} 
+
+export const searchBarangByName = async(keyword) => {
+  let response
+  if(keyword.length > 0){
+    response = await fetch(`/api/barang/searching?keyword=${keyword}`)
+  } 
   const data = await response.json()
   return data
 } 

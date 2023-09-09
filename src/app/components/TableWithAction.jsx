@@ -7,10 +7,19 @@ import { BsDatabaseSlash } from 'react-icons/bs'
 import { BiUserPlus } from 'react-icons/bi'
 import { BiUserMinus } from 'react-icons/bi'
 import { RxCross1 } from 'react-icons/rx'
-import { useLogin } from '../context/login'
 import { useUser } from '../context/user'
 
 const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, initialField, initialData, totalRow, currentPage, handleClickCurrentPage, showPaggination, handleClickActionFromTable }) => {
+
+    const filteredData = initialData.map(item => {
+        const filteredItem = {};
+        initialField.forEach(field => {
+          if (field.showOn.includes('view')) {
+            filteredItem[field.key] = item[field.key];
+          }
+        });
+        return filteredItem;
+      });
 
     let alreadyUser
 
@@ -23,6 +32,8 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
     const itemsPerRow = 10
     const totalPage = Math.ceil(totalRow / itemsPerRow)
     const startIndex = (currentPage - 1) * itemsPerRow
+
+
   return (
     <>
     {/* SHOW DETAIL WHILE IN MOBILE */}
@@ -40,16 +51,17 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                 <div className='flex'>
                     <div className='flex-1 px-5'>
                         {
-                            initialField.map(val=>(
+                            initialField.map(val=>{
+                                return (
                                 <div key={val.key} className='flex'>
                                     <div className='flex-1'>
-                                        <p>{val.label}</p>
+                                        { val.showOn.includes('view') && <p>{val.label}</p> }
                                     </div>
                                     <div className='flex-1'>
-                                        <p>: {detailItem[val.altKey] ? detailItem[val.altKey] : detailItem[val.key] }</p>                                
+                                        { val.showOn.includes('view') && <p>: {detailItem[val.altKey] ? detailItem[val.altKey] : detailItem[val.key] }</p> }                                
                                     </div>
                                 </div>
-                            ))
+                            )})
                         }
                     </div>
                 </div>
@@ -126,7 +138,7 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                         </thead>
                         <tbody>
                             { 
-                                initialData?.map((data, index)=>{
+                                filteredData?.map((data, index)=>{
                                     let accountActiveButton
                                     if(page.toLowerCase() === 'pegawai'){
                                         if(alreadyUser.length < 1){
@@ -211,17 +223,21 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                                 <th>No. </th>
                                 {
                                     initialField?.map((fieldData)=>{
-                                        return (
-                                        fieldData.showOn.includes('view') && <th key={fieldData.key}>{fieldData.label}</th>
-                                    )})
+                                        if (fieldData.showOn.includes('view')) {
+                                            return (
+                                                <th key={fieldData.key}>{fieldData.label}</th>
+                                            )
+                                        }
+                                      })
                                 }
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
                             { 
-                                initialData?.map((data, index)=>{
+                                filteredData?.map((data, index)=>{
                                     let accountActiveButton
+                                    
                                     if(page.toLowerCase() === 'pegawai'){
                                         if(alreadyUser.length < 1){
                                             accountActiveButton = (
@@ -258,9 +274,11 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
                                     <tr key={index} className={`${index % 2 === 0 ? 'bg-blue-200' : 'bg-green-200'} h-7 hover:bg-blue-400 hover:duration-150 ease-out`}>
                                         <td className='font-semibold'>{startIndex + (index + 1)}. </td>
                                             {
-                                                Object.values(data).map((value, index)=>(
+
+                                                Object.values(data).map((value, index)=>{
+                                                    return (
                                                     <td key={index} className='text-md'>{value}</td>
-                                                ))     
+                                                )})     
                                             }
                                         <td className='flex items-center justify-center my-1'>
                                             <div className='group w-fit h-fit flex items-center justify-center relative'>

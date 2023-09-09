@@ -39,32 +39,30 @@ export const fieldBarang = [{
         type: 'select',
         primaryKey: false,
         manualInput: true,
-        showOn : ['view', 'add', 'edit'],
-        join: true,
-        altKey: 'namaSatuan'
+        showOn : ['add']
     },{
         label: 'Kategori',
         key: 'idKategori',
         type: 'select',
         primaryKey: false,
         manualInput: true,
-        showOn : ['view', 'add', 'edit'],
-        join: true,
-        altKey: 'nmKategori'
+        showOn : ['add']
     },{
         label: 'Satuan',
         key: 'namaSatuan',
         type: 'select',
         primaryKey: false,
         manualInput: true,
-        showOn : ['add', 'edit']
+        displayKey: 'namaSatuan',
+        showOn : ['view', 'edit']
     },{
         label: 'Kategori',
         key: 'nmKategori',
         type: 'select',
         primaryKey: false,
         manualInput: true,
-        showOn : ['add', 'edit']
+        displayKey: 'nmKategori',
+        showOn : ['view', 'edit']
     }
 ]
 
@@ -264,56 +262,90 @@ export const fieldPembelian = [{
     type: 'text',
     primaryKey: true,
     manualInput: false,
-    showOn : ['view', 'add', 'edit']
+    showOn : [],
+    selectBarangFirst: false,
+    mobileView: false
 },{
     label: 'Tanggal Beli',
     key: 'tglBeli',
     type: 'text',
     primaryKey: false,
     manualInput: false,
-    showOn : ['view', 'add', 'edit']
+    showOn : [],
+    selectBarangFirst: false,
+    mobileView: false
 },{
     label: 'Pegawai',
     key: 'nmPegawai',
     type: 'text',
     primaryKey: false,
-    manualInput: true,
-    showOn : ['view', 'add', 'edit']
+    manualInput: false,
+    showOn : [],
+    selectBarangFirst: false,
+    mobileView: false
 },{
-    label: 'Konsumen',
-    key: 'nmKonsumen',
+    label: 'Supplier',
+    key: 'idSupplier',
+    type: 'select',
+    primaryKey: false,
+    manualInput: true,
+    showOn : ['add'],
+    selectBarangFirst: false,
+    mobileView: false
+},{
+    label: 'No Faktur',
+    key: 'noFaktur',
     type: 'text',
     primaryKey: false,
     manualInput: true,
-    showOn : ['view', 'add', 'edit']
+    showOn : ['add'],
+    selectBarangFirst: false,
+    mobileView: false
 },{
-    label: 'Barang',
-    key: 'Nama Barang',
+    label: 'ID Barang',
+    key: 'idBarang',
     type: 'text',
     primaryKey: false,
     manualInput: true,
-    showOn : ['view', 'add', 'edit']
+    showOn : ['view'],
+    selectBarangFirst: false,
+    mobileView: true
 },{
-    label: 'Jumlah Beli',
+    label: 'Nama',
+    key: 'namaBarang',
+    type: 'text',
+    primaryKey: false,
+    manualInput: true,
+    showOn : ['view'],
+    selectBarangFirst: false,
+    mobileView: true
+},{
+    label: 'Jml',
     key: 'jumlahBeli',
     type: 'number',
     primaryKey: false,
     manualInput: true,
-    showOn : ['view', 'add', 'edit']
+    showOn : ['add', 'view'],
+    selectBarangFirst: true,
+    mobileView: true
 },{
-    label: 'Harga Beli',
+    label: 'Hrg',
     key: 'hargaBeli',
-    type: 'number',
+    type: 'currency',
     primaryKey: false,
     manualInput: true,
-    showOn : ['view', 'add', 'edit']
+    showOn : ['add', 'view'],
+    selectBarangFirst: true,
+    mobileView: true
 },{
-    label: 'Total Harga',
-    key: 'totalHarga',
-    type: 'number',
+    label: 'Total',
+    key: 'totalBayar',
+    type: 'currency',
     primaryKey: false,
-    manualInput: false,
-    showOn : ['view', 'add', 'edit']
+    manualInput: true,
+    showOn : ['view'],
+    selectBarangFirst: true,
+    mobileView: true
 }]
 
 
