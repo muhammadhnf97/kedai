@@ -1,12 +1,12 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Loading from '../components/Loading'
-import Notification from '../components/Notification'
-import AddItem from '../components/AddItem'
+import Verification from '../components/Verification'
 import EditForm from '../components/EditForm'
 import Search from '../components/Search'
 import TableWithAction from '../components/TableWithAction'
 import TableWithoutAction from '../components/TableWithoutAction'
+import AddItemSatuan from '../components/AddItemSatuan'
 import { fieldSatuan } from '../utils/tableName'
 import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
@@ -31,12 +31,7 @@ const Home = () => {
       getTotalRow(page).then(data=>setTotalRow(data))
     }, [])
 
-    const [isNotif, setIsNotif] = useState({
-      showNotif: false,
-      alertTitle : null,
-      desc: null,
-      action: null
-    })
+    const [isNotif, setIsNotif] = useState({})
 
     const makeNotif = (showNotif = false, alertTitle = null, desc = null, action = null) => {
         setIsNotif(prev=>{
@@ -60,9 +55,14 @@ const Home = () => {
     }
 
     const [tempData, setTempData] = useState({})
-    const [insertData, setInsertData] = useState({
-        namaSatuan: ''
-    })
+    const [insertData, setInsertData] = useState(null)
+    const [turunan, setTurunan] = useState(false)
+
+    const handleClickTurunan = () => {
+      setTurunan(prev=>!prev)
+      setInsertData({})
+    }
+
     const [searchQuery, setSearchQuery] = useState({
         keyword: ''
     })
@@ -86,13 +86,13 @@ const Home = () => {
     const handleClickResponseNotif = async(res) => {
       makeNotif()
       if(res){
-        if(isNotif.action === 'delete'){
+        if(isNotif?.action === 'delete'){
           setIsLoading(true)
           deleteData(page, tempData).then(data=>{
             setInitialData(prevData=>prevData.filter(data=>data.idSatuan !== Object.values(tempData)[0]))
             setIsLoading(false)
             setTotalRow(prevData=>prevData-1)
-            setSatuan(prevData=>prevData.filter(data=>data.idSatuan !== tempData.idSatuan))
+            setSatuan(prevData=>prevData.filter(data=>data.idSatuan !== tempData?.idSatuan))
             makeNotif(data.isNotif, data.alertTitle, data.desc)
           })
           setTempData({})
@@ -102,7 +102,7 @@ const Home = () => {
         } 
       }
     }
-
+    
     const handleSubmit = async(e, action) => {
       e.preventDefault()
       setIsLoading(true)
@@ -114,10 +114,11 @@ const Home = () => {
           makeNotif(data.isNotif, data.alertTitle, data.desc)
           setInitialData(prev=>{
             return prev.map(prevItem => {
-                if(prevItem.idSatuan === tempData.idSatuan){
+                if(prevItem.idSatuan === tempData?.idSatuan){
                     return {
                       idSatuan: tempData?.idSatuan,
                       namaSatuan: tempData?.namaSatuan,
+                      turunan: tempData?.turunan || tempData?.namaSatuan
                     }
                 } else {
                     return prevItem
@@ -127,7 +128,7 @@ const Home = () => {
           setTempData({})
         })
       } else if (action === 'add') {
-        if(insertData.namaSatuan.length < 1){
+        if(!insertData){
           setIsLoading(false)
           makeNotif(true, 'info', 'Data tidak boleh kosong')
           return
@@ -138,7 +139,8 @@ const Home = () => {
             return [
               {
                 idSatuan: data.data.idSatuan,
-                namaSatuan: insertData.namaSatuan, 
+                namaSatuan: insertData?.namaSatuan, 
+                turunan: insertData?.turunan || insertData?.namaSatuan
               },
               ...prev
             ]
@@ -149,7 +151,7 @@ const Home = () => {
             return [
               ...prevData, {
               idSatuan: data.data.idSatuan,
-              namaSatuan: insertData.namaSatuan,
+              namaSatuan: insertData?.namaSatuan,
             }]
           })
           makeNotif(data.isNotif, data.alertTitle, data.desc)
@@ -192,9 +194,7 @@ const Home = () => {
     }
 
     const handleClickEmptyInsert = () => {
-      setInsertData({
-        namaSatuan: ''
-      })
+      setInsertData({})
     }
 
     useEffect(()=>{  
@@ -203,6 +203,8 @@ const Home = () => {
         setShowPaggination(data.paggination)
       })
     }, [searchQuery])
+
+    console.log(initialData)
 
     const handleChangeResetQuery = () => {
       setSearchQuery({
@@ -233,10 +235,10 @@ const Home = () => {
       handleChange={handleChange}  /> }
     { isLoading && <Loading /> }
     {
-      isNotif.showNotif &&
-      <Notification 
-        alertTitle={isNotif.alertTitle} 
-        desc={isNotif.desc} 
+      isNotif?.showNotif &&
+      <Verification 
+        alertTitle={isNotif?.alertTitle} 
+        desc={isNotif?.desc} 
         handleClickResponseNotif={handleClickResponseNotif} 
       />
     }
@@ -244,14 +246,22 @@ const Home = () => {
       <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
         { loginData.penanggungJawab !== 'satuan' && <section className='flex-1'>
-          <AddItem
+          {/* <AddItem
             page={page}
             field={fieldSatuan} 
             inputData={insertData} 
             handleChange={handleChange}
             handleSubmitInsert={handleSubmit}
             handleClickReset={handleClickEmptyInsert}
-          />
+          /> */}
+          <AddItemSatuan 
+            field={fieldSatuan}
+            insertData={insertData}
+            handleChange={handleChange}
+            turunan={turunan}
+            handleClickTurunan={handleClickTurunan}
+            handleSubmit={handleSubmit}
+            handleReset={handleClickEmptyInsert} />
         </section> }
         <section className='flex-1'>
           <Search 

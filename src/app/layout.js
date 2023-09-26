@@ -22,29 +22,38 @@ export const metadata = {
 export default function RootLayout({ children }) {
 
   const pathname = usePathname()
-  const [isLoginPage, setIsLoginPage] = useState(pathname)
+  const [currentPathname, setCurrentPathname] = useState(null)
+  const [isLoading, setIsLoading] = useState(true)
   let renderPage
 
   useEffect(()=>{
-    setIsLoginPage(pathname)
+    setCurrentPathname(pathname)
+    setIsLoading(false)
   }, [pathname])
 
-  if(isLoginPage === '/login'){
-    renderPage = ( 
-      <>
-        {children}
+  if (currentPathname === '/login') {
+    if (isLoading) {
+      renderPage = <Loading />
+    } else {
+      renderPage = 
+      <main className='min-h-screen'>
+        { children }
         <Footer />
-      </>
-     )
+      </main>
+    }
   } else {
-    renderPage = (
-      <>
-        <Header />
-        <main className='mt-20 py-5'>
-          {children}
-        </main>
-        <Footer />
-      </>)
+    if (isLoading) {
+      renderPage = <Loading />
+    } else {
+      renderPage = 
+      <div className='min-h-screen flex flex-col justify-between'>
+      <Header />
+      <main className='mt-20 py-5'>
+        {children}
+      </main>
+      <Footer />
+      </div>
+    }
   }
 
   return (

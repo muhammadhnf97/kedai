@@ -1,23 +1,13 @@
 import React from 'react'
 
-const StickyNote = ({ desc, nominal, baseColor}) => {
-  let newBaseColor
-  let secondColor
+const StickyNote = ({ title, nominal, bg}) => {
   
-  if(baseColor%2==0){
-    newBaseColor = 'bg-green-100'
-    secondColor = 'bg-green-400'
-  } else {
-    newBaseColor = 'bg-red-100'
-    secondColor = 'bg-red-400'
-  }
-
   return (
-    <div className={`flex w-72 ${newBaseColor} shadow-md`}>
-      <div className={`w-1/12 ${secondColor}`}></div>
-      <div className="flex-1 text-center p-3">
-        <p className="text-lg">{desc}</p>
-        <p className="font-bold text-2xl">{nominal.toLocaleString("id-ID", { style: "currency", currency: "IDR"})}</p>
+    <div className={`flex w-72 h-36  shadow-md mx-auto md:h-32 md:w-full rounded-lg shadow-gray-300 overflow-hidden ${bg}`}>
+      <div className={`w-1/12 bg-slate-600`}></div>
+      <div className="flex-1 text-center p-5 flex flex-col justify-center">
+        <p className="text-xl">{title}</p>
+        <p className="font-semibold text-slate-700 text-3xl">{nominal?.toLocaleString("id-ID", { style: "currency", currency: "IDR"})}</p>
       </div>
     </div>
   )

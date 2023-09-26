@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Loading from '../components/Loading'
-import Notification from '../components/Notification'
+import Verification from '../components/Verification'
 import AddItem from '../components/AddItem'
 import EditForm from '../components/EditForm'
 import Search from '../components/Search'
@@ -12,15 +12,13 @@ import { fieldBarang } from '../utils/tableName'
 import { searchBarangBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
 import { useLogin } from '../context/login'
-import { useKategori } from '../context/kategori'
 import { useBarang } from '../context/barang'
 import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postData, getBasedSearch } from '../utils/fetchingdata'
 
 const Home = () => {
 
     const { loginData } = useLogin()
-    const { setListKategori } = useKategori()
-    const { totalAset, handleIncreaseAsset, handleDecreaseAsset, handleUpdateAsset } = useBarang()
+    const { totalAset, getTotalAset, totalAsetBersih, getTotalAsetBersih } = useBarang()
 
     const page = 'barang'
     const searchParam = useSearchParams().get('page')
@@ -30,6 +28,13 @@ const Home = () => {
     const [currentPage, setCurrentPage] = useState(searchParam || 1)
     const [initialData, setInitialData] = useState([])
     const [totalRow, setTotalRow] = useState(0)
+
+    
+    useEffect(()=>{
+      getTotalAsetBersih()
+      getTotalAset()
+    }, [initialData])
+    
 
     useEffect(()=>{
       getTotalRow(page).then(data=>setTotalRow(data))
@@ -116,12 +121,10 @@ const Home = () => {
             setInitialData(prevData=>prevData.filter(data=>data.idBarang !== Object.values(tempData)[0]))
             setIsLoading(false)
             setTotalRow(prevData=>prevData-1)
-            setListKategori(prevData=>prevData.filter(data=>data.idBarang !== tempData.idBarang))
             makeNotif(data.isNotif, data.alertTitle, data.desc)
-            handleDecreaseAsset(tempData.stok * tempData.hargaJual)
           })
           setTempData({})
-        } else if(isNotif?.action === 'edit'){
+        } else if (isNotif?.action === 'edit'){
           setShowEditForm(true)
           setIsShowDetai(false)
         } 
@@ -137,7 +140,6 @@ const Home = () => {
           setShowEditForm(false)
           setIsShowDetai(false)
           makeNotif(data.isNotif, data.alertTitle, data.desc)
-          handleUpdateAsset(data.data.oldAsset, data.data.newAsset)
           setInitialData(prev=>{
             return prev.map(prevItem => {
                 if(prevItem.idBarang === tempData.idBarang){
@@ -145,7 +147,7 @@ const Home = () => {
                       idBarang: tempData?.idBarang,
                       namaBarang: tempData?.namaBarang,
                       stok: tempData?.stok,
-                      modalBeli: tempData?.modalBeli,
+                      hargaSatuan: tempData?.hargaSatuan,
                       hargaJual: tempData?.hargaJual,
                       namaSatuan: data.data.namaSatuan,
                       nmKategori: data.data.nmKategori
@@ -158,7 +160,7 @@ const Home = () => {
           setTempData({})
         })
       } else if (action === 'add') {
-        if(insertData.namaBarang.length < 1 && insertData.stok.length < 1 && insertData.modalBeli.length < 1 && insertData.hargaJual.length < 1 && insertData.idSatuan.length < 1 && insertData.idKategori.length < 1){
+        if(insertData.namaBarang.length < 1 && insertData.stok.length < 1 && insertData.hargaSatuan.length < 1 && insertData.hargaJual.length < 1 && insertData.idSatuan.length < 1 && insertData.idKategori.length < 1){
           setIsLoading(false)
           makeNotif(true, 'info', 'Data tidak boleh kosong')
           return
@@ -166,40 +168,51 @@ const Home = () => {
 
         postData(page, insertData).then(data=>{
           setInitialData(prev=>{
-            return [
-              {
-                idBarang: data.data.idBarang,
-                namaBarang: insertData?.namaBarang,
-                stok: insertData?.stok,
-                modalBeli: insertData?.modalBeli,
-                hargaJual: insertData?.hargaJual,
-                namaSatuan: data.data.namaSatuan,
-                nmKategori: data.data.nmKategori
-              },
-              ...prev
-            ]
+            if (data.data.newIdBarang) {
+              return [
+                {
+                  idBarang: data.data.idBarang,
+                  namaBarang: insertData?.namaBarang,
+                  stok: insertData?.stok,
+                  hargaSatuan: insertData?.hargaSatuan,
+                  hargaJual: insertData?.hargaJual,
+                  namaSatuan: data.data.namaSatuan,
+                  nmKategori: data.data.nmKategori
+                },
+                {
+                  idBarang: data.data.newIdBarang ,
+                  namaBarang: insertData?.namaBarang,
+                  stok: data.data.stokTurunan,
+                  hargaSatuan: data.data.hargaSatuanTurunan,
+                  hargaJual: data.data.hargaJualTurunan,
+                  namaSatuan: data.data.namaTurunan,
+                  nmKategori: data.data.nmKategori
+                },
+                ...prev
+              ]
+            } else {
+              return [
+                {
+                  idBarang: data.data.idBarang,
+                  namaBarang: insertData?.namaBarang,
+                  stok: insertData?.stok,
+                  hargaSatuan: insertData?.hargaSatuan,
+                  hargaJual: insertData?.hargaJual,
+                  namaSatuan: data.data.namaSatuan,
+                  nmKategori: data.data.nmKategori
+                },
+                ...prev
+              ]
+            }
           })
-          handleIncreaseAsset(data.data.newTotalAset)
           setIsLoading(false)
           setTotalRow(prevData=>prevData + 1)
-          setListKategori(prevData=>{
-            return [
-              ...prevData, {
-              idBarang: data.data.idBarang,
-              namaBarang: insertData?.namaBarang,
-              stok: insertData?.stok,
-              modalBeli: insertData?.modalBeli,
-              hargaJual: insertData?.hargaJual,
-              idSatuan: insertData?.idSatuan,
-              idKategori: insertData?.idKategori
-            }]
-          })
           makeNotif(data.isNotif, data.alertTitle, data.desc)
         })
         setInsertData({
           namaBarang: '',
           stok: '',
-          modalBeli: '',
+          hargaSatuan: '',
           hargaJual: '',
           idSatuan: '',
           idKategori: ''
@@ -215,7 +228,7 @@ const Home = () => {
     const [insertData, setInsertData] = useState({
         namaBarang: '',
         stok: '',
-        modalBeli: '',
+        hargaSatuan: '',
         hargaJual: '',
         idSatuan: '',
         idKategori: ''
@@ -225,7 +238,7 @@ const Home = () => {
       setInsertData({
         namaBarang: '',
         stok: '',
-        modalBeli: '',
+        hargaSatuan: '',
         hargaJual: '',
         idSatuan: '',
         idKategori: ''
@@ -258,7 +271,7 @@ const Home = () => {
       item ? setDetailItem(item) : setDetailItem({})
         setIsShowDetai(prev=>!prev)
     }
-    
+
   return (
     <>
     { showEditForm && 
@@ -273,7 +286,7 @@ const Home = () => {
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
-      <Notification 
+      <Verification 
         alertTitle={isNotif.alertTitle} 
         desc={isNotif.desc} 
         handleClickResponseNotif={handleClickResponseNotif} 
@@ -333,10 +346,17 @@ const Home = () => {
             handleClickActionFromTable={handleClickActionFromTable}
           />}
       </section>
-      <section className='w-full px-2 md:px-5'>
-        <TableAset
-        desc={"Total Aset"}
-        nominal={totalAset} />
+      <section>
+        <div className='w-full px-2 md:px-5'>
+          <TableAset
+          desc={"Total Aset"}
+          nominal={totalAset} />
+        </div>
+        <div className='w-full px-2 md:px-5'>
+          <TableAset
+          desc={"Total Aset Bersih"}
+          nominal={totalAsetBersih} />
+        </div>
       </section>
     </div>
     </>

@@ -20,8 +20,8 @@ export const fieldBarang = [{
         manualInput: true,
         showOn : ['view', 'add', 'edit']
     },{
-        label: 'Modal Beli',
-        key: 'modalBeli',
+        label: 'Harga Satuan',
+        key: 'hargaSatuan',
         type: 'number',
         primaryKey: false,
         manualInput: true,
@@ -97,6 +97,13 @@ export const fieldSatuan = [{
     primaryKey: false,
     manualInput: true,
     showOn : ['view', 'add', 'edit']
+},{
+    label: 'Turunan',
+    key: 'turunan',
+    type: 'text',
+    primaryKey: false,
+    manualInput: true,
+    showOn : ['view', 'add']
 },]
 
 
@@ -263,8 +270,7 @@ export const fieldPembelian = [{
     primaryKey: true,
     manualInput: false,
     showOn : [],
-    selectBarangFirst: false,
-    mobileView: false
+    selectBarangFirst: false
 },{
     label: 'Tanggal Beli',
     key: 'tglBeli',
@@ -272,8 +278,7 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: false,
     showOn : [],
-    selectBarangFirst: false,
-    mobileView: false
+    selectBarangFirst: false
 },{
     label: 'Pegawai',
     key: 'nmPegawai',
@@ -281,8 +286,7 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: false,
     showOn : [],
-    selectBarangFirst: false,
-    mobileView: false
+    selectBarangFirst: false
 },{
     label: 'Supplier',
     key: 'idSupplier',
@@ -290,8 +294,7 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: true,
     showOn : ['add'],
-    selectBarangFirst: false,
-    mobileView: false
+    selectBarangFirst: false
 },{
     label: 'No Faktur',
     key: 'noFaktur',
@@ -299,8 +302,7 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: true,
     showOn : ['add'],
-    selectBarangFirst: false,
-    mobileView: false
+    selectBarangFirst: false
 },{
     label: 'ID Barang',
     key: 'idBarang',
@@ -308,8 +310,7 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: true,
     showOn : ['view'],
-    selectBarangFirst: false,
-    mobileView: true
+    selectBarangFirst: false
 },{
     label: 'Nama',
     key: 'namaBarang',
@@ -317,26 +318,23 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: true,
     showOn : ['view'],
-    selectBarangFirst: false,
-    mobileView: true
+    selectBarangFirst: false
 },{
-    label: 'Jml',
+    label: 'Jumlah Beli',
     key: 'jumlahBeli',
     type: 'number',
     primaryKey: false,
     manualInput: true,
     showOn : ['add', 'view'],
-    selectBarangFirst: true,
-    mobileView: true
+    selectBarangFirst: true
 },{
-    label: 'Hrg',
+    label: 'Harga',
     key: 'hargaBeli',
     type: 'currency',
     primaryKey: false,
     manualInput: true,
     showOn : ['add', 'view'],
-    selectBarangFirst: true,
-    mobileView: true
+    selectBarangFirst: true
 },{
     label: 'Total',
     key: 'totalBayar',
@@ -344,10 +342,159 @@ export const fieldPembelian = [{
     primaryKey: false,
     manualInput: true,
     showOn : ['view'],
-    selectBarangFirst: true,
-    mobileView: true
+    selectBarangFirst: true
 }]
 
+export const fieldPenjualan = [{
+    label: 'No Nota',
+    key: 'noNota',
+    type: 'text',
+    primaryKey: true,
+    manualInput: false,
+    showOn : [],
+    kunciKonsumen: false
+},{
+    label: 'idKonsumen',
+    key: 'idKonsumen',
+    type: 'text',
+    primaryKey: true,
+    manualInput: false,
+    showOn : ['add'],
+    kunciKonsumen: false
+},{
+    label: 'Konsumen',
+    key: 'nmKonsumen',
+    type: 'select',
+    primaryKey: true,
+    manualInput: false,
+    showOn : [],
+    kunciKonsumen: false
+}]
+
+export const fieldPiutang = [
+    {
+    label: 'Konsumen',
+    key: 'idKonsumen',
+    type: 'select',
+    manualInput: true,
+    showOn: ['add']
+    },
+    {
+    label: 'No Nota',
+    key: 'noNota',
+    type: 'select',
+    manualInput: true,
+    showOn: ['add']
+    },
+    {
+    label: 'Tanggal Pembelian',
+    key: 'tglJual',
+    type: 'text',
+    manualInput: true,
+    showOn: ['detail']
+    },
+    {
+    label: 'Deposit',
+    key: 'deposit',
+    type: 'number',
+    manualInput: true,
+    showOn: ['detail']
+    },
+    {
+    label: 'ID Barang',
+    key: 'idBarang',
+    type: 'text',
+    manualInput: true,
+    showOn: ['table']
+    },
+    {
+    label: 'Barang',
+    key: 'namaBarang',
+    type: 'text',
+    manualInput: true,
+    showOn: ['table']
+    },
+    {
+    label: 'Jumlah',
+    key: 'jumlah',
+    type: 'number',
+    manualInput: true,
+    showOn: ['table']
+    },
+    {
+    label: 'Harga Jual',
+    key: 'hargaJual',
+    type: 'number',
+    manualInput: true,
+    showOn: ['table']
+    },
+    {
+    label: 'Total',
+    key: 'total',
+    type: 'number',
+    manualInput: true,
+    showOn: ['table']
+    }
+    
+]
+
+export const fieldHutang = [
+    {
+        label: 'ID Pembelian',
+        key: 'idPembelian',
+        type: 'text',
+        primaryKey: true,
+        manualInput: false,
+        showOn : ['view'],
+        selectBarangFirst: false,
+        mobileView: true
+    },{
+        label: 'Tanggal Beli',
+        key: 'tglBeli',
+        type: 'text',
+        primaryKey: false,
+        manualInput: false,
+        showOn : ['view'],
+        selectBarangFirst: false,
+        mobileView: true
+    },{
+        label: 'Barang',
+        key: 'namaBarang',
+        type: 'text',
+        primaryKey: false,
+        manualInput: true,
+        showOn : ['view'],
+        selectBarangFirst: false,
+        mobileView: true
+    },{
+        label: 'Jumlah',
+        key: 'jumlahBeli',
+        type: 'number',
+        primaryKey: false,
+        manualInput: true,
+        showOn : ['view'],
+        selectBarangFirst: true,
+        mobileView: true
+    },{
+        label: 'Harga Satuan',
+        key: 'hargaBeli',
+        type: 'currency',
+        primaryKey: false,
+        manualInput: true,
+        showOn : ['view'],
+        selectBarangFirst: true,
+        mobileView: true
+    },{
+        label: 'Total',
+        key: 'totalHarga',
+        type: 'currency',
+        primaryKey: false,
+        manualInput: true,
+        showOn : ['view'],
+        selectBarangFirst: true,
+        mobileView: true
+    }
+]
 
 export const menu = [{
     id: 'home',
@@ -416,8 +563,14 @@ export const menu = [{
         child: null
     },{
         id: 'penjualan',
-        label: 'Kategori Barang',
+        label: 'Penjualan',
         pathName: '/penjualan',
+        jabatan: ['administrator','pimpinan','pegawai'],
+        child: null
+    },{
+        id: 'konversi',
+        label: 'Konversi Barang',
+        pathName: '/konversi',
         jabatan: ['administrator','pimpinan','pegawai'],
         child: null
     }]

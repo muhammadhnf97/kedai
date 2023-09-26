@@ -9,19 +9,37 @@ const Search = ({ page, searchValue, handleChange, searchUtils, handleClickReset
 
   return (
     <div className='w-full space-y-5 bg-white rounded-lg shadow-md p-3 border border-slate-300 md:px-5'>
-        <div className='font-semibold text-lg flex items-center justify-start gap-2'><FaMagnifyingGlass /> Cari data {page.toLocaleLowerCase()}</div>
+        <div className='font-semibold text-lg flex items-center justify-start gap-2'>
+        <FaMagnifyingGlass /> Cari data {page.toLocaleLowerCase()}</div>
         <div className='space-y-3'>
             {
                 searchUtils.map(value=>{
                     let inputType
                     if(value.type === "text"){
                         inputType = ( 
-                            <input type={value.type} name={value.key} value={searchValue[value.key]} className=' border border-gray-400 w-full rounded-sm outline-none duration-150 px-2 focus:border-blue-400' placeholder={value.label}  onChange={(e)=>handleChangeSearch(e, 'search')} />
+                            <input 
+                                type={value.type} 
+                                name={value.key} 
+                                value={searchValue[value.key]} 
+                                className=' 
+                                    h-8 w-full border border-gray-300 outline-none 
+                                    px-1 duration-150 hover:border-blue-500 focus:border-blue-600 
+                                    rounded-sm md:flex-1' 
+                                placeholder={value.label}
+                                onChange={(e)=>handleChange(e, 'search')} 
+                            />
                         )
                     } else {
                         inputType = (
-                            <select name={value.key} value={searchValue[value.key]} className='border border-gray-400 w-full rounded-sm outline-none duration-150 px-1 focus:border-blue-400'  onChange={(e)=>handleChangeSearch(e, 'search')}>
-                                <option value="">Cari berdasarkan {value.label} ..</option>
+                            <select 
+                                name={value.key} 
+                                value={searchValue[value.key]} 
+                                className='
+                                    border border-gray-400 w-full rounded-sm 
+                                    outline-none duration-150 px-1 focus:border-blue-400'  
+                                onChange={(e)=>handleChange(e, 'search')} 
+                            >
+                                <option>Cari berdasarkan {value.label} ..</option>
                                 { 
                                     value.key === 'idKategori' && listKategori.map(data=>(
                                     <option key={data.idKategori} value={data.idKategori}>{data.nmKategori}</option>

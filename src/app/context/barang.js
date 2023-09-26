@@ -7,48 +7,47 @@ export const useBarang = () => useContext(BarangContext)
 
 export default function BarangProvider({ children }) {
   const [totalAset, setTotalAset] = useState(0)
+  const [totalAsetBersih, setTotalAsetBersih] = useState(0)
+
+  const getTotalAsetBersih = async() => {
+    try {
+      const response = await fetch('/api/barang/totalasetbersih')
+      const data = await response.json()
+      if (data.status === 200) {
+        setTotalAsetBersih(data.totalAsetBersih)
+      } else {
+        setTotalAsetBersih(0)
+      }
+    } catch (error) {
+      console.error('Ada kesalahan saat mengambil Total Aset Bersih', error)
+      setTotalAsetBersih(0)
+    }
+  }
+  
+  const getTotalAset = async() => {
+      try {
+          const response = await fetch(`/api/barang/totalaset`)
+          const data = await response.json()
+          if (data.status === 200) {
+            setTotalAset(data.totalAset)
+          } else {
+            setTotalAset(0)
+          }
+      } catch (error) {
+        console.error('Ada kesalahan saat mengambil Total Aset Bersih', error)
+        setTotalAset(0)
+      }
+  }
 
     useEffect(()=>{
-        const fetchStokDanHargaJual = async() => {
-            try {
-                const response = await fetch(`/api/barang/totalaset`)
-                const data = await response.json()
-                
-                const total = data.data.map(prev=>{
-                    return {
-                        ...prev,
-                        aset : prev.stok * prev.hargaJual
-                    } 
-                })
-
-                const totalAset = total.reduce((total, obj)=> total + obj.aset, 0)
-
-                return totalAset
-            } catch (error) {
-                return {
-                    message: "Ada Kelasahanan",
-                    error
-                }
-            }
-        }
-
-        fetchStokDanHargaJual().then(data=>setTotalAset(data))
+      getTotalAsetBersih()
+      getTotalAset()
+        
     }, [])
 
-    const handleIncreaseAsset = (newAsset) => {
-      setTotalAset(prev=> prev + newAsset)
-    }
-
-    const handleDecreaseAsset = (newAsset) => {
-      setTotalAset(prev=> prev - newAsset )
-    }
-
-    const handleUpdateAsset = (oldAsset, newAsset) => {
-      setTotalAset(prev=>prev - oldAsset + newAsset)
-    }
 
   return (
-    <BarangContext.Provider value={{totalAset, handleIncreaseAsset, handleDecreaseAsset, handleUpdateAsset}}>
+    <BarangContext.Provider value={{totalAset, getTotalAset, totalAsetBersih, getTotalAsetBersih}}>
       {children}
     </BarangContext.Provider>
   )

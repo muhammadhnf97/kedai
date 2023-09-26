@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Search from '../components/Search'
 import Loading from '../components/Loading'
-import Notification from '../components/Notification'
+import Verification from '../components/Verification'
 import { fieldUser } from '../utils/tableName'
 import { searchBy } from '../utils/searchutils'
 import { useSearchParams } from 'next/navigation'
@@ -172,7 +172,7 @@ const Home = () => {
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
-      <Notification 
+      <Verification 
         alertTitle={isNotif.alertTitle} 
         desc={isNotif.desc} 
         handleClickResponseNotif={handleClickResponseNotif} 

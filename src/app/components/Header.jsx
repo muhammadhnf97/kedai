@@ -48,7 +48,7 @@ const Header = () => {
     <>
     {isLoading && <Loading />}
     {}
-    <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-20'>
+    <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-30'>
         <div className='max-w-7xl h-full  px-5 mx-auto flex justify-between items-center relative'>
             { renderUsernameAndStatus }
             <ul className='flex gap-5 justify-center items-center'>
@@ -96,7 +96,7 @@ const Header = () => {
             onClick={handleClickLogout}>Logout</button>
         </div>
     </div>
-    <div className='md:hidden fixed w-full h-20 px-5 flex items-center justify-between bg-white shadow-md z-10'>
+    <div className='md:hidden fixed w-full h-20 px-5 flex items-center justify-between bg-white shadow-md z-30'>
         { renderUsernameAndStatus }
         <button className='flex items-center md:hidden' onClick={handleClickMobileNavbar}>
             <RiMenu3Fill className='w-7 h-7 ' />

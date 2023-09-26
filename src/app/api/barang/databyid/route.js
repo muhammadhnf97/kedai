@@ -5,12 +5,11 @@ export async function GET(req){
     const id = new URL(req.url).searchParams.get("id")
 
     try {
-        const data = await dbConnect(`SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.idSatuan, kategori.idKategori, satuan.namaSatuan, kategori.nmKategori 
+        const data = await dbConnect(`SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.hargaSatuan, barang.hargaJual, satuan.idSatuan, kategori.idKategori, satuan.namaSatuan, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
         INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan 
         WHERE idBarang = ${id}`, [id])
-        
 
         if(data.length > 0){
             return NextResponse.json({

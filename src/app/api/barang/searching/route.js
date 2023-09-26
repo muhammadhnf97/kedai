@@ -8,21 +8,21 @@ export async function GET(req){
     let query 
 
     if(keyword && !kategori) {
-        query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
+        query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.hargaSatuan, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
         INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan 
         WHERE namaBarang LIKE '%${keyword}%' OR idBarang LIKE '%${keyword}%' 
         ORDER BY barang.idBarang DESC`
     } else if(!keyword && kategori){
-        query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
+        query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.hargaSatuan, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
         INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan 
         WHERE barang.idKategori = ${kategori} 
         ORDER BY barang.idBarang DESC`
     } else if(keyword && kategori){
-        query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
+        query = `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.hargaSatuan, barang.hargaJual, satuan.namaSatuan, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
         INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan 

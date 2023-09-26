@@ -1,45 +1,89 @@
 'use client'
-import { useEffect, useState } from "react"
 import StickyNote from "./components/StickyNote"
-import Table from "./components/Table"
-import { fieldBarang } from "./utils/tableName"
-import TableAset from "./components/TableAset"
 import { useBarang } from "./context/barang"
+import { usePenjualan } from "./context/penjualan"
 
 export default function Home() {
-  const [currentPage, setCurrentPage] = useState(1)
-  const [tableBarang, setTableBarang] = useState([])
-
   const { totalAset } = useBarang()
+  const { PenjualanLunas, PenjualanKredit, penjualanLunasBulanan, penjualanKreditBulanan } = usePenjualan()
 
-  useEffect(()=>{
-    const getDataBarang = async() => {
-      try {
-        const response = await fetch(`/api/barang`)
-        const data = await response.json()
-        return data
-      } catch (error) {
-        console.log('error : ', error)
-      }
+  const harian = [
+    {
+      id: 1,
+      title: 'Penjualan Hari ini',
+      nominal: PenjualanLunas
+    },
+    {
+      id: 2,
+      title: 'Piutang',
+      nominal: PenjualanKredit
     }
+  ]
 
-    getDataBarang().then(barang=>setTableBarang(barang.data))
-  }, [])
+  const bulanan = [
+    {
+      id: 1,
+      title: 'Penjualan Bulan ini',
+      nominal: penjualanLunasBulanan
+    },
+    {
+      id: 2,
+      title: 'Piutang Bulan ini',
+      nominal: penjualanKreditBulanan
+    }
+  ]
+
+  const daftarBulan = ['januari','februari','maret','april','mei','juni','juli','agustus','september','oktober','november','desember',]
+
+  const date = new Date()
+  const month = date.getMonth()
+
+  
+  const monthName = daftarBulan.find((value, index)=>{
+    if (index === month) {
+      return value
+    } 
+  })
+
 
   return (
     <>
-    <div className="max-w-7xl mx-auto flex flex-col items-center justify-between space-y-10">
-      <section className="w-full flex flex-wrap flex-col items-center justify-center gap-2 md:gap-5 md:flex-row">
-        <StickyNote desc={'Penjualan Januari'} nominal={10000000} baseColor={1} />
-        <StickyNote desc={'Pembelian Januari'} nominal={9000000} baseColor={2} />
-        <StickyNote desc={'Total Hutang'} nominal={10000000} baseColor={1} />
-        <StickyNote desc={'Total Piutang'} nominal={9000000} baseColor={2} />
-        <StickyNote desc={'Total Aset'} nominal={totalAset} baseColor={1} />
+    <div className="max-w-7xl mx-auto flex flex-col items-center justify-between space-y-5">
+      <section className="w-full">
+        {
+            <StickyNote
+              title={'Total Aset'} 
+              nominal={totalAset} 
+              bg={'bg-red-200'} />
+        }
       </section>
-      <section className="w-full px-2 md:px-5">
-        <h4 className="font-semibold text-xl">Barang</h4>
-        <Table field={fieldBarang} row={tableBarang} />
-        <TableAset desc={'Total Aset'} nominal={totalAset} />
+      <section className="w-full space-y-2">
+        <p className="text-xl font-semibold">Data Harian</p>
+        <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
+          {
+            harian.map((noteData, index)=>(
+              <StickyNote 
+                key={noteData.id} 
+                title={noteData.title} 
+                nominal={noteData.nominal} 
+                bg={index % 2 === 0 ? 'bg-orange-200' : 'bg-green-200'} />
+            ))
+          }
+        </div>
+      </section>
+      <section className="w-full space-y-2">
+        <p className="text-xl font-semibold">Data Bulan {monthName.toUpperCase().slice(0, 1) + monthName.slice(1)}</p>
+        <div className="grid grid-cols-1 gap-7 md:grid-cols-2">
+          {
+            bulanan.map((noteData, index)=>(
+              <StickyNote 
+                key={noteData.id} 
+                title={noteData.title} 
+                nominal={noteData.nominal} 
+                bg={index % 2 === 0 ? 'bg-blue-200' : 'bg-violet-200'} />
+            ))
+          }
+        </div>
       </section>
     </div>
     </>

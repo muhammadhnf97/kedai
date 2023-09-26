@@ -39,8 +39,8 @@ export async function POST(req) {
 
         const dateCreated = new Date 
 
-        const PostQuery = `INSERT INTO konsumen (idKonsumen, nmKonsumen, noTelp, alamat, dateCreated) VALUES (?, ?, ?, ?, ?)`
-        const values = [newID, nmKonsumen, noTelp, alamat, dateCreated]
+        const PostQuery = `INSERT INTO konsumen (idKonsumen, nmKonsumen, noTelp, alamat, deposit, dateCreated) VALUES (?, ?, ?, ?, ?, ?)`
+        const values = [newID, nmKonsumen, noTelp, alamat, 0, dateCreated]
         await dbConnect(PostQuery, values)
 
         return NextResponse.json({

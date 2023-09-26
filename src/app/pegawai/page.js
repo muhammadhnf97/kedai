@@ -4,7 +4,7 @@ import AddItem from '../components/AddItem'
 import Search from '../components/Search'
 import TableWithAction from '../components/TableWithAction'
 import Loading from '../components/Loading'
-import Notification from '../components/Notification'
+import Verification from '../components/Verification'
 import EditForm from '../components/EditForm'
 import TableWithoutAction from '../components/TableWithoutAction'
 import { fieldPegawai } from '../utils/tableName'
@@ -270,7 +270,7 @@ const Home = () => {
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
-      <Notification 
+      <Verification 
         alertTitle={isNotif.alertTitle} 
         desc={isNotif.desc} 
         handleClickResponseNotif={handleClickResponseNotif} 

@@ -7,12 +7,11 @@ export async function POST(req) {
     const cookieStore = cookies()
 
     try {
-        if(cookieStore.get('auth') && cookieStore.get('jabatan')){
+        if(cookieStore.get('alreadyLogin') && cookieStore.get('jabatan')){
             await dbConnect(`DELETE FROM session WHERE sessionId = ${loginData.sessionId}`)
-            cookieStore.delete('auth')
+            cookieStore.delete('alreadyLogin')
             cookieStore.delete('jabatan')
-            cookieStore.delete('userId')
-            cookieStore.delete('sessionId')
+            cookieStore.delete('email')
             
             return NextResponse.json({
                 status: 200,

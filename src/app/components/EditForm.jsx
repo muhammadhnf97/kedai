@@ -21,7 +21,7 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
     console.log(listKategori)
   return (
     <form onSubmit={(e)=>handleSubmitEdit(e, 'edit')}>
-        <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-20'>
+        <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-30'>
             <div className='w-fit h-fit bg-white rounded-lg shadow-md px-10 space-y-2 py-5'>
                 <div className='flex justify-between text-lg'>
                     <p className='font-semibold text-center'>Edit {page}</p>

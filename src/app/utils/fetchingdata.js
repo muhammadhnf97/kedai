@@ -213,7 +213,7 @@ export const updateUser = async(tempData) => {
 
 export const loginAuth = async(user) => {
   try {
-    const response = await fetch('/api/auth', {
+    const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
             "Content-Type": "application/json"

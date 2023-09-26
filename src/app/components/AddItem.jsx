@@ -17,8 +17,8 @@ const AddItem = ({ page, field, inputData, handleChange, handleSubmitInsert, han
                     field?.map(values=>{
                         let inputElement
                         if (values.showOn.includes('add') && values.manualInput === true) {
-                            if (values.type === 'text' || values.type === 'number') {
-                                inputElement = <input type={values.type} name={values.key} value={inputData[values.key]} className='h-8 w-full border border-gray-300 outline-none px-1 duration-150 hover:border-blue-500 focus:border-blue-600 rounded-sm md:flex-1' disabled={disable} onChange={(e)=>handleChange(e, 'add')}  />
+                            if (values.type === 'text' || values.type === 'number' || values.type === 'currency') {
+                                inputElement = <input autoComplete='off' type={values.type} name={values.key} value={inputData[values.key]} className='h-8 w-full border border-gray-300 outline-none px-1 duration-150 hover:border-blue-500 focus:border-blue-600 rounded-sm md:flex-1' disabled={disable} onChange={(e)=>handleChange(e, 'add')}  />
                             } else if (values.type === 'select') {
                                 let options
                                 if (values.label.toLowerCase() === 'kategori') {
@@ -31,7 +31,7 @@ const AddItem = ({ page, field, inputData, handleChange, handleSubmitInsert, han
                                     ))
                                 }
                                 inputElement = 
-                                <select name={values.key}  value={inputData[values.key]} className='h-8 w-full border border-gray-300 outline-none px-1 duration-150 hover:border-blue-500 focus:border-blue-600 md:flex-1' disabled={disable} onChange={(e)=>handleChange(e, 'add')}>
+                                <select name={values.key} value={inputData[values.key]} className='h-8 w-full border border-gray-300 outline-none px-1 duration-150 hover:border-blue-500 focus:border-blue-600 md:flex-1' disabled={disable} onChange={(e)=>handleChange(e, 'add')}>
                                     <option>-- select --</option>
                                     {options}
                                 </select>

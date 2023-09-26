@@ -9,16 +9,18 @@ import { loginAuth } from '../utils/fetchingdata'
 
 const Home = () => {
 
+    const { handleClickSaveLoginData } = useLogin()
     const [disableElement, setDisableElement] = useState(false)
-
     const [isLoading, setIsLoading] = useState(false)
     const router = useRouter()
-    const { handleClickSaveLoginData } = useLogin()
-
     const [isNotif, setIsNotif] = useState({
         showNotif: false,
         desc: null
-      })
+    })
+    const [user, setUser] = useState({
+        email: '',
+        password: ''
+    })
   
       const makeNotif = (showNotif = false, desc = null) => {
           setIsNotif(prev=>{
@@ -36,12 +38,6 @@ const Home = () => {
         })
     }
 
-
-    const [user, setUser] = useState({
-        email: '',
-        password: ''
-    })
-
     const handleChangeUser = (e) => {
         const {name, value} = e.target
         setUser(prev=>{
@@ -51,6 +47,7 @@ const Home = () => {
             }
         })
     }
+    
     const handleSubmitAuth = async(e) => {
         e.preventDefault()
         if(user.email.length < 1 || user.password.length < 1){
@@ -62,18 +59,23 @@ const Home = () => {
 
         loginAuth(user).then(values=>{
             if(values.data.status === 200){
-                const { userId, sessionId, email, nmPegawai, jabatan, token } = values.data.data
-                handleClickSaveLoginData( userId, sessionId, email, nmPegawai, jabatan, token )
+                const { userId, sessionId, email, nmPegawai, jabatan, token, idPegawai } = values.data.data
+                handleClickSaveLoginData( userId, sessionId, email, nmPegawai, jabatan, token, idPegawai )
                 localStorage.setItem("auth", JSON.stringify({ data: {
+                    sessionId : sessionId,
                     nmPegawai: nmPegawai,
-                    jabatan : jabatan
+                    idPegawai: idPegawai,
+                    email: email,
+                    jabatan : jabatan,
+                    token : token,
+                    userId: userId
                 }}))
                 router.push('/')
             } else {
                 setDisableElement(false)
                 makeNotif(true, values.data.message)
+                setIsLoading(false)
             }
-            setIsLoading(false)
         })
     }
 

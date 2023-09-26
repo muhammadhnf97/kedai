@@ -8,6 +8,7 @@ export const useLogin = () => useContext(LoginContext)
 export const LoginProvider = ({ children }) => {
     const [loginData, setLoginData] = useState({
         userId: '',
+        idPegawai: '',
         sessionId: '',
         email: '',
         nmPegawai: '',
@@ -24,6 +25,7 @@ export const LoginProvider = ({ children }) => {
             setLoginData({
                 userId: storage?.data?.userId,
                 sessionId: storage?.data?.sessionId,
+                idPegawai: storage?.data?.idPegawai,
                 email: storage?.data?.email,
                 nmPegawai: storage?.data?.nmPegawai,
                 jabatan: storage?.data?.jabatan,
@@ -32,14 +34,9 @@ export const LoginProvider = ({ children }) => {
         }
     }, [])
 
-    const handleClickSaveLoginData = ( userId, sessionId, email, nmPegawai, jabatan, token ) => {
+    const handleClickSaveLoginData = ( userId, sessionId, email, nmPegawai, jabatan, token, idPegawai ) => {
         setLoginData({
-            userId,
-            sessionId,
-            email,
-            nmPegawai,
-            jabatan,
-            token
+            userId, sessionId, email, nmPegawai, jabatan, token, idPegawai
         })
     }
     return (

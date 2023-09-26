@@ -8,7 +8,7 @@ export async function GET(req) {
 
     try {
         const query = 
-        `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.modalBeli, barang.hargaJual, barang.idSatuan, satuan.namaSatuan, kategori.idKategori, kategori.nmKategori 
+        `SELECT barang.idBarang, barang.namaBarang, barang.stok, barang.hargaSatuan, barang.hargaJual, barang.idSatuan, satuan.namaSatuan, kategori.idKategori, kategori.nmKategori 
         FROM barang 
         INNER JOIN kategori ON barang.idKategori = kategori.idKategori 
         INNER JOIN satuan ON barang.idSatuan = satuan.idSatuan ORDER BY barang.dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`
@@ -29,7 +29,7 @@ export async function GET(req) {
 
 export async function POST(req) {
     const { insertData } = await req.json()
-    const { namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori } = insertData
+    const { namaBarang, stok, hargaSatuan, hargaJual, idSatuan, idKategori } = insertData
 
     try {
         const lastIdQuery = `SELECT barang.idBarang FROM barang WHERE idKategori = ${parseInt(idKategori)}`
@@ -46,16 +46,41 @@ export async function POST(req) {
         const listNamaSatuan = await dbConnect(`SELECT namaSatuan FROM satuan WHERE idSatuan = ${idSatuan}`)
         const namaSatuan = listNamaSatuan[0].namaSatuan
 
-        await dbConnect(`INSERT INTO barang (idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`, [newID, namaBarang, stok, modalBeli,hargaJual, idSatuan, idKategori, dateCreated])
+        
+        await dbConnect(`INSERT INTO barang (idBarang, namaBarang, stok, hargaSatuan, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [newID, namaBarang, stok, hargaSatuan, hargaSatuan, hargaJual, idSatuan, idKategori, dateCreated])
+        
+        const cekSatuan = await dbConnect('SELECT * FROM satuan WHERE idSatuan = ?', [idSatuan])
 
-        const newTotalAset = hargaJual * stok
+        let newIdBarang
+        let namaTurunan
+        const stokTurunan = 0 
+        const hargaSatuanTurunan = 0 
+        const hargaJualTurunan = 0
+        
+        if (cekSatuan[0].namaSatuan !== cekSatuan[0].turunan) {
+
+            namaTurunan = cekSatuan[0].turunan
+            const getTurunanId = await dbConnect('SELECT * FROM satuan WHERE namaSatuan = ?', [namaTurunan])
+            const turunanId = getTurunanId[0].idSatuan
+            
+            
+            const nextIDBarang = maxID + 1
+            newIdBarang = '9999' + idKategori.toString().padStart(3, '0') + nextIDBarang.toString().padStart(3, '0') 
+            
+            await dbConnect(`INSERT INTO barang (idBarang, namaBarang, stok, hargaSatuan, modalBeli, hargaJual, idSatuan, idKategori, dateCreated) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`, [newIdBarang, namaBarang, stokTurunan, hargaSatuanTurunan, hargaSatuanTurunan, hargaJualTurunan, turunanId, idKategori, dateCreated])
+
+        }
 
         return NextResponse.json({
             status: 200,
             idBarang: newID,
+            newIdBarang: newIdBarang,
             nmKategori,
             namaSatuan,
-            newTotalAset,
+            namaTurunan,
+            stokTurunan,
+            hargaSatuanTurunan,
+            hargaJualTurunan,
             message: "Data berhasil disimpan"
         })
     } catch (error) {
@@ -89,24 +114,21 @@ export async function DELETE(req) {
 
 export async function PUT(req){
     const { tempData } = await req.json()
-    const {idBarang, namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori} = tempData
+    const {idBarang, namaBarang, stok, hargaSatuan, hargaJual, idSatuan, idKategori} = tempData
     
     try {
         const listNamaKategori = await dbConnect(`SELECT * FROM kategori WHERE idKategori = ?`, [idKategori])
         const nmKategori = listNamaKategori[0]?.nmKategori
         const listNamaSatuan = await dbConnect(`SELECT * FROM satuan WHERE idSatuan = ?`, [idSatuan])
         const namaSatuan = listNamaSatuan[0]?.namaSatuan
-        const getBarang = await dbConnect(`SELECT barang.stok, barang.hargaJual FROM barang WHERE idBarang = ?`, [idBarang])
 
-        const oldAsset = getBarang[0]?.stok * getBarang[0]?.hargaJual
-        const newAsset = stok * hargaJual
-
-        await dbConnect('UPDATE barang SET namaBarang = ?, stok = ?, modalBeli = ?, hargaJual = ?, idSatuan = ?, idKategori = ? WHERE idBarang = ?', [namaBarang, stok, modalBeli, hargaJual, idSatuan, idKategori, idBarang])
+        await dbConnect('UPDATE barang SET namaBarang = ?, stok = ?, hargaSatuan = ?, hargaJual = ?, idSatuan = ?, idKategori = ? WHERE idBarang = ?', 
+        [namaBarang, stok, hargaSatuan, hargaJual, idSatuan, idKategori, idBarang])
 
         return NextResponse.json({
             status: 200,
             message: "Data berhasil diubah",
-            namaSatuan, nmKategori, oldAsset, newAsset
+            namaSatuan, nmKategori
         })
     } catch (error) {
         console.error("Gagal mengupdate data", error)

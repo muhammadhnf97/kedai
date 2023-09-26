@@ -1,7 +1,7 @@
 'use client'
 import React, { useEffect, useState } from 'react'
 import Loading from '../components/Loading'
-import Notification from '../components/Notification'
+import Verification from '../components/Verification'
 import AddItem from '../components/AddItem'
 import EditForm from '../components/EditForm'
 import Search from '../components/Search'
@@ -246,7 +246,7 @@ const Home = () => {
     { isLoading && <Loading /> }
     {
       isNotif.showNotif &&
-      <Notification 
+      <Verification 
         alertTitle={isNotif.alertTitle} 
         desc={isNotif.desc} 
         handleClickResponseNotif={handleClickResponseNotif} 

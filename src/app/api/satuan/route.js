@@ -7,7 +7,7 @@ export async function GET(req) {
     const offsed = (page - 1) * itemsPerPage
 
     try {
-        const query = `SELECT idSatuan, namaSatuan FROM satuan ORDER BY dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`
+        const query = `SELECT idSatuan, namaSatuan, turunan FROM satuan ORDER BY dateCreated DESC LIMIT ${itemsPerPage} OFFSET ${offsed}`
         const data = await dbConnect(query);
 
         return NextResponse.json({
@@ -25,14 +25,25 @@ export async function GET(req) {
 
 export async function POST(req) {
     const { insertData } = await req.json()
-    const { namaSatuan } = insertData
+    const { namaSatuan, turunan } = insertData
     
     try {
         const querySatuan = await dbConnect('SELECT idSatuan FROM satuan')
         const satuan = querySatuan.map(kat=>kat.idSatuan)
         const newID = satuan.length > 0 ? Math.max(...satuan) + 1 : 1
 
-        await dbConnect(`INSERT INTO satuan ( idSatuan, namaSatuan ) VALUES (?, ?)`, [newID, namaSatuan])
+        if (!turunan) {
+            await dbConnect(`INSERT INTO satuan ( idSatuan, namaSatuan, turunan ) VALUES (?, ?, ?)`, [newID, namaSatuan, namaSatuan])
+        } else {
+            await dbConnect(`INSERT INTO satuan ( idSatuan, namaSatuan, turunan ) VALUES (?, ?, ?)`, [newID, namaSatuan, turunan])
+            
+            const cekTurunan = await dbConnect('SELECT * FROM satuan WHERE namaSatuan = ?', [turunan])
+            console.log(cekTurunan)
+
+            if (cekTurunan.length < 1) {
+                await dbConnect(`INSERT INTO satuan ( idSatuan, namaSatuan, turunan ) VALUES (?, ?, ?)`, [newID + 1, turunan, turunan])
+            }
+        }
 
         return NextResponse.json({
             status: 200,
