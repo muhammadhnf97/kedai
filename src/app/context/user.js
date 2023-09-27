@@ -6,7 +6,6 @@ export const useUser = () => useContext(UserContext)
 
 export const UserProvider = ({ children }) => {
     const [userCreated, setUserCreated] = useState([])
-    console.log()
 
     const handleClickUserCreated = (idPegawai) => {
         setUserCreated(prevValue=>{
@@ -30,7 +29,7 @@ export const UserProvider = ({ children }) => {
             const data = await response.json()
             setUserCreated(data.data)
           } catch (error) {
-            console.log(error)
+            console.error(error)
           }
         }
         cekAccount()

@@ -16,7 +16,7 @@ export async function POST (req) {
         console.error('Terjadi kesalahan : ', error)
         return NextResponse.json({
             status: 404,
-            message: "Data tidak ditemukan"
+            message: "Gagal melakukan authentication"
         })
     }
 }

@@ -18,7 +18,6 @@ const EditForm = ({ page, listField, initalValue, handleClickCloseEditForm, hand
     const newField = listField.filter(value=>{
         return value.showOn.includes('edit')
     })
-    console.log(listKategori)
   return (
     <form onSubmit={(e)=>handleSubmitEdit(e, 'edit')}>
         <div className='fixed h-full w-full bg-black bg-opacity-80 top-0 flex items-center justify-center z-30'>

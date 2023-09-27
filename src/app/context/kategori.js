@@ -13,10 +13,7 @@ export default function KategoriProvider({ children }){
                 const data = await response.json()
                 return data.data
             } catch (error) {
-                console.log({
-                    message: "Terjadi kesalahan masbro",
-                    error
-                })
+                console.error('Gagal mengambil data kategori : ', error)
             }
         }
         

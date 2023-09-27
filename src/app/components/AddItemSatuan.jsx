@@ -1,7 +1,6 @@
 import React from 'react'
 
 const AddItemSatuan = ({ insertData, field, handleChange, turunan, handleClickTurunan, handleSubmit, handleReset }) => {
-    console.log(turunan)
   return (
     <div className='w-full'>
         <div className='bg-white rounded-lg shadow-md shadow-gray-300 border border-gray-300 p-3'>

@@ -13,10 +13,7 @@ export default function SupplierProvider({ children }){
                 const data = await response.json()
                 return data.data
             } catch (error) {
-                console.log({
-                    message: "Tidak bisa fetching data",
-                    error
-                })
+                console.error('Gagal mengambil data supplier', error)
             }
         }
         

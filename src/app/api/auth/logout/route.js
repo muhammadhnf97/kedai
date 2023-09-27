@@ -27,29 +27,4 @@ export async function POST(req) {
         })
         
     }
-    
-
-    // try {
-    //     if(cookiesStorage.has('auth') && cookiesStorage.has('jabatan')){
-    //         await dbConnect(`DELETE FROM session WHERE sessionId = ${sessionId}`)
-    //         cookiesStorage.delete('auth')
-    //         cookiesStorage.delete('jabatan')
-
-    //         return NextResponse.json({
-    //             status: 200,
-    //             message: 'Telah logout'
-    //         })
-    //     } else {
-    //         return NextResponse.json({
-    //             status: 401,
-    //             message: 'Gagal logout'
-    //         })
-    //     }
-    // } catch (error) {
-    //     return NextResponse.json({
-    //         status: 500,
-    //         message: "Gagal terhubung ke server"
-    //     })
-    // }
-
 }

@@ -29,28 +29,4 @@ export async function PUT (req) {
             message: `${firstBarang[0].namaBarang} telah dikonversi`
         })
     }
-
-    
-
-    
-
-    // try {
-    //     const newStok = stok - 1
-    //     // await dbConnect('UPDATE barang SET stok = ? where idBarang = ?', [newStok, idBarang])
-
-    //     const newStokBarang = stokBarang + stokKonversi
-    //     // await dbConnect('UPDATE barang SET stok = ? where idBarang = ?', [newStokBarang, idKonversi])
-
-    //     return NextResponse.json({
-    //         status: 200,
-    //         message: 'Punten masbro',
-    //         idBarang, idBarangKonversi, stokKonversi
-    //     })
-    // } catch (error) {
-    //     console.error('Ada kesalahan :', error)
-    //     return NextResponse.json({
-    //         status: 501,
-    //         message: 'Ada kesalahan saat mengirim ke database'
-    //     })
-    // }
 }

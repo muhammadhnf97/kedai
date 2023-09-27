@@ -46,13 +46,13 @@ export async function POST(req) {
         return NextResponse.json({
             status: 200,
             idKonsumen: newID,
-            message: "Data berhasil disimpan",
+            message: "Konsumen berhasil disimpan",
         })
     } catch (error) {
-        console.log("Gagal menyimpan data", error)
+        console.error("Gagal menyimpan data konsumen", error)
         return NextResponse.json({
             status: 500,
-            message: "Gagal menyimpan data"
+            message: "Gagal menyimpan data konsumen"
         })
     }
 }

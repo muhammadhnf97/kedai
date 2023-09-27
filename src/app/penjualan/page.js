@@ -6,6 +6,7 @@ import { FcLock } from 'react-icons/fc'
 import { RxCross1 } from 'react-icons/rx'
 import { useLogin } from '../context/login'
 import Notification from '../components/Notification'
+import { useDebounce } from 'use-debounce'
 
 const page = () => {
   const { loginData } = useLogin()
@@ -40,6 +41,8 @@ const page = () => {
     getAllKonsumen()
   }, [])
 
+  const [debounceText] = useDebounce(keyword, 5000)
+
   useEffect(()=>{
     const getBarang = async () => {
       const response = await fetch (`/api/barang/getbyname?keyword=${keyword}`)
@@ -56,7 +59,7 @@ const page = () => {
       getBarang()
     }
 
-  }, [keyword])
+  }, [debounceText])
 
   const handleChange = (e, action) => {
     const { name, value } = e.target
@@ -187,12 +190,10 @@ const page = () => {
       })()
     }
   }
-
-  console.log(loginData?.idPegawai, konsumen, listTempBarang)
   
   return (
     <>
-    {<Notification
+    {notif.showNotif && <Notification
       notif={notif}
       handleNotif={handleNotif} />}
     {isLoading && <Loading />}

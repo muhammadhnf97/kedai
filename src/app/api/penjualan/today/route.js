@@ -34,7 +34,7 @@ export async function GET () {
                 totalPenjualanKredit
             })
         } else {
-            console.log('Data tidak ditemukan')
+            console.log('Data penjualan hari ini tidak dapat didapatkan')
             return NextResponse.json({
                 status: 404,
                 newDate

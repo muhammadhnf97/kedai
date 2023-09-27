@@ -84,7 +84,7 @@ export async function POST(req) {
             message: "Data berhasil disimpan"
         })
     } catch (error) {
-        console.log("Gagal menyimpan data", error)
+        console.error("Gagal menyimpan data", error)
         return NextResponse.json({
             status: 500,
             message: "Gagal menyimpan data"

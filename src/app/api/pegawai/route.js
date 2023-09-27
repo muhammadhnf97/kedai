@@ -52,10 +52,10 @@ export async function POST(req) {
             message: "Data berhasil disimpan",
         })
     } catch (error) {
-        console.log("Gagal menyimpan data", error)
+        console.error("Gagal menyimpan data pegawai", error)
         return NextResponse.json({
             status: 500,
-            message: "Gagal menyimpan data"
+            message: "Gagal menyimpan data pegawai"
         })
     }
 }
@@ -92,10 +92,10 @@ export async function PUT(req){
             message: "Berhasil mengubah data "
         })
     } catch (error) {
-        console.error("Gagal mengupdate data", error)
+        console.error("Gagal mengupdate data pegawai", error)
         return NextResponse.json({
             status: 500,
-            message: "Gagal mengupdate data"
+            message: "Gagal mengupdate data pegawai"
         })
     }
 }

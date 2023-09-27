@@ -22,10 +22,10 @@ export async function GET () {
             totalAsetBersih
         }) 
     } catch (error) {
-        console.log(error)
+        console.error('Gagal mendapatkan total aset bersih', error)
         return NextResponse.json({
             status: 500,
-            message: 'Gagal mengambil data'
+            message: 'Gagal mendapatkan total aset bersih'
         }) 
     }
 }

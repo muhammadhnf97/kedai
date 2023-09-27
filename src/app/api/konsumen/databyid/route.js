@@ -19,10 +19,10 @@ export async function GET(req){
             })
         }
     } catch (error) {
-        console.error("Error while fetching konsumen data:", error);
+        console.error("Gagal mendapatkan data konsumen : ", error);
         return NextResponse.json({
             status: 500,
-            message: "Terjadi kesalahan saat mengambil data konsumen"
+            message: "Gagal mendapatkan data konsumen : "
         });
     }
 } 

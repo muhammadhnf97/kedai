@@ -12,7 +12,7 @@ const dbConnect = async(query, values=[]) => {
         connect.end()
         return results
     } catch (error) {
-        console.log(error)
+        console.error('Gagal menghubungkan ke database :', error)
     }
 }
 
