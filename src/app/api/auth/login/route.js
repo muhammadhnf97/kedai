@@ -7,76 +7,162 @@ import { NextResponse } from "next/server";
 export async function POST (req) {
     const { user } = await req.json()
     const { email, password } = user
+    
+    const dataUser = await dbConnect(`SELECT userId, password, status FROM user WHERE email = ?`, [email])
 
     try {
-        const dataUser = await dbConnect(`SELECT userId, password, status FROM user WHERE email = ?`, [email])
-        const isCorrect = await bcrypt.compare(password, dataUser[0].password)
-        const UID = dataUser[0].userId
-        const status = dataUser[0].status
+        if (dataUser.length > 0) {
+            const isCorrect = await bcrypt.compare(password, dataUser[0].password)
+            const UID = dataUser[0].userId
+            const status = dataUser[0].status
+
+            if (isCorrect && status === 'active') {
+                const secretKey = 'iwannaberichman'
+                const payload = {userId: UID}
+                const token = jwt.sign(payload, secretKey, { expiresIn: '1d'})
+
+                //CURRENT DATE DAN EXPIREDDATE
+                const currentDate = new Date
+                const oneDayFromNow = new Date(currentDate)
+                oneDayFromNow.setDate(currentDate.getDate() + 1)
+                const expiredDate = oneDayFromNow.toISOString()
+
+                //NEW ID
+                const totalSession = await dbConnect('SELECT sessionId FROM session')
+                const SID = totalSession.map(values=>values.sessionId)
+                const sessionId = SID.length > 0 ? Math.max(...SID) + 1 : 1
+
+                const getUser = await dbConnect(`SELECT user.userId, user.jabatan, pegawai.idPegawai, pegawai.nmPegawai, user.email 
+                    FROM user 
+                    INNER JOIN pegawai ON pegawai.idPegawai = user.idPegawai 
+                    WHERE user.email = ?`, [email])
+                const jabatan = getUser[0].jabatan
+                const idPegawai = getUser[0].idPegawai
+                const nmPegawai = getUser[0].nmPegawai
+
+                const cekSession = await dbConnect(`SELECT * FROM session WHERE userId = ?`, [UID])
     
-        if(isCorrect && status === 'active'){
-            //TOKEN
-            const secretKey = 'iwannaberichman'
-            const payload = {userId: UID}
-            const token = jwt.sign(payload, secretKey, { expiresIn: '1d'})
-    
-            //CURRENT DATE DAN EXPIREDDATE
-            const currentDate = new Date
-            const oneDayFromNow = new Date(currentDate)
-            oneDayFromNow.setDate(currentDate.getDate() + 1)
-            const expiredDate = oneDayFromNow.toISOString()
-            
-            //NEW ID
-            const totalSession = await dbConnect('SELECT sessionId FROM session')
-            const SID = totalSession.map(values=>values.sessionId)
-            const sessionId = SID.length > 0 ? Math.max(...SID) + 1 : 1
-            
-            const getUser = await dbConnect('SELECT user.userId, user.jabatan, pegawai.idPegawai, pegawai.nmPegawai, user.email FROM user INNER JOIN pegawai ON pegawai.idPegawai = user.idPegawai WHERE user.email = ?', [email])
-            const jabatan = getUser[0].jabatan
-            const idPegawai = getUser[0].idPegawai
-            const nmPegawai = getUser[0].nmPegawai
+                if (cekSession.length > 0) {
+                    await dbConnect('UPDATE session SET token = ?, dateCreated = ?, dateExpired = ? WHERE userId = ?', [token, currentDate, expiredDate, UID])
+                } else {
+                    await dbConnect("INSERT INTO session (sessionId, userId, token, dateCreated, dateExpired) VALUES (?, ?, ?, ?, ?)", [sessionId, UID, token, currentDate, expiredDate])
+                }
+                const oneDay = 24 * 60 * 60 * 1000
+                
+                cookies().set('alreadyLogin', true, { expires: Date.now() + oneDay})
+                cookies().set('email', email, { expires: Date.now() + oneDay})
+                cookies().set('jabatan', jabatan, { expires: Date.now() + oneDay})
 
-            const cekSession = await dbConnect(`SELECT * FROM session WHERE userId = ?`, [UID])
-
-            if (cekSession.length > 0) {
-                await dbConnect('UPDATE session SET token = ?, dateCreated = ?, dateExpired = ? WHERE userId = ?', [token, currentDate, expiredDate, UID])
-
+                return NextResponse.json({
+                    status: 200,
+                    data: {
+                        sessionId,
+                        userId: UID,
+                        idPegawai,
+                        nmPegawai,
+                        jabatan,
+                        token,
+                        email,
+                    },
+                    message: "Login berhasil"
+                })
             } else {
-                await dbConnect("INSERT INTO session (sessionId, userId, token, dateCreated, dateExpired) VALUES (?, ?, ?, ?, ?)", [sessionId, UID, token, currentDate, expiredDate])
-        
-            }
+                return NextResponse.json({
+                    status: 401,
+                    message: "Password salah"
 
-            const oneDay = 24 * 60 * 60 * 1000
-            
-            cookies().set('alreadyLogin', true, { expires: Date.now() + oneDay})
-            cookies().set('email', email, { expires: Date.now() + oneDay})
-            cookies().set('jabatan', jabatan, { expires: Date.now() + oneDay})
-    
-            return NextResponse.json({
-                status: 200,
-                data: {
-                    sessionId,
-                    userId: UID,
-                    idPegawai,
-                    nmPegawai,
-                    jabatan,
-                    token,
-                    email,
-                },
-                message: "Login berhasil"
-            })
+                })
+            }
         } else {
             return NextResponse.json({
                 status: 401,
-                message: "Email atau Password salah" 
+                message: "Email tidak ditemukan"
             })
         }
-        
     } catch (error) {
+        console.error("Tidak dapat menyambungkan ke server : ", error)
         return NextResponse.json({
             status: 500,
-            message: 'Tidak dapat terhubung ke server. Ada kesalahan'
+            message: "Tidak dapat menyambungkan ke server : "
         })
+        
     }
 
+    // return NextResponse.json({
+    //     status: 200,
+    //     email, password, dataUser
+    // })
+
+    // const dataUser = await dbConnect(`SELECT userId, password, status FROM user WHERE email = ?`, [email])
+    // const isCorrect = await bcrypt.compare(password, dataUser[0].password)
+    // const UID = dataUser[0].userId
+    // const status = dataUser[0].status
+    // try {
+    
+    //     if(isCorrect && status === 'active'){
+    //         //TOKEN
+    //         const secretKey = 'iwannaberichman'
+    //         const payload = {userId: UID}
+    //         const token = jwt.sign(payload, secretKey, { expiresIn: '1d'})
+    
+    //         //CURRENT DATE DAN EXPIREDDATE
+    //         const currentDate = new Date
+    //         const oneDayFromNow = new Date(currentDate)
+    //         oneDayFromNow.setDate(currentDate.getDate() + 1)
+    //         const expiredDate = oneDayFromNow.toISOString()
+            
+    //         //NEW ID
+    //         const totalSession = await dbConnect('SELECT sessionId FROM session')
+    //         const SID = totalSession.map(values=>values.sessionId)
+    //         const sessionId = SID.length > 0 ? Math.max(...SID) + 1 : 1
+            
+    //         const getUser = await dbConnect('SELECT user.userId, user.jabatan, pegawai.idPegawai, pegawai.nmPegawai, user.email FROM user INNER JOIN pegawai ON pegawai.idPegawai = user.idPegawai WHERE user.email = ?', [email])
+    //         const jabatan = getUser[0].jabatan
+    //         const idPegawai = getUser[0].idPegawai
+    //         const nmPegawai = getUser[0].nmPegawai
+
+    //         const cekSession = await dbConnect(`SELECT * FROM session WHERE userId = ?`, [UID])
+
+    //         if (cekSession.length > 0) {
+    //             await dbConnect('UPDATE session SET token = ?, dateCreated = ?, dateExpired = ? WHERE userId = ?', [token, currentDate, expiredDate, UID])
+
+    //         } else {
+    //             await dbConnect("INSERT INTO session (sessionId, userId, token, dateCreated, dateExpired) VALUES (?, ?, ?, ?, ?)", [sessionId, UID, token, currentDate, expiredDate])
+        
+    //         }
+
+    //         const oneDay = 24 * 60 * 60 * 1000
+            
+    //         cookies().set('alreadyLogin', true, { expires: Date.now() + oneDay})
+    //         cookies().set('email', email, { expires: Date.now() + oneDay})
+    //         cookies().set('jabatan', jabatan, { expires: Date.now() + oneDay})
+    
+    //         return NextResponse.json({
+    //             status: 200,
+    //             data: {
+    //                 sessionId,
+    //                 userId: UID,
+    //                 idPegawai,
+    //                 nmPegawai,
+    //                 jabatan,
+    //                 token,
+    //                 email,
+    //             },
+    //             message: "Login berhasil"
+    //         })
+    //     } else {
+    //         return NextResponse.json({
+    //             status: 401,
+    //             message: "Email atau Password salah"
+    //         })
+    //     }
+        
+    // } catch (error) {
+    //     console.error('Ada kesalahan', error)
+    //     return NextResponse.json({
+    //         status: 500,
+    //         message: 'Tidak dapat terhubung ke server. Ada kesalahan',
+    //         dataUser, isCorrect
+    //     })
+    // }
 }

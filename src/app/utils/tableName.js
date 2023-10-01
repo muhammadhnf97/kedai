@@ -496,6 +496,92 @@ export const fieldHutang = [
     }
 ]
 
+export const laporanPenjualan = [
+    {
+        label: 'No Nota',
+        key: 'noNota',
+        type: 'text',
+    },
+    {
+        label: 'Tanggal',
+        key: 'tglJual',
+        type: 'text',
+    },
+    {
+        label: 'Barang',
+        key: 'namaBarang',
+        type: 'text',
+    },
+    {
+        label: 'Satuan',
+        key: 'namaSatuan',
+        type: 'text',
+    },
+    {
+        label: 'Harga Jual',
+        key: 'hargaJual',
+        type: 'currency',
+    },
+    {
+        label: 'Jumlah',
+        key: 'jumlah',
+        type: 'number',
+    },
+    {
+        label: 'Total',
+        key: 'total',
+        type: 'currency',
+    },
+    {
+        label: 'Status',
+        key: 'status',
+        type: 'text',
+    },
+]
+
+export const laporanPembelian = [
+    {
+        label: 'Faktur',
+        key: 'noFaktur',
+        type: 'text',
+    },
+    {
+        label: 'Tanggal',
+        key: 'tglBeli',
+        type: 'text',
+    },
+    {
+        label: 'Barang',
+        key: 'namaBarang',
+        type: 'text',
+    },
+    {
+        label: 'Satuan',
+        key: 'namaSatuan',
+        type: 'text',
+    },
+    {
+        label: 'Harga Beli',
+        key: 'hargaBeli',
+        type: 'currency',
+    },
+    {
+        label: 'Total',
+        key: 'totalHarga',
+        type: 'number',
+    },
+    {
+        label: 'Total',
+        key: 'total',
+        type: 'currency',
+    },
+    {
+        label: 'Status',
+        key: 'status',
+        type: 'text',
+    },
+]
+
 export const menu = [{
     id: 'home',
     label: 'Home',

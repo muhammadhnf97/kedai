@@ -7,6 +7,7 @@ import { LoginProvider } from './login'
 import { UserProvider } from './user'
 import SupplierProvider from './supplier'
 import { PenjualanProvider } from './penjualan'
+import { NotificationProvider } from './notification'
 
 const Providers = ({ children }) => {
   return (
@@ -17,7 +18,9 @@ const Providers = ({ children }) => {
             <UserProvider>
               <SupplierProvider>
                 <PenjualanProvider>
+                  <NotificationProvider>
              {children}
+                  </NotificationProvider>
                 </PenjualanProvider>
              </SupplierProvider>
             </UserProvider>
