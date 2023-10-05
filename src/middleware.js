@@ -1,25 +1,6 @@
 import { NextResponse } from 'next/server'
  
 export async function middleware(request) {
-   // const login = request.cookies.get('auth')
-   // const jabatan = request.cookies.get('jabatan')
-   // const getUrl = new URL(request.url).pathname
-
-   // if (login && jabatan) {
-   //    if (jabatan?.value === 'pegawai') {
-   //       if(getUrl?.toString() === '/pegawai' || getUrl?.toString() === '/user'){
-   //          return NextResponse.redirect(new URL('/login', request.url))
-   //       } else {
-   //          return NextResponse.next()
-   //       }
-   //    } else {
-   //       return NextResponse.next()
-   //    }
-   // } else {
-   //    return NextResponse.redirect(new URL('/login', request.url))
-   // }  
-
-
    const alreadyLogin = request.cookies.get('alreadyLogin')
    const cookieEmail = request.cookies.get('email')
    const currentUrl = new URL(request.url).pathname

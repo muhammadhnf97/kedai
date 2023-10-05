@@ -36,6 +36,7 @@ const Home = () => {
         }
         try {
             loginAuth(user).then(values=>{
+                console.log(values)
                 status = values.data.status
                 if (values.data.status === 200) {
                     const { userId, sessionId, email, nmPegawai, jabatan, token, idPegawai } = values.data.data
@@ -56,27 +57,6 @@ const Home = () => {
             setUser({})
             
         }
-        // loginAuth(user).then(values=>{
-        //     console.log(values)
-        //     if(values.data.status === 200){
-        //         const { userId, sessionId, email, nmPegawai, jabatan, token, idPegawai } = values.data.data
-        //         handleClickSaveLoginData( userId, sessionId, email, nmPegawai, jabatan, token, idPegawai )
-        //         localStorage.setItem("auth", JSON.stringify({ data: {
-        //             sessionId : sessionId,
-        //             nmPegawai: nmPegawai,
-        //             idPegawai: idPegawai,
-        //             email: email,
-        //             jabatan : jabatan,
-        //             token : token,
-        //             userId: userId
-        //         }}))
-        //         router.push('/')
-        //     } else {
-        //         setfalse(false)
-        //         makeNotif(true, values.data.message)
-        //         setIsLoading(false)
-        //     }
-        // })
     }
 
   return (

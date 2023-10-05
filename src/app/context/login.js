@@ -23,13 +23,13 @@ export const LoginProvider = ({ children }) => {
             const storage = JSON.parse(cekLocalStorage)
 
             setLoginData({
-                userId: storage?.data?.userId,
-                sessionId: storage?.data?.sessionId,
-                idPegawai: storage?.data?.idPegawai,
-                email: storage?.data?.email,
-                nmPegawai: storage?.data?.nmPegawai,
-                jabatan: storage?.data?.jabatan,
-                token: storage?.data?.token
+                userId: storage?.userId,
+                sessionId: storage?.sessionId,
+                idPegawai: storage?.idPegawai,
+                email: storage?.email,
+                nmPegawai: storage?.nmPegawai,
+                jabatan: storage?.jabatan,
+                token: storage?.token
             })
         }
     }, [])

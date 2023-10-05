@@ -11,7 +11,7 @@ import { useUser } from '../context/user'
 
 const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, initialField, initialData, totalRow, currentPage, handleClickCurrentPage, showPaggination, handleClickActionFromTable }) => {
 
-    const filteredData = initialData.map(item => {
+    const filteredData = initialData?.map(item => {
         const filteredItem = {};
         initialField.forEach(field => {
           if (field.showOn.includes('view')) {

@@ -33,12 +33,8 @@ const Home = () => {
     useEffect(()=>{
       getTotalAsetBersih()
       getTotalAset()
-    }, [initialData])
-    
-
-    useEffect(()=>{
       getTotalRow(page).then(data=>setTotalRow(data))
-    }, [])
+    }, [initialData])
 
     const [isNotif, setIsNotif] = useState({
       showNotif: false,
@@ -58,11 +54,12 @@ const Home = () => {
 
     useEffect(()=>{
       setIsLoading(true)
-      getInitialData(page, currentPage).then(data=>{
-        setIsLoading(false)
-        setInitialData(data.data)
-      })
+        getInitialData(page, currentPage, loginData.token).then(data=>{
+          setIsLoading(false)
+          setInitialData(data.data)
+        })
     }, [currentPage])
+    console.log(initialData)
 
     const handleClickCurrentPage = (page) => {
         setCurrentPage(page)

@@ -41,7 +41,7 @@ export async function POST (req) {
                 const nmPegawai = getUser[0].nmPegawai
 
                 const cekSession = await dbConnect(`SELECT * FROM session WHERE userId = ?`, [UID])
-    
+                
                 if (cekSession.length > 0) {
                     await dbConnect('UPDATE session SET token = ?, dateCreated = ?, dateExpired = ? WHERE userId = ?', [token, currentDate, expiredDate, UID])
                 } else {
@@ -52,6 +52,8 @@ export async function POST (req) {
                 cookies().set('alreadyLogin', true, { expires: Date.now() + oneDay})
                 cookies().set('email', email, { expires: Date.now() + oneDay})
                 cookies().set('jabatan', jabatan, { expires: Date.now() + oneDay})
+                cookies().set('token', token, { expires: Date.now() + oneDay})
+                cookies().set('sessionId', SID, { expires: Date.now() + oneDay})
 
                 return NextResponse.json({
                     status: 200,

@@ -36,8 +36,7 @@ export async function GET () {
         } else {
             console.log('Data penjualan hari ini tidak dapat didapatkan')
             return NextResponse.json({
-                status: 404,
-                newDate
+                status: 404
             })
         }
     } catch (error) {

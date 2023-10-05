@@ -6,6 +6,7 @@ import { IoIosArrowDown } from 'react-icons/io'
 import { useRouter, usePathname } from 'next/navigation'
 import { useLogin } from '../context/login'
 import { RxCross1 } from 'react-icons/rx'
+import { FaUserEdit } from 'react-icons/fa'
 import { menu } from '../utils/tableName'
 import { logoutAuth } from '../utils/fetchingdata'
 import Loading from './Loading'
@@ -18,9 +19,18 @@ const Header = () => {
     const { nmPegawai, jabatan } = loginData
 
     const renderUsernameAndStatus = (
-        <div className='leading-3'>
+        <div className='leading-3 relative'>
             <h3 className='text-2xl font-bold text-[#293241]'>{nmPegawai}</h3>
             <h3 className='text-sml font-bold text-[#3D5A80]'>{jabatan}</h3>
+            <Link href={'/profile'}>
+                <button 
+                    className='p-2 rounded-full bg-white border 
+                        border-gray-300 absolute -right-12 top-1/2 
+                        -translate-y-1/2 flex items-center justify-center 
+                        hover:bg-blue-100 duration-150'>
+                    <FaUserEdit className='w-5 h-5 text-slate-600' />
+                </button>
+            </Link>
         </div>
     )
 
@@ -47,7 +57,6 @@ const Header = () => {
   return (
     <>
     {isLoading && <Loading />}
-    {}
     <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-30'>
         <div className='max-w-7xl h-full  px-5 mx-auto flex justify-between items-center relative'>
             { renderUsernameAndStatus }
@@ -113,7 +122,7 @@ const Header = () => {
                 className='px-5 bg-orange-400 hover:bg-orange-500 active:bg-orange-600 shadow-sm rounded-full py-1'
                 onClick={handleClickLogout}>Logout</button>
             </div>
-            <ul className='leading-6 px-10 py-2'>
+            <ul className='leading-6 px-10 py-2 grid'>
                 {
                     menu.map(listmenu=>{
                         if (listmenu.jabatan.includes(jabatan)){
@@ -128,14 +137,14 @@ const Header = () => {
                             } else {
                                 return (
                                     <div key={listmenu.id} className='group leading-7 my-2 rounded-lg'>
-                                        <ul className='border-b-2 border-blue-500 bg-white p-1'>
+                                        <ul className='bg-blue-200 rounded-lg grid grid-cols-2 gap-3 p-2'>
                                         {
                                             listmenu.child.map(childmenu=>{
                                                 if (childmenu.jabatan.includes(jabatan)){
                                                     return (
-                                                    <div key={childmenu.id}>
+                                                    <div key={childmenu.id} className=''>
                                                         <Link href={childmenu.pathName}>
-                                                            <li><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
+                                                            <li><p className={` border-white hover:bg-white border-b-2 hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
                                                         </Link>
                                                     </div>
                                                     )

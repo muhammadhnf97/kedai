@@ -4,25 +4,35 @@ export const getTotalRow = async(page) => {
     return data.totalRow
 }
 
-export const getInitialData = async(page, currentPage) => {
+export const getInitialData = async(page, currentPage, token) => {
     try {
-        const response = await fetch(`/api/${page}?page=${currentPage}`)
-        const data = await response.json()
-        if(data.status === 200){
-            return data
-        } else {
-            return {
-                isNotif: true,
-                alertTitle: 'info',
-                desc: 'Gagal mengambil dari database'
-            }
+      const response = await fetch(`/api/${page}?page=${currentPage}`, {
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
         }
-    } catch (error) {
+      })
+      const data = await response.json()
+      
+      if (data.status === 200) {
         return {
-            isNotif: true,
-            alertTitle: 'info',
-            desc: 'Gagal mengambil dari database'
+          data : data.data,
+          paggination: true
         }
+      } else {
+        return {
+          data: [],
+          paggination: false,
+          message: data.message
+        }
+      }
+    } catch (error) {
+      console.error(error)
+      return {
+        data: [],
+        paggination: false,
+        message: "Ada kesalahan saat memanggil barang"
+      }
     }
 }
 
@@ -213,7 +223,7 @@ export const updateUser = async(tempData) => {
 
 export const loginAuth = async(user) => {
   try {
-    const response = await fetch('/api/auth/login', {
+    const response = await fetch(`/api/auth/login`, {
         method: 'POST',
         headers: {
             "Content-Type": "application/json"
