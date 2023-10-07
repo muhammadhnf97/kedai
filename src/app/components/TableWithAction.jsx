@@ -23,10 +23,8 @@ const TableWithAction = ({ page, isShowDetail, detailItem, handleClickDetail, in
 
     let alreadyUser
 
-    if(page.toLowerCase() === 'pegawai'){
-        const user = useUser()
-        alreadyUser = user.userCreated
-    }
+    const user = useUser()
+    alreadyUser = user?.userCreated
 
     //MEMBUAT INDEX PENOMORAN
     const itemsPerRow = 10
