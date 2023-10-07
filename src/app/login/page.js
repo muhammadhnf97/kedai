@@ -36,7 +36,6 @@ const Home = () => {
         }
         try {
             loginAuth(user).then(values=>{
-                console.log(values)
                 status = values.data.status
                 if (values.data.status === 200) {
                     const { userId, sessionId, email, nmPegawai, jabatan, token, idPegawai } = values.data.data

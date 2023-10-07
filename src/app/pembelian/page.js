@@ -214,7 +214,7 @@ const Home = () => {
         </div>
       </section>
     }
-    <div className='max-w-7xl mx-auto space-y-5 px-2 md:px-5'>
+    <div className='max-w-7xl mx-auto space-y-5 px-2 md:px-5 mt-20 py-5'>
       <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col md:flex-row gap-3 md:gap-5'>
         <section className='w-full md:w-96'>

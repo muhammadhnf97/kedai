@@ -57,7 +57,10 @@ const Header = () => {
   return (
     <>
     {isLoading && <Loading />}
-    <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-30'>
+    {
+        currentPathname !== '/login' &&
+        <>
+        <div className='fixed hidden md:block w-full h-20 bg-white shadow-md z-30'>
         <div className='max-w-7xl h-full  px-5 mx-auto flex justify-between items-center relative'>
             { renderUsernameAndStatus }
             <ul className='flex gap-5 justify-center items-center'>
@@ -104,63 +107,65 @@ const Header = () => {
             className='px-5 bg-orange-400 hover:bg-orange-500 active:bg-orange-600 shadow-sm rounded-full py-1'
             onClick={handleClickLogout}>Logout</button>
         </div>
-    </div>
-    <div className='md:hidden fixed w-full h-20 px-5 flex items-center justify-between bg-white shadow-md z-30'>
-        { renderUsernameAndStatus }
-        <button className='flex items-center md:hidden' onClick={handleClickMobileNavbar}>
-            <RiMenu3Fill className='w-7 h-7 ' />
-        </button>
-    </div>
-    <div className={`fixed w-full h-full bg-black bg-opacity-70 z-30 ${showMobileView ? 'visible' : 'invisible'}`}>
-        <div className={`w-full h-fit shadow-md bg-white text-center leading-7 relative`}>
-            <button className='absolute right-3 top-2 rounded-full border-white border p-2'onClick={handleClickMobileNavbar}>
-                <RxCross1 className='w-5 h-5' />
-            </button>
-            <div className='bg-indigo-200 space-y-3 p-3 shadow-inner'>
-                { renderUsernameAndStatus }
-                <button 
-                className='px-5 bg-orange-400 hover:bg-orange-500 active:bg-orange-600 shadow-sm rounded-full py-1'
-                onClick={handleClickLogout}>Logout</button>
-            </div>
-            <ul className='leading-6 px-10 py-2 grid'>
-                {
-                    menu.map(listmenu=>{
-                        if (listmenu.jabatan.includes(jabatan)){
-                            if(!listmenu.child){
-                                return (
-                                    <div key={listmenu.id}>
-                                        <Link href={listmenu.pathName}>
-                                            <li className=' border-b-2 border-blue-500 bg-white p-1'><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{listmenu.label}</p></li>
-                                        </Link>
-                                    </div>
-                                )
-                            } else {
-                                return (
-                                    <div key={listmenu.id} className='group leading-7 my-2 rounded-lg'>
-                                        <ul className='bg-blue-200 rounded-lg grid grid-cols-2 gap-3 p-2'>
-                                        {
-                                            listmenu.child.map(childmenu=>{
-                                                if (childmenu.jabatan.includes(jabatan)){
-                                                    return (
-                                                    <div key={childmenu.id} className=''>
-                                                        <Link href={childmenu.pathName}>
-                                                            <li><p className={` border-white hover:bg-white border-b-2 hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
-                                                        </Link>
-                                                    </div>
-                                                    )
-                                                }
-                                            })
-                                        }
-                                        </ul>
-                                    </div>
-                                )
-                            }    
-                        }
-                    })
-                }
-            </ul>
         </div>
-    </div>
+        <div className='md:hidden fixed w-full h-20 px-5 flex items-center justify-between bg-white shadow-md z-30'>
+            { renderUsernameAndStatus }
+            <button className='flex items-center md:hidden' onClick={handleClickMobileNavbar}>
+                <RiMenu3Fill className='w-7 h-7 ' />
+            </button>
+        </div>
+        <div className={`fixed w-full h-full bg-black bg-opacity-70 z-30 ${showMobileView ? 'visible' : 'invisible'}`}>
+            <div className={`w-full h-fit shadow-md bg-white text-center leading-7 relative`}>
+                <button className='absolute right-3 top-2 rounded-full border-white border p-2'onClick={handleClickMobileNavbar}>
+                    <RxCross1 className='w-5 h-5' />
+                </button>
+                <div className='bg-indigo-200 space-y-3 p-3 shadow-inner'>
+                    { renderUsernameAndStatus }
+                    <button 
+                    className='px-5 bg-orange-400 hover:bg-orange-500 active:bg-orange-600 shadow-sm rounded-full py-1'
+                    onClick={handleClickLogout}>Logout</button>
+                </div>
+                <ul className='leading-6 px-10 py-2 grid'>
+                    {
+                        menu.map(listmenu=>{
+                            if (listmenu.jabatan.includes(jabatan)){
+                                if(!listmenu.child){
+                                    return (
+                                        <div key={listmenu.id}>
+                                            <Link href={listmenu.pathName}>
+                                                <li className=' border-b-2 border-blue-500 bg-white p-1'><p className={`px-2 hover:bg-[#98C1D9] hover:rounded-full ${listmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{listmenu.label}</p></li>
+                                            </Link>
+                                        </div>
+                                    )
+                                } else {
+                                    return (
+                                        <div key={listmenu.id} className='group leading-7 my-2 rounded-lg'>
+                                            <ul className='bg-blue-200 rounded-lg grid grid-cols-2 gap-3 p-2'>
+                                            {
+                                                listmenu.child.map(childmenu=>{
+                                                    if (childmenu.jabatan.includes(jabatan)){
+                                                        return (
+                                                        <div key={childmenu.id} className=''>
+                                                            <Link href={childmenu.pathName}>
+                                                                <li><p className={` border-white hover:bg-white border-b-2 hover:rounded-full ${childmenu.pathName === currentPathname && 'font-semibold bg-violet-300 rounded-full'}`}>{childmenu.label}</p></li>
+                                                            </Link>
+                                                        </div>
+                                                        )
+                                                    }
+                                                })
+                                            }
+                                            </ul>
+                                        </div>
+                                    )
+                                }    
+                            }
+                        })
+                    }
+                </ul>
+            </div>
+        </div>
+        </>
+    }
     </>
   )
 }

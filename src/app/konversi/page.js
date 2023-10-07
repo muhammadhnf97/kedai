@@ -106,7 +106,7 @@ const Home = () => {
         notif={notif}
         handleNotif={handleNotif}
     />}
-    <div className='max-w-7xl mx-auto space-y-5'>
+    <div className='max-w-7xl mx-auto space-y-5 mt-20 py-5'>
         <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
         <div className='w-full bg-white rounded-lg shadow-md shadow-gray-300 py-2 px-3 space-y-5 border border-gray-300'>
             <h3 className='text-lg font-semibold'>{page.toUpperCase().slice(0, 1)+page.slice(1)} Barang</h3>

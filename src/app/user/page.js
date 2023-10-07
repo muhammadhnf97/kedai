@@ -50,7 +50,6 @@ const Home = () => {
         try {
           const response = await fetch(`/api/user?page=${currentPage}`)
           const data = await response.json()
-          console.log(data)
           if(data.status === 200){
             setInitialData(data.data)
             setIsLoading(false)
@@ -178,7 +177,7 @@ const Home = () => {
         handleClickResponseNotif={handleClickResponseNotif} 
       />
     }
-    <div className='max-w-7xl mx-auto space-y-5'>
+    <div className='max-w-7xl mx-auto space-y-5 mt-20 py-5'>
       <h3 className='text-center text-3xl font-semibold'>{page}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
         <section className='flex-1'>

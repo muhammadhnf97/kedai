@@ -8,6 +8,7 @@ import { UserProvider } from './user'
 import SupplierProvider from './supplier'
 import { PenjualanProvider } from './penjualan'
 import { NotificationProvider } from './notification'
+import { LayoutProvider } from './layout'
 
 const Providers = ({ children }) => {
   return (
@@ -19,7 +20,9 @@ const Providers = ({ children }) => {
               <SupplierProvider>
                 <PenjualanProvider>
                   <NotificationProvider>
+                    <LayoutProvider>
              {children}
+                    </LayoutProvider>
                   </NotificationProvider>
                 </PenjualanProvider>
              </SupplierProvider>

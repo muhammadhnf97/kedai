@@ -105,7 +105,7 @@ const Home = () => {
                 />
     }
     
-    <div className='max-w-7xl mx-auto space-y-3'>
+    <div className='max-w-7xl mx-auto space-y-3 mt-20 py-5'>
       <h3 className='text-center text-3xl font-semibold'>Ubah Password</h3>
         <div className='w-full bg-white rounded-lg shadow-md shadow-gray-300 p-5 flex justify-center'>
             <form onSubmit={(e)=>handleSubmit(e)}>

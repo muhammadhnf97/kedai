@@ -12,6 +12,8 @@ export async function POST(req) {
             cookieStore.delete('alreadyLogin')
             cookieStore.delete('jabatan')
             cookieStore.delete('email')
+            cookieStore.delete('sessionId')
+            cookieStore.delete('token')
             
             return NextResponse.json({
                 status: 200,

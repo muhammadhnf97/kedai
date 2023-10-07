@@ -63,9 +63,6 @@ const Home = () => {
                 })
                 const data = await response.json()
                 setLaporan(data.data)
-
-                console.log(data)
-                
                 handleNotif(true, data.message)
 
             } catch (error) {
@@ -88,7 +85,7 @@ const Home = () => {
     { isLoading &&
         <Loading />
     }
-    <div className='max-w-7xl mx-auto'>
+    <div className='max-w-7xl mx-auto mt-20 py-5'>
         <section className='w-full h-full bg-white rounded-lg shadow-md shadow-gray-300 border px-5 py-2 flex flex-col gap-3 md:flex-row'>
             <div className='flex-1 space-y-1'>
                 <p className='text-lg font-semibold'>Tanggal</p>

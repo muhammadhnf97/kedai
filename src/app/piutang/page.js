@@ -155,7 +155,7 @@ const page = () => {
         <Notification
             notif={notif}
             handleNotif={handleNotif} />}
-    <div className='max-w-7xl mx-auto space-y-5'>
+    <div className='max-w-7xl mx-auto space-y-5 mt-20 py-5'>
       <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
         <div className='w-full flex gap-3'>
             <section className='w-2/6 p-5 space-y-5 bg-white rounded-lg shadow-md shadow-gray-300'>

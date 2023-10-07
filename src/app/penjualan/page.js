@@ -197,7 +197,7 @@ const page = () => {
       notif={notif}
       handleNotif={handleNotif} />}
     {isLoading && <Loading />}
-    <div className='max-w-7xl mx-auto'>
+    <div className='max-w-7xl mx-auto mt-20 py-5'>
       <div className='flex gap-2'>
         <section 
           className='w-2/6 bg-white rounded-lg 

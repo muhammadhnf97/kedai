@@ -91,7 +91,6 @@ const Home = () => {
                 })
             })
             const data = await response.json()
-            console.log(data)
             handleClickNotification(true, data.message)
         } catch (error) {
             console.error('Ada kesalahan : ', error)
@@ -126,7 +125,7 @@ const Home = () => {
         </div>
       </section>
     }
-    <div className='max-w-7xl mx-auto rounded-lg px-5 flex flex-col gap-5'>
+    <div className='max-w-7xl mx-auto rounded-lg px-5 flex flex-col gap-5 mt-20 py-5'>
         <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
         <div className='flex flex-col w-full gap-2 bg-white rounded-lg shadow-md px-3 py-2 md:flex-row'>
             <section className='w-full'>
