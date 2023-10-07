@@ -252,7 +252,7 @@ const Home = () => {
             handleClickTurunan={handleClickTurunan}
             handleSubmit={handleSubmit}
             handleReset={handleClickEmptyInsert} />
-          <p className='text-sm text-gray-900 font-semibold'>* Jika satuan memiliki turunan, seperti 'dus' yang nanti akan diturunkan menjadi pcs. Maka cantumkan turunan satuannya</p>
+          <p className='text-sm text-gray-900 font-semibold'>* Jika satuan memiliki turunan, seperti &apos;dus&apos; yang nanti akan diturunkan menjadi pcs. Maka cantumkan turunan satuannya</p>
         </section> }
         <section className='flex-1'>
           <Search 

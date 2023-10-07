@@ -18,7 +18,8 @@ import { getDataById, getTotalRow, updateData, getInitialData, deleteData, postD
 const Home = () => {
 
     const { loginData } = useLogin()
-    const { totalAset, getTotalAset, totalAsetBersih, getTotalAsetBersih } = useBarang()
+    const { totalAset, totalAsetBersih } = useBarang()
+    const { getTotalAset, getTotalAsetBersih } = useBarang()
 
     const page = 'barang'
     const searchParam = useSearchParams().get('page')
