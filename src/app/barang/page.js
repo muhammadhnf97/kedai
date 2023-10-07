@@ -59,7 +59,6 @@ const Home = () => {
           setInitialData(data.data)
         })
     }, [currentPage])
-    console.log(initialData)
 
     const handleClickCurrentPage = (page) => {
         setCurrentPage(page)
@@ -292,7 +291,7 @@ const Home = () => {
     <div className='max-w-7xl mx-auto space-y-5'>
       <h3 className='text-center text-3xl font-semibold'>{page.toUpperCase().slice(0,1)+page.slice(1)}</h3>
       <div className='flex flex-col px-2 gap-3 md:px-5 md:flex-row md:gap-5'>
-        { loginData.penanggungJawab !== 'kategori' && <section className='flex-1'>
+        { loginData.penanggungJawab !== 'kategori' && <section className='flex-1 space-y-1'>
           <AddItem
             page={page}
             disable={isLoading}
@@ -302,6 +301,7 @@ const Home = () => {
             handleSubmitInsert={handleSubmit}
             handleClickReset={handleClickEmptyInsert}
           />
+          <p className='text-sm text-gray-900 font-semibold'>* Jika satuan barang yang dibuat bukan pcs, data barang dengan satuan pcs otomatis dibuat</p>
         </section> }
         <section className='flex-1'>
           <Search 
