@@ -50,7 +50,7 @@ const Home = () => {
 
     useEffect(()=>{
       setIsLoading(true)
-      getInitialData(page, currentPage, loginData.token).then(data=>{
+      getInitialData(page, currentPage).then(data=>{
         setIsLoading(false)
         setInitialData(data.data)
       })

@@ -4,12 +4,11 @@ export const getTotalRow = async(page) => {
     return data.totalRow
 }
 
-export const getInitialData = async(page, currentPage, token) => {
+export const getInitialData = async(page, currentPage) => {
     try {
       const response = await fetch(`/api/${page}?page=${currentPage}`, {
         headers: {
           "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
         }
       })
       const data = await response.json()

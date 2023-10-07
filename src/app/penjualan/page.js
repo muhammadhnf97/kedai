@@ -8,7 +8,7 @@ import { useLogin } from '../context/login'
 import Notification from '../components/Notification'
 import { useDebounce } from 'use-debounce'
 
-const page = () => {
+const Home = () => {
   const { loginData } = useLogin()
   const [isLoading, setIsLoading] = useState(true)
   const [listTempBarang, setListTempBarang] = useState([])
@@ -385,4 +385,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Home

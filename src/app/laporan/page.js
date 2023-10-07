@@ -213,8 +213,8 @@ const Home = () => {
                         <tr key={index} className={index % 2 === 0 ? 'bg-blue-200' : 'bg-blue-300'}>
                             <td>{index+1}.</td>
                             {
-                                Object.values(values).map(data=>(
-                                    <td>{data}</td>
+                                Object.values(values).map((data, index)=>(
+                                    <td key={index}>{data}</td>
                                 ))
                             }
                         </tr>

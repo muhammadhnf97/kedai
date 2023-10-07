@@ -5,7 +5,7 @@ import { fieldPiutang } from '../utils/tableName'
 import Loading from '../components/Loading'
 import Notification from '../components/Notification'
 
-const page = () => {
+const Home = () => {
     const page = 'piutang'
     const [konsumen, setKonsumen] = useState([])
     const [allNota, setAllNota] = useState([])
@@ -277,4 +277,4 @@ const page = () => {
   )
 }
 
-export default page
+export default Home
