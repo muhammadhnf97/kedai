@@ -63,6 +63,7 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <head>
         <title>{metadata.title}</title>
+        <link rel="icon" href="/images/icon.png" sizes="any" />
         <meta name="description" content={metadata.description} />
       </head>
       <body className={`h-full flex flex-col bg-slate-100 ${poppins.className}`}>
