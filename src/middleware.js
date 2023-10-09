@@ -5,8 +5,10 @@ export async function middleware(request) {
    const cookieEmail = request.cookies.get('email')
    const currentUrl = new URL(request.url).pathname
 
+   const host = process.env.PUBLIC_URL
+
    if (alreadyLogin) {
-      const response = await fetch(`http://localhost:3000/api/auth`, {
+      const response = await fetch(`${host}/api/auth`, {
          method: 'POST',
          headers: {
             "Content-Type": 'application/json'

@@ -48,7 +48,7 @@ export default function Home() {
 
   return (
     <>
-    <div className="max-w-7xl mx-auto flex flex-col items-center justify-between space-y-5 text-center">
+    <div className="max-w-7xl mx-auto flex flex-col items-center justify-between space-y-5 text-center mt-20 py-5">
       <section className="w-full">
         {
             <StickyNote
